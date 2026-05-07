@@ -28,6 +28,7 @@ const VIEW_TABLE := "table"
 const VIEW_FIXTURES := "fixtures"
 const VIEW_TEAM := "team"
 const VIEW_MATCH := "match"
+const VIEW_TACTICS := "tactics"
 
 
 # --------------------------------------------------------------------------- #
@@ -55,6 +56,14 @@ var current_view: String = VIEW_TABLE
 var selected_team: Team = null
 var selected_match: MatchResult = null
 
+# "Mi club" — el equipo que dirige el usuario (si lo hay).
+# Cuando se establece, el usuario puede personalizar la alineación.
+var user_team_id: String = ""
+# Alineación personalizada del usuario, dict con keys:
+#   formation, eleven_ids (Array[String]), slot_assignments (Array[String]),
+#   tactics: { mentality, tempo, pressing, width }
+var user_lineup_template: Dictionary = {}
+
 # UI refs (populadas en _build_ui)
 var year_label: Label
 var jornada_label: Label
@@ -64,6 +73,8 @@ var segunda_div_button: Button
 var view_table_button: Button
 var view_fixtures_button: Button
 var view_team_button: Button
+var view_tactics_button: Button
+var user_team_label: Label
 var content_area: VBoxContainer
 var advance_button: Button
 var advance_all_button: Button
@@ -145,6 +156,21 @@ func _build_ui() -> void:
 	view_tabs.add_child(view_fixtures_button)
 	view_team_button = _make_tab_button("Plantilla", _on_select_view.bind(VIEW_TEAM))
 	view_tabs.add_child(view_team_button)
+	view_tactics_button = _make_tab_button("Mi alineación", _on_select_view.bind(VIEW_TACTICS))
+	view_tabs.add_child(view_tactics_button)
+
+	# Indicador de "Mi club"
+	var spacer2 := Control.new()
+	spacer2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	view_tabs.add_child(spacer2)
+	user_team_label = Label.new()
+	user_team_label.add_theme_font_size_override("font_size", 13)
+	user_team_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	view_tabs.add_child(user_team_label)
+	var pick_user_button := Button.new()
+	pick_user_button.text = "Cambiar mi club"
+	pick_user_button.pressed.connect(_on_pick_user_team)
+	view_tabs.add_child(pick_user_button)
 
 	vbox.add_child(HSeparator.new())
 
@@ -302,8 +328,18 @@ func _simulate_jornada(state: DivisionState) -> void:
 	for fixture: Dictionary in jornada:
 		var home: Team = team_index[fixture["home_id"]]
 		var away: Team = team_index[fixture["away_id"]]
-		var home_lineup := AutoLineup.pick(home, home.tactics_default.formation)
-		var away_lineup := AutoLineup.pick(away, away.tactics_default.formation)
+		# Si el usuario dirige uno de los equipos, usar su alineación personalizada
+		var home_lineup: Lineup = null
+		var away_lineup: Lineup = null
+		if home.id == user_team_id:
+			home_lineup = _build_user_lineup(home)
+		if away.id == user_team_id:
+			away_lineup = _build_user_lineup(away)
+		# Fallback a AutoLineup
+		if home_lineup == null:
+			home_lineup = AutoLineup.pick(home, home.tactics_default.formation)
+		if away_lineup == null:
+			away_lineup = AutoLineup.pick(away, away.tactics_default.formation)
 		state.seed_counter += 1
 		var result: MatchResult = MatchEngine.simulate(home_lineup, away_lineup, state.seed_counter)
 		if result != null:
@@ -327,7 +363,8 @@ func _on_save_game() -> void:
 	var result: Dictionary = SaveSystem.save_game(
 		"autosave", year, all_teams,
 		primera_state.current_jornada, segunda_state.current_jornada,
-		primera_state.league_table, segunda_state.league_table)
+		primera_state.league_table, segunda_state.league_table,
+		user_team_id, user_lineup_template)
 	if result.get("ok", false):
 		status_label.text = "Partida guardada (autosave) — %s" % result["saved_at"]
 	else:
@@ -358,6 +395,10 @@ func _on_load_game() -> void:
 	segunda_state.last_jornada_results = []
 	primera_state.seed_counter = SEED_BASE * 1000 + primera_state.current_jornada * 100
 	segunda_state.seed_counter = (SEED_BASE + 1) * 1000 + segunda_state.current_jornada * 100
+
+	# Restaurar selección de "mi club" + alineación personal
+	user_team_id = save_data.user_team_id
+	user_lineup_template = save_data.user_lineup_template.duplicate(true)
 
 	current_view = VIEW_TABLE
 	selected_team = null
@@ -405,6 +446,15 @@ func _refresh_ui() -> void:
 	view_table_button.disabled = (current_view == VIEW_TABLE)
 	view_fixtures_button.disabled = (current_view == VIEW_FIXTURES)
 	view_team_button.disabled = (current_view == VIEW_TEAM)
+	view_tactics_button.disabled = (current_view == VIEW_TACTICS)
+	view_tactics_button.visible = user_team_id != ""
+
+	# User team label
+	if user_team_id != "":
+		var ut := _find_team_by_id(user_team_id)
+		user_team_label.text = "Mi club: %s" % (ut.name if ut else user_team_id)
+	else:
+		user_team_label.text = "Sin club seleccionado"
 
 	# Limpiar contenido
 	for c in content_area.get_children():
@@ -415,6 +465,7 @@ func _refresh_ui() -> void:
 		VIEW_FIXTURES: _render_fixtures_view()
 		VIEW_TEAM: _render_team_view()
 		VIEW_MATCH: _render_match_view()
+		VIEW_TACTICS: _render_tactics_view()
 
 
 # --------------------------------------------------------------------------- #
@@ -721,3 +772,256 @@ func _on_team_selector_changed(idx: int, st: DivisionState) -> void:
 	if idx >= 0 and idx < st.teams.size():
 		selected_team = st.teams[idx]
 		_refresh_ui()
+
+
+# =========================================================================== #
+# "Mi club" + Mi alineación
+# =========================================================================== #
+func _find_team_by_id(team_id: String) -> Team:
+	for t: Team in all_teams:
+		if t.id == team_id:
+			return t
+	return null
+
+
+func _on_pick_user_team() -> void:
+	# Diálogo: lista de equipos con OptionButton.
+	# Para v1 simple, abrimos un Popup con OptionButton.
+	var popup := AcceptDialog.new()
+	popup.title = "Elige tu club"
+	popup.size = Vector2(320, 180)
+	add_child(popup)
+	var vbox := VBoxContainer.new()
+	popup.add_child(vbox)
+	var lbl := Label.new()
+	lbl.text = "Selecciona el club que vas a dirigir:"
+	vbox.add_child(lbl)
+	var option := OptionButton.new()
+	option.add_item("(ninguno)", -1)
+	# Equipos ordenados alfabéticamente
+	var sorted_teams: Array = all_teams.duplicate()
+	sorted_teams.sort_custom(func(a: Team, b: Team) -> bool: return a.name < b.name)
+	for i in sorted_teams.size():
+		var t: Team = sorted_teams[i]
+		option.add_item("%s (%s)" % [t.name, t.division.capitalize()], i)
+		if t.id == user_team_id:
+			option.selected = i + 1  # +1 porque el primer item es "(ninguno)"
+	if user_team_id == "":
+		option.selected = 0
+	vbox.add_child(option)
+	popup.confirmed.connect(func() -> void:
+		var sel: int = option.selected
+		if sel <= 0:
+			user_team_id = ""
+		else:
+			user_team_id = sorted_teams[sel - 1].id
+			# Inicializar la alineación con auto-pick para el club elegido
+			_initialize_user_lineup()
+		_refresh_ui()
+		popup.queue_free()
+	)
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
+
+
+func _initialize_user_lineup() -> void:
+	if user_team_id == "":
+		user_lineup_template = {}
+		return
+	var team := _find_team_by_id(user_team_id)
+	if team == null:
+		return
+	var auto := AutoLineup.pick(team, team.tactics_default.formation)
+	user_lineup_template = {
+		"formation": auto.formation,
+		"eleven_ids": auto.starting_eleven.map(func(p: Player) -> String: return p.id),
+		"slot_assignments": auto.slot_assignments.duplicate(),
+		"tactics": {
+			"mentality": auto.tactics.mentality,
+			"tempo": auto.tactics.tempo,
+			"pressing": auto.tactics.pressing,
+			"width": auto.tactics.width,
+		},
+	}
+
+
+func _build_user_lineup(team: Team) -> Lineup:
+	# Construye un Lineup objeto a partir del template guardado, asociado al equipo.
+	if user_lineup_template.is_empty() or team.id != user_team_id:
+		return null
+	var lineup := Lineup.new()
+	lineup.team = team
+	lineup.formation = String(user_lineup_template.get("formation", "4-3-3"))
+	var eleven_ids: Array = user_lineup_template.get("eleven_ids", [])
+	var slot_assignments: Array = user_lineup_template.get("slot_assignments", [])
+	var starting: Array[Player] = []
+	var slots_typed: Array[String] = []
+	for i in eleven_ids.size():
+		var p: Player = team.find_player(String(eleven_ids[i]))
+		if p == null:
+			# Jugador eliminado del equipo (vendido/retirado): regenerar lineup
+			return null
+		starting.append(p)
+		slots_typed.append(String(slot_assignments[i]) if i < slot_assignments.size() else "CM")
+	if starting.size() != 11:
+		return null
+	lineup.starting_eleven = starting
+	lineup.slot_assignments = slots_typed
+	# Banquillo: el resto del equipo, hasta 7
+	var bench: Array[Player] = []
+	for p: Player in team.players:
+		if p in starting:
+			continue
+		if p.injury != null and not p.injury.is_empty() and int(p.injury.get("dias_restantes", 0)) > 0:
+			continue
+		bench.append(p)
+		if bench.size() >= 7:
+			break
+	lineup.subs_available = bench
+	# Tácticas
+	var tactics_dict: Dictionary = user_lineup_template.get("tactics", {})
+	var t := Tactics.new()
+	t.formation = lineup.formation
+	t.mentality = String(tactics_dict.get("mentality", "equilibrado"))
+	t.tempo = String(tactics_dict.get("tempo", "normal"))
+	t.pressing = String(tactics_dict.get("pressing", "medio"))
+	t.width = String(tactics_dict.get("width", "normal"))
+	lineup.tactics = t
+	lineup.auto_picked = false  # ¡no penalización!
+	return lineup
+
+
+# Render de la vista "Mi alineación".
+func _render_tactics_view() -> void:
+	if user_team_id == "":
+		var l := Label.new()
+		l.text = "No has seleccionado un club. Pulsa 'Cambiar mi club' arriba."
+		content_area.add_child(l)
+		return
+	var team := _find_team_by_id(user_team_id)
+	if team == null:
+		var l := Label.new()
+		l.text = "Club %s no encontrado." % user_team_id
+		content_area.add_child(l)
+		return
+	if user_lineup_template.is_empty():
+		_initialize_user_lineup()
+
+	# Cabecera
+	var header := Label.new()
+	header.text = "Alineación de %s" % team.name
+	header.add_theme_font_size_override("font_size", 16)
+	content_area.add_child(header)
+
+	# Formación + tácticas
+	var grid_top := GridContainer.new()
+	grid_top.columns = 2
+	grid_top.add_theme_constant_override("h_separation", 16)
+	content_area.add_child(grid_top)
+	_add_option_row(grid_top, "Formación:", Lineup.FORMATIONS.keys(), user_lineup_template["formation"], func(val: String) -> void:
+		user_lineup_template["formation"] = val
+		# Reasignar slots: como cambia la formación, re-auto-pick
+		_initialize_user_lineup()
+		# Pero preservar la formación elegida
+		user_lineup_template["formation"] = val
+		var auto := AutoLineup.pick(team, val)
+		user_lineup_template["eleven_ids"] = auto.starting_eleven.map(func(p: Player) -> String: return p.id)
+		user_lineup_template["slot_assignments"] = auto.slot_assignments.duplicate()
+		_refresh_ui()
+	)
+	var tactics: Dictionary = user_lineup_template["tactics"]
+	_add_option_row(grid_top, "Mentalidad:", ["muy_defensivo","defensivo","equilibrado","ofensivo","muy_ofensivo"], tactics["mentality"], func(v: String) -> void: user_lineup_template["tactics"]["mentality"] = v)
+	_add_option_row(grid_top, "Tempo:", ["lento","normal","rapido"], tactics["tempo"], func(v: String) -> void: user_lineup_template["tactics"]["tempo"] = v)
+	_add_option_row(grid_top, "Presión:", ["bajo","medio","alto"], tactics["pressing"], func(v: String) -> void: user_lineup_template["tactics"]["pressing"] = v)
+	_add_option_row(grid_top, "Anchura:", ["estrecho","normal","ancho"], tactics["width"], func(v: String) -> void: user_lineup_template["tactics"]["width"] = v)
+
+	content_area.add_child(HSeparator.new())
+
+	# Once inicial
+	var subhead := Label.new()
+	subhead.text = "Once inicial — pulsa un slot para cambiar el jugador"
+	content_area.add_child(subhead)
+
+	var slots: Array = Lineup.FORMATIONS[user_lineup_template["formation"]]
+	var slot_grid := GridContainer.new()
+	slot_grid.columns = 3
+	slot_grid.add_theme_constant_override("h_separation", 14)
+	slot_grid.add_theme_constant_override("v_separation", 4)
+	content_area.add_child(slot_grid)
+
+	var eleven_ids: Array = user_lineup_template["eleven_ids"]
+	for i in slots.size():
+		var slot: String = slots[i]
+		var lbl := Label.new()
+		lbl.text = "%s:" % slot
+		lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		slot_grid.add_child(lbl)
+
+		var current_id: String = String(eleven_ids[i]) if i < eleven_ids.size() else ""
+		var current_player: Player = team.find_player(current_id)
+		var name_lbl := Label.new()
+		name_lbl.text = current_player.name if current_player else "(vacío)"
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		slot_grid.add_child(name_lbl)
+
+		var pick_btn := Button.new()
+		pick_btn.text = "Cambiar"
+		pick_btn.pressed.connect(_on_change_slot_player.bind(i, slot, team))
+		slot_grid.add_child(pick_btn)
+
+
+func _add_option_row(grid: GridContainer, label_text: String, options: Array, current: String, callback: Callable) -> void:
+	var l := Label.new()
+	l.text = label_text
+	grid.add_child(l)
+	var opt := OptionButton.new()
+	for i in options.size():
+		opt.add_item(String(options[i]), i)
+		if String(options[i]) == String(current):
+			opt.selected = i
+	opt.item_selected.connect(func(idx: int) -> void:
+		callback.call(String(options[idx])))
+	grid.add_child(opt)
+
+
+func _on_change_slot_player(slot_idx: int, slot: String, team: Team) -> void:
+	# Diálogo con candidatos compatibles
+	var popup := AcceptDialog.new()
+	popup.title = "Elige jugador para slot %s" % slot
+	popup.size = Vector2(420, 240)
+	add_child(popup)
+	var vbox := VBoxContainer.new()
+	popup.add_child(vbox)
+	var lbl := Label.new()
+	lbl.text = "Candidatos para %s (ordenados por overall):" % slot
+	vbox.add_child(lbl)
+	var option := OptionButton.new()
+	# Excluir al jugador que YA está en el slot (no, sí lo incluimos por si quieren mantenerlo)
+	var taken_ids: Dictionary = {}
+	var eleven_ids: Array = user_lineup_template["eleven_ids"]
+	for j in eleven_ids.size():
+		if j != slot_idx:
+			taken_ids[String(eleven_ids[j])] = true
+	# Listar candidatos (cualquier jugador del team que no sea ya titular en otro slot)
+	var candidates: Array = []
+	for p: Player in team.players:
+		if taken_ids.has(p.id):
+			continue
+		candidates.append({ "player": p, "fit": PlayerFactory.compute_overall(p, slot) * Lineup.position_familiarity(p, slot) })
+	candidates.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a["fit"]) > float(b["fit"]))
+	for i in mini(40, candidates.size()):
+		var p: Player = candidates[i]["player"]
+		var fit: float = candidates[i]["fit"]
+		option.add_item("%s (%s, ovr %d)" % [p.name, ", ".join(p.positions), int(fit)], i)
+	vbox.add_child(option)
+	popup.confirmed.connect(func() -> void:
+		var sel: int = option.selected
+		if sel >= 0 and sel < candidates.size():
+			var chosen: Player = candidates[sel]["player"]
+			user_lineup_template["eleven_ids"][slot_idx] = chosen.id
+		_refresh_ui()
+		popup.queue_free()
+	)
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
