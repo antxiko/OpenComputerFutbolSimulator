@@ -77,6 +77,15 @@ var goal_flash_timer: float = 0.0
 func _ready() -> void:
 	anchor_right = 1.0
 	anchor_bottom = 1.0
+	# Fondo opaco que cubre TODO lo que hay detrás (game_hub) para que no se vea solapado
+	var bg := ColorRect.new()
+	bg.color = Color(0.08, 0.08, 0.10)
+	bg.anchor_right = 1.0
+	bg.anchor_bottom = 1.0
+	bg.mouse_filter = Control.MOUSE_FILTER_STOP  # bloquea clicks al UI de detrás
+	add_child(bg)
+	# Hacemos que el viewer entero también capture input para que no llegue al hub
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	_build_ui()
 
 
