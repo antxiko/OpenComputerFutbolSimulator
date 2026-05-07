@@ -187,18 +187,14 @@ func _build_ui() -> void:
 	view_market_button = _make_tab_button("Mercado", _on_select_view.bind(VIEW_MARKET))
 	view_tabs.add_child(view_market_button)
 
-	# Indicador de "Mi club"
+	# Indicador de "Mi club" (solo lectura — el club se elige en Nueva partida)
 	var spacer2 := Control.new()
 	spacer2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	view_tabs.add_child(spacer2)
 	user_team_label = Label.new()
-	user_team_label.add_theme_font_size_override("font_size", 13)
+	user_team_label.add_theme_font_size_override("font_size", 12)
 	user_team_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 	view_tabs.add_child(user_team_label)
-	var pick_user_button := Button.new()
-	pick_user_button.text = "Cambiar mi club"
-	pick_user_button.pressed.connect(_on_pick_user_team)
-	view_tabs.add_child(pick_user_button)
 
 	vbox.add_child(HSeparator.new())
 
@@ -226,32 +222,38 @@ func _build_ui() -> void:
 	footer.add_child(status_label)
 
 	advance_button = Button.new()
-	advance_button.text = "Siguiente jornada"
+	advance_button.text = "▶ Jornada"
+	advance_button.tooltip_text = "Simular siguiente jornada (con modal pre-partido si juega tu equipo)"
 	advance_button.pressed.connect(_on_advance_jornada)
 	footer.add_child(advance_button)
 
 	advance_all_button = Button.new()
-	advance_all_button.text = "Toda la temporada"
+	advance_all_button.text = "▶▶ Temporada"
+	advance_all_button.tooltip_text = "Simular toda la temporada sin pausas"
 	advance_all_button.pressed.connect(_on_advance_full_season)
 	footer.add_child(advance_all_button)
 
 	reset_button = Button.new()
-	reset_button.text = "Nueva temporada"
+	reset_button.text = "🔁 Nueva temp."
+	reset_button.tooltip_text = "Aplicar asc/desc + aging + cantera + mercado IA, empezar nueva temporada"
 	reset_button.pressed.connect(_on_reset_season)
 	footer.add_child(reset_button)
 
 	save_button = Button.new()
-	save_button.text = "💾 Guardar"
+	save_button.text = "💾"
+	save_button.tooltip_text = "Guardar partida (slot autosave)"
 	save_button.pressed.connect(_on_save_game)
 	footer.add_child(save_button)
 
 	load_button = Button.new()
-	load_button.text = "📂 Cargar"
+	load_button.text = "📂"
+	load_button.tooltip_text = "Cargar partida (slot autosave)"
 	load_button.pressed.connect(_on_load_game)
 	footer.add_child(load_button)
 
 	var menu_button := Button.new()
-	menu_button.text = "🏠 Menú"
+	menu_button.text = "🏠"
+	menu_button.tooltip_text = "Volver al menú principal"
 	menu_button.pressed.connect(_on_back_to_menu)
 	footer.add_child(menu_button)
 
@@ -592,12 +594,12 @@ func _refresh_ui() -> void:
 	view_market_button.disabled = (current_view == VIEW_MARKET)
 	view_market_button.visible = user_team_id != ""
 
-	# User team label
+	# User team label (short_name para que quepa)
 	if user_team_id != "":
 		var ut := _find_team_by_id(user_team_id)
-		user_team_label.text = "Mi club: %s" % (ut.name if ut else user_team_id)
+		user_team_label.text = "🌟 %s" % (ut.short_name if ut else user_team_id)
 	else:
-		user_team_label.text = "Sin club seleccionado"
+		user_team_label.text = ""
 
 	# Limpiar contenido
 	for c in content_area.get_children():
@@ -618,16 +620,20 @@ func _refresh_ui() -> void:
 func _render_table_view() -> void:
 	var grid := GridContainer.new()
 	grid.columns = 10
-	grid.add_theme_constant_override("h_separation", 18)
-	grid.add_theme_constant_override("v_separation", 4)
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 2)
 	content_area.add_child(grid)
 
 	var headers: Array[String] = ["Pos", "Equipo", "PJ", "G", "E", "P", "GF", "GC", "DG", "Pts"]
-	for h in headers:
+	for i in headers.size():
 		var l := Label.new()
-		l.text = h
+		l.text = headers[i]
 		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
-		l.add_theme_font_size_override("font_size", 13)
+		l.add_theme_font_size_override("font_size", 12)
+		# Header de Equipo alineado izquierda; resto centrado/derecha
+		if i == 0 or i >= 2:
+			l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			l.custom_minimum_size = Vector2(28, 0)
 		grid.add_child(l)
 
 	var st := _current_state()
@@ -650,15 +656,18 @@ func _add_table_row(grid: GridContainer, pos: int, row: LeagueTable.TeamRow, n_t
 	elif pos > n_teams - 3:
 		color = Color(1.0, 0.65, 0.65)
 
+	# Ajustamos el ancho del botón de equipo para que el resto de columnas quepan
 	var team_button := Button.new()
 	team_button.text = row.team_name
 	team_button.flat = true
 	team_button.add_theme_color_override("font_color", color)
+	team_button.add_theme_font_size_override("font_size", 12)
 	team_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	team_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	team_button.custom_minimum_size = Vector2(220, 0)  # ancho fijo: nombre cabe pero no domina
+	team_button.clip_text = true
 	team_button.pressed.connect(_on_team_clicked.bind(row.team_id))
 
-	var cells_pre: Array[String] = [str(pos)]
 	var cells_post: Array[String] = [
 		str(row.played), str(row.won), str(row.drawn), str(row.lost),
 		str(row.goals_for), str(row.goals_against),
@@ -666,18 +675,22 @@ func _add_table_row(grid: GridContainer, pos: int, row: LeagueTable.TeamRow, n_t
 	]
 	# Pos
 	var l_pos := Label.new()
-	l_pos.text = cells_pre[0]
+	l_pos.text = str(pos)
 	l_pos.add_theme_color_override("font_color", color)
+	l_pos.add_theme_font_size_override("font_size", 12)
 	l_pos.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	l_pos.custom_minimum_size = Vector2(28, 0)
 	grid.add_child(l_pos)
 	# Equipo (botón clickable)
 	grid.add_child(team_button)
-	# Resto
+	# Resto (compacto, ancho fijo)
 	for c in cells_post:
 		var l := Label.new()
 		l.text = c
 		l.add_theme_color_override("font_color", color)
+		l.add_theme_font_size_override("font_size", 12)
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		l.custom_minimum_size = Vector2(32, 0)
 		grid.add_child(l)
 
 
