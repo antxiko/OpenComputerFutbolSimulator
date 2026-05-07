@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Getafe",
+  "colors": {
+    "primary": "#003F87",
+    "secondary": "#FFFFFF"
+  },
+  "division": "primera",
+  "finances": {
+    "budget_transfers_eur": 5000000,
+    "tv_revenue_eur_year": 40000000,
+    "wage_budget_eur_year": 32000000
+  },
+  "founded": 1983,
+  "id": "getafe_cf",
+  "manager": {
+    "birth_year": 1964,
+    "name": "José Bordalás",
+    "nationality": "ES",
+    "preferred_formation": "4-4-2",
+    "preferred_style": "directo"
+  },
+  "name": "Getafe Club de Fútbol",
+  "players": [
+    {
+      "birth_date": {
+        "day": 3,
+        "month": 12,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 742926,
+        "until_year": 2030
+      },
+      "id": "get_p001",
+      "joined_year": 2024,
+      "name": "GET Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 1,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 4,
+        "month": 9,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 808843,
+        "until_year": 2029
+      },
+      "id": "get_p002",
+      "joined_year": 2026,
+      "name": "GET Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 13,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 10,
+        "year": 2010
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 481167,
+        "until_year": 2028
+      },
+      "id": "get_p003",
+      "joined_year": 2020,
+      "name": "GET Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 25,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 7,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 3971658,
+        "until_year": 2031
+      },
+      "id": "get_p004",
+      "joined_year": 2020,
+      "name": "GET Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 4,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 3,
+        "month": 6,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2219200,
+        "until_year": 2028
+      },
+      "id": "get_p005",
+      "joined_year": 2025,
+      "name": "GET Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 5,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 4,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 849719,
+        "until_year": 2029
+      },
+      "id": "get_p006",
+      "joined_year": 2020,
+      "name": "GET Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 14,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 3,
+        "year": 2010
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 409395,
+        "until_year": 2031
+      },
+      "id": "get_p007",
+      "joined_year": 2022,
+      "name": "GET Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 22,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 3,
+        "month": 3,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 966603,
+        "until_year": 2029
+      },
+      "id": "get_p008",
+      "joined_year": 2020,
+      "name": "GET Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 3,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 9,
+        "month": 8,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 947123,
+        "until_year": 2031
+      },
+      "id": "get_p009",
+      "joined_year": 2025,
+      "name": "GET Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 4,
+        "month": 2,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2065447,
+        "until_year": 2031
+      },
+      "id": "get_p010",
+      "joined_year": 2022,
+      "name": "GET Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 2,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 12,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 887909,
+        "until_year": 2028
+      },
+      "id": "get_p011",
+      "joined_year": 2024,
+      "name": "GET Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 16,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 11,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 3599347,
+        "until_year": 2028
+      },
+      "id": "get_p012",
+      "joined_year": 2025,
+      "name": "GET Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 6,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 3,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 728555,
+        "until_year": 2029
+      },
+      "id": "get_p013",
+      "joined_year": 2024,
+      "name": "GET Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 23,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 12,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2312308,
+        "until_year": 2031
+      },
+      "id": "get_p014",
+      "joined_year": 2024,
+      "name": "GET Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 8,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 9,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2104125,
+        "until_year": 2030
+      },
+      "id": "get_p015",
+      "joined_year": 2026,
+      "name": "GET Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 18,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 3,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2178744,
+        "until_year": 2028
+      },
+      "id": "get_p016",
+      "joined_year": 2022,
+      "name": "GET Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 21,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 24,
+        "month": 9,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 785262,
+        "until_year": 2031
+      },
+      "id": "get_p017",
+      "joined_year": 2020,
+      "name": "GET Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 10,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 4,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 791329,
+        "until_year": 2031
+      },
+      "id": "get_p018",
+      "joined_year": 2023,
+      "name": "GET Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 20,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 11,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 901520,
+        "until_year": 2029
+      },
+      "id": "get_p019",
+      "joined_year": 2024,
+      "name": "GET Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 11,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 4,
+        "month": 2,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 1031591,
+        "until_year": 2031
+      },
+      "id": "get_p020",
+      "joined_year": 2025,
+      "name": "GET Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 19,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 22,
+        "month": 12,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 3790375,
+        "until_year": 2030
+      },
+      "id": "get_p021",
+      "joined_year": 2022,
+      "name": "GET Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 7,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 2,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1614229,
+        "until_year": 2028
+      },
+      "id": "get_p022",
+      "joined_year": 2024,
+      "name": "GET Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 15,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 3,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1330884,
+        "until_year": 2030
+      },
+      "id": "get_p023",
+      "joined_year": 2022,
+      "name": "GET Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 9,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 1,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 527108,
+        "until_year": 2031
+      },
+      "id": "get_p024",
+      "joined_year": 2022,
+      "name": "GET Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 24,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 9,
+        "year": 2006
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 199913,
+        "until_year": 2031
+      },
+      "id": "get_p025",
+      "joined_year": 2024,
+      "name": "GET Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 27,
+      "tier": "Y",
+      "traits": []
+    }
+  ],
+  "reputation": 58,
+  "short_name": "GET",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 17393,
+    "name": "Coliseum"
+  },
+  "tactics_default": {
+    "formation": "4-4-2",
+    "mentality": "defensivo",
+    "pressing": "alto",
+    "tempo": "lento",
+    "width": "estrecho"
+  }
+}

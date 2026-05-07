@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Eibar",
+  "colors": {
+    "primary": "#B30000",
+    "secondary": "#1F4998"
+  },
+  "division": "segunda",
+  "finances": {
+    "budget_transfers_eur": 1500000,
+    "tv_revenue_eur_year": 7000000,
+    "wage_budget_eur_year": 10000000
+  },
+  "founded": 1940,
+  "id": "sd_eibar",
+  "manager": {
+    "birth_year": 1975,
+    "name": "Por confirmar",
+    "nationality": "ES",
+    "preferred_formation": "4-2-3-1",
+    "preferred_style": "equilibrado"
+  },
+  "name": "Sociedad Deportiva Eibar",
+  "players": [
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 9,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 663157,
+        "until_year": 2031
+      },
+      "id": "eib_p001",
+      "joined_year": 2026,
+      "name": "EIB Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 1,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 22,
+        "month": 5,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 846219,
+        "until_year": 2031
+      },
+      "id": "eib_p002",
+      "joined_year": 2026,
+      "name": "EIB Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 13,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 11,
+        "year": 2006
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 868515,
+        "until_year": 2029
+      },
+      "id": "eib_p003",
+      "joined_year": 2024,
+      "name": "EIB Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 25,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 25,
+        "month": 1,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 892928,
+        "until_year": 2030
+      },
+      "id": "eib_p004",
+      "joined_year": 2020,
+      "name": "EIB Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 4,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 16,
+        "month": 8,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 711001,
+        "until_year": 2028
+      },
+      "id": "eib_p005",
+      "joined_year": 2020,
+      "name": "EIB Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 5,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 20,
+        "month": 3,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 325055,
+        "until_year": 2031
+      },
+      "id": "eib_p006",
+      "joined_year": 2026,
+      "name": "EIB Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "R",
+      "shirt_number": 14,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 7,
+        "year": 2008
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 258552,
+        "until_year": 2028
+      },
+      "id": "eib_p007",
+      "joined_year": 2021,
+      "name": "EIB Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 22,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 8,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1860304,
+        "until_year": 2030
+      },
+      "id": "eib_p008",
+      "joined_year": 2025,
+      "name": "EIB Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 3,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 2,
+        "month": 4,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 705132,
+        "until_year": 2031
+      },
+      "id": "eib_p009",
+      "joined_year": 2023,
+      "name": "EIB Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 5,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 804787,
+        "until_year": 2029
+      },
+      "id": "eib_p010",
+      "joined_year": 2021,
+      "name": "EIB Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 2,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 1,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 385630,
+        "until_year": 2028
+      },
+      "id": "eib_p011",
+      "joined_year": 2020,
+      "name": "EIB Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "R",
+      "shirt_number": 16,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 12,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1783668,
+        "until_year": 2029
+      },
+      "id": "eib_p012",
+      "joined_year": 2020,
+      "name": "EIB Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 6,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 9,
+        "month": 5,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 615666,
+        "until_year": 2031
+      },
+      "id": "eib_p013",
+      "joined_year": 2026,
+      "name": "EIB Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 23,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 3,
+        "month": 1,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 502861,
+        "until_year": 2029
+      },
+      "id": "eib_p014",
+      "joined_year": 2025,
+      "name": "EIB Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 8,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 7,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 850504,
+        "until_year": 2028
+      },
+      "id": "eib_p015",
+      "joined_year": 2024,
+      "name": "EIB Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 18,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 2,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 539475,
+        "until_year": 2031
+      },
+      "id": "eib_p016",
+      "joined_year": 2022,
+      "name": "EIB Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 21,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 1,
+        "month": 3,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1326157,
+        "until_year": 2029
+      },
+      "id": "eib_p017",
+      "joined_year": 2024,
+      "name": "EIB Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 10,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 2,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 770416,
+        "until_year": 2028
+      },
+      "id": "eib_p018",
+      "joined_year": 2021,
+      "name": "EIB Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 20,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 2,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 637546,
+        "until_year": 2028
+      },
+      "id": "eib_p019",
+      "joined_year": 2023,
+      "name": "EIB Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 11,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 11,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 706162,
+        "until_year": 2030
+      },
+      "id": "eib_p020",
+      "joined_year": 2022,
+      "name": "EIB Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 19,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 22,
+        "month": 5,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 667693,
+        "until_year": 2029
+      },
+      "id": "eib_p021",
+      "joined_year": 2024,
+      "name": "EIB Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 7,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 4,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 467193,
+        "until_year": 2029
+      },
+      "id": "eib_p022",
+      "joined_year": 2021,
+      "name": "EIB Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "R",
+      "shirt_number": 15,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 9,
+        "month": 6,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1623336,
+        "until_year": 2031
+      },
+      "id": "eib_p023",
+      "joined_year": 2025,
+      "name": "EIB Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 9,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 20,
+        "month": 10,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 458424,
+        "until_year": 2028
+      },
+      "id": "eib_p024",
+      "joined_year": 2025,
+      "name": "EIB Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 24,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 3,
+        "month": 12,
+        "year": 2010
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 349109,
+        "until_year": 2031
+      },
+      "id": "eib_p025",
+      "joined_year": 2022,
+      "name": "EIB Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 27,
+      "tier": "Y",
+      "traits": []
+    }
+  ],
+  "reputation": 44,
+  "short_name": "EIB",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 8050,
+    "name": "Ipurua"
+  },
+  "tactics_default": {
+    "formation": "4-2-3-1",
+    "mentality": "equilibrado",
+    "pressing": "alto",
+    "tempo": "normal",
+    "width": "normal"
+  }
+}

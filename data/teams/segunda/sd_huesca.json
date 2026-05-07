@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Huesca",
+  "colors": {
+    "primary": "#003F87",
+    "secondary": "#BF1530"
+  },
+  "division": "segunda",
+  "finances": {
+    "budget_transfers_eur": 1200000,
+    "tv_revenue_eur_year": 6500000,
+    "wage_budget_eur_year": 8500000
+  },
+  "founded": 1960,
+  "id": "sd_huesca",
+  "manager": {
+    "birth_year": 1975,
+    "name": "Por confirmar",
+    "nationality": "ES",
+    "preferred_formation": "4-2-3-1",
+    "preferred_style": "equilibrado"
+  },
+  "name": "Sociedad Deportiva Huesca",
+  "players": [
+    {
+      "birth_date": {
+        "day": 20,
+        "month": 3,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 823797,
+        "until_year": 2028
+      },
+      "id": "hue_p001",
+      "joined_year": 2022,
+      "name": "HUE Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 1,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 17,
+        "month": 4,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 510697,
+        "until_year": 2029
+      },
+      "id": "hue_p002",
+      "joined_year": 2024,
+      "name": "HUE Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 13,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 24,
+        "month": 1,
+        "year": 2006
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 324067,
+        "until_year": 2029
+      },
+      "id": "hue_p003",
+      "joined_year": 2023,
+      "name": "HUE Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 25,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 4,
+        "month": 12,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 825211,
+        "until_year": 2029
+      },
+      "id": "hue_p004",
+      "joined_year": 2023,
+      "name": "HUE Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 4,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 2,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1857735,
+        "until_year": 2029
+      },
+      "id": "hue_p005",
+      "joined_year": 2026,
+      "name": "HUE Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 5,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 9,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 472021,
+        "until_year": 2030
+      },
+      "id": "hue_p006",
+      "joined_year": 2023,
+      "name": "HUE Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "R",
+      "shirt_number": 14,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 4,
+        "year": 2005
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 510788,
+        "until_year": 2029
+      },
+      "id": "hue_p007",
+      "joined_year": 2022,
+      "name": "HUE Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 22,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 9,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 513624,
+        "until_year": 2031
+      },
+      "id": "hue_p008",
+      "joined_year": 2026,
+      "name": "HUE Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 3,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 3,
+        "month": 5,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 659502,
+        "until_year": 2030
+      },
+      "id": "hue_p009",
+      "joined_year": 2024,
+      "name": "HUE Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 1,
+        "month": 9,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1896022,
+        "until_year": 2028
+      },
+      "id": "hue_p010",
+      "joined_year": 2025,
+      "name": "HUE Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 2,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 5,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 453708,
+        "until_year": 2031
+      },
+      "id": "hue_p011",
+      "joined_year": 2024,
+      "name": "HUE Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 16,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 2,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 602514,
+        "until_year": 2031
+      },
+      "id": "hue_p012",
+      "joined_year": 2021,
+      "name": "HUE Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 6,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 5,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 826435,
+        "until_year": 2029
+      },
+      "id": "hue_p013",
+      "joined_year": 2022,
+      "name": "HUE Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 23,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 6,
+        "month": 9,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 794179,
+        "until_year": 2028
+      },
+      "id": "hue_p014",
+      "joined_year": 2020,
+      "name": "HUE Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 8,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 4,
+        "month": 6,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1245198,
+        "until_year": 2030
+      },
+      "id": "hue_p015",
+      "joined_year": 2025,
+      "name": "HUE Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 18,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 3,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 825128,
+        "until_year": 2030
+      },
+      "id": "hue_p016",
+      "joined_year": 2023,
+      "name": "HUE Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 21,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 5,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1634878,
+        "until_year": 2030
+      },
+      "id": "hue_p017",
+      "joined_year": 2023,
+      "name": "HUE Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 10,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 6,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 814599,
+        "until_year": 2028
+      },
+      "id": "hue_p018",
+      "joined_year": 2023,
+      "name": "HUE Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 20,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 14,
+        "month": 1,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 839646,
+        "until_year": 2030
+      },
+      "id": "hue_p019",
+      "joined_year": 2024,
+      "name": "HUE Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 11,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 4,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 783575,
+        "until_year": 2031
+      },
+      "id": "hue_p020",
+      "joined_year": 2025,
+      "name": "HUE Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 19,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 2,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1401147,
+        "until_year": 2030
+      },
+      "id": "hue_p021",
+      "joined_year": 2023,
+      "name": "HUE Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 7,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 21,
+        "month": 7,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 746321,
+        "until_year": 2028
+      },
+      "id": "hue_p022",
+      "joined_year": 2021,
+      "name": "HUE Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 15,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 1,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 568581,
+        "until_year": 2030
+      },
+      "id": "hue_p023",
+      "joined_year": 2025,
+      "name": "HUE Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 9,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 13,
+        "month": 9,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 609873,
+        "until_year": 2030
+      },
+      "id": "hue_p024",
+      "joined_year": 2023,
+      "name": "HUE Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 24,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 13,
+        "month": 9,
+        "year": 2006
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 689094,
+        "until_year": 2028
+      },
+      "id": "hue_p025",
+      "joined_year": 2025,
+      "name": "HUE Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 27,
+      "tier": "D",
+      "traits": []
+    }
+  ],
+  "reputation": 42,
+  "short_name": "HUE",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 9099,
+    "name": "El Alcoraz"
+  },
+  "tactics_default": {
+    "formation": "4-2-3-1",
+    "mentality": "equilibrado",
+    "pressing": "medio",
+    "tempo": "normal",
+    "width": "normal"
+  }
+}

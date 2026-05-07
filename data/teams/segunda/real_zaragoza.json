@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Zaragoza",
+  "colors": {
+    "primary": "#003F87",
+    "secondary": "#FFFFFF"
+  },
+  "division": "segunda",
+  "finances": {
+    "budget_transfers_eur": 2500000,
+    "tv_revenue_eur_year": 9000000,
+    "wage_budget_eur_year": 15000000
+  },
+  "founded": 1932,
+  "id": "real_zaragoza",
+  "manager": {
+    "birth_year": 1975,
+    "name": "Por confirmar",
+    "nationality": "ES",
+    "preferred_formation": "4-2-3-1",
+    "preferred_style": "equilibrado"
+  },
+  "name": "Real Zaragoza",
+  "players": [
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 11,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 908046,
+        "until_year": 2031
+      },
+      "id": "zar_p001",
+      "joined_year": 2021,
+      "name": "ZAR Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 1,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 1,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1151228,
+        "until_year": 2030
+      },
+      "id": "zar_p002",
+      "joined_year": 2021,
+      "name": "ZAR Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 13,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 22,
+        "month": 2,
+        "year": 2005
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 493374,
+        "until_year": 2030
+      },
+      "id": "zar_p003",
+      "joined_year": 2021,
+      "name": "ZAR Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 25,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 1,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1238466,
+        "until_year": 2028
+      },
+      "id": "zar_p004",
+      "joined_year": 2025,
+      "name": "ZAR Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 4,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 6,
+        "month": 1,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 900454,
+        "until_year": 2029
+      },
+      "id": "zar_p005",
+      "joined_year": 2025,
+      "name": "ZAR Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 5,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 3,
+        "month": 6,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1701110,
+        "until_year": 2030
+      },
+      "id": "zar_p006",
+      "joined_year": 2021,
+      "name": "ZAR Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 14,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 21,
+        "month": 3,
+        "year": 2005
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 607673,
+        "until_year": 2028
+      },
+      "id": "zar_p007",
+      "joined_year": 2020,
+      "name": "ZAR Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 22,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 14,
+        "month": 12,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 663355,
+        "until_year": 2030
+      },
+      "id": "zar_p008",
+      "joined_year": 2024,
+      "name": "ZAR Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 3,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 7,
+        "month": 8,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 591674,
+        "until_year": 2031
+      },
+      "id": "zar_p009",
+      "joined_year": 2023,
+      "name": "ZAR Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 10,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 3949457,
+        "until_year": 2029
+      },
+      "id": "zar_p010",
+      "joined_year": 2024,
+      "name": "ZAR Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 2,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 12,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 480349,
+        "until_year": 2029
+      },
+      "id": "zar_p011",
+      "joined_year": 2026,
+      "name": "ZAR Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 16,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 15,
+        "month": 6,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 499722,
+        "until_year": 2030
+      },
+      "id": "zar_p012",
+      "joined_year": 2021,
+      "name": "ZAR Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 6,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 3,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 667786,
+        "until_year": 2029
+      },
+      "id": "zar_p013",
+      "joined_year": 2023,
+      "name": "ZAR Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 23,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 6,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 3912269,
+        "until_year": 2028
+      },
+      "id": "zar_p014",
+      "joined_year": 2021,
+      "name": "ZAR Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 8,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 6,
+        "month": 2,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 2850384,
+        "until_year": 2030
+      },
+      "id": "zar_p015",
+      "joined_year": 2025,
+      "name": "ZAR Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 18,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 2,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 586457,
+        "until_year": 2030
+      },
+      "id": "zar_p016",
+      "joined_year": 2021,
+      "name": "ZAR Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 21,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 9,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2018036,
+        "until_year": 2030
+      },
+      "id": "zar_p017",
+      "joined_year": 2023,
+      "name": "ZAR Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 10,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 11,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1998436,
+        "until_year": 2029
+      },
+      "id": "zar_p018",
+      "joined_year": 2021,
+      "name": "ZAR Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 20,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 10,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1158446,
+        "until_year": 2030
+      },
+      "id": "zar_p019",
+      "joined_year": 2024,
+      "name": "ZAR Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 11,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 6,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 861323,
+        "until_year": 2028
+      },
+      "id": "zar_p020",
+      "joined_year": 2022,
+      "name": "ZAR Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 19,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 1,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 698363,
+        "until_year": 2029
+      },
+      "id": "zar_p021",
+      "joined_year": 2022,
+      "name": "ZAR Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 7,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 7,
+        "month": 2,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 607229,
+        "until_year": 2029
+      },
+      "id": "zar_p022",
+      "joined_year": 2026,
+      "name": "ZAR Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 15,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 7,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1073093,
+        "until_year": 2030
+      },
+      "id": "zar_p023",
+      "joined_year": 2025,
+      "name": "ZAR Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 9,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 22,
+        "month": 2,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 536801,
+        "until_year": 2030
+      },
+      "id": "zar_p024",
+      "joined_year": 2022,
+      "name": "ZAR Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 24,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 24,
+        "month": 12,
+        "year": 2008
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 776110,
+        "until_year": 2031
+      },
+      "id": "zar_p025",
+      "joined_year": 2025,
+      "name": "ZAR Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 27,
+      "tier": "D",
+      "traits": []
+    }
+  ],
+  "reputation": 50,
+  "short_name": "ZAR",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 33608,
+    "name": "La Romareda"
+  },
+  "tactics_default": {
+    "formation": "4-2-3-1",
+    "mentality": "equilibrado",
+    "pressing": "medio",
+    "tempo": "normal",
+    "width": "normal"
+  }
+}

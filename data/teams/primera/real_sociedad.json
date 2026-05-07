@@ -1,0 +1,240 @@
+{
+  "_draft_note": "BORRADOR temporada 2025-26. Verificar fichajes/altas/bajas (Zubimendi se rumoreaba a Arsenal verano 2025; estado de Imanol como entrenador) y dorsales antes de simular.",
+  "id": "real_sociedad",
+  "name": "Real Sociedad de Fútbol",
+  "short_name": "RSO",
+  "city": "San Sebastián",
+  "founded": 1909,
+  "stadium": {
+    "name": "Reale Arena",
+    "capacity": 39500
+  },
+  "colors": {
+    "primary": "#0067B1",
+    "secondary": "#FFFFFF"
+  },
+  "division": "primera",
+  "reputation": 76,
+  "signing_policy": "open",
+  "manager": {
+    "name": "Sergio Francisco",
+    "nationality": "ES",
+    "birth_year": 1983,
+    "preferred_formation": "4-3-3",
+    "preferred_style": "posesion"
+  },
+  "tactics_default": {
+    "formation": "4-3-3",
+    "mentality": "equilibrado",
+    "tempo": "normal",
+    "pressing": "medio",
+    "width": "normal"
+  },
+  "finances": {
+    "budget_transfers_eur": 25000000,
+    "wage_budget_eur_year": 80000000,
+    "tv_revenue_eur_year": 65000000
+  },
+  "players": [
+    {
+      "id": "rso_p001", "name": "Álex Remiro",
+      "birth_date": { "year": 1995, "month": 3, "day": 24 },
+      "nationality": "ES", "positions": ["GK"], "preferred_foot": "R",
+      "tier": "A", "potential_tier": "A", "shirt_number": 1, "captain": false,
+      "traits": ["leader", "passing_accurate"], "overrides": {},
+      "joined_year": 2019,
+      "contract": { "until_year": 2028, "salary_eur_year": 4000000, "release_clause_eur": 50000000 }
+    },
+    {
+      "id": "rso_p013", "name": "Unai Marrero",
+      "birth_date": { "year": 2000, "month": 5, "day": 5 },
+      "nationality": "ES", "positions": ["GK"], "preferred_foot": "R",
+      "tier": "C", "potential_tier": "B", "shirt_number": 13, "captain": false,
+      "traits": [], "overrides": {},
+      "joined_year": 2017,
+      "contract": { "until_year": 2027, "salary_eur_year": 700000, "release_clause_eur": 10000000 }
+    },
+    {
+      "id": "rso_p025", "name": "Jokin Ezkieta",
+      "birth_date": { "year": 1997, "month": 2, "day": 7 },
+      "nationality": "ES", "positions": ["GK"], "preferred_foot": "R",
+      "tier": "C", "potential_tier": "B", "shirt_number": 25, "captain": false,
+      "traits": [], "overrides": {},
+      "joined_year": 2023,
+      "contract": { "until_year": 2026, "salary_eur_year": 600000, "release_clause_eur": 5000000 }
+    },
+    {
+      "id": "rso_p006", "name": "Igor Zubeldia",
+      "birth_date": { "year": 1997, "month": 3, "day": 30 },
+      "nationality": "ES", "positions": ["CB", "CDM"], "preferred_foot": "R",
+      "tier": "B", "potential_tier": "A", "shirt_number": 6, "captain": false,
+      "traits": ["passing_accurate"], "overrides": {},
+      "joined_year": 2014,
+      "contract": { "until_year": 2028, "salary_eur_year": 3000000, "release_clause_eur": 50000000 }
+    },
+    {
+      "id": "rso_p004", "name": "Aritz Elustondo",
+      "birth_date": { "year": 1994, "month": 3, "day": 28 },
+      "nationality": "ES", "positions": ["CB"], "preferred_foot": "R",
+      "tier": "B", "potential_tier": "B", "shirt_number": 4, "captain": false,
+      "traits": ["aerial_strong", "leader"], "overrides": {},
+      "joined_year": 2014,
+      "contract": { "until_year": 2026, "salary_eur_year": 2200000, "release_clause_eur": 15000000 }
+    },
+    {
+      "id": "rso_p005", "name": "Jon Pacheco",
+      "birth_date": { "year": 2001, "month": 3, "day": 8 },
+      "nationality": "ES", "positions": ["CB"], "preferred_foot": "R",
+      "tier": "B", "potential_tier": "A", "shirt_number": 5, "captain": false,
+      "traits": ["passing_accurate"], "overrides": {},
+      "joined_year": 2018,
+      "contract": { "until_year": 2028, "salary_eur_year": 1500000, "release_clause_eur": 30000000 }
+    },
+    {
+      "id": "rso_p012", "name": "Hamari Traoré",
+      "birth_date": { "year": 1992, "month": 1, "day": 27 },
+      "nationality": "ML", "positions": ["RB"], "preferred_foot": "R",
+      "tier": "B", "potential_tier": "B", "shirt_number": 12, "captain": false,
+      "traits": ["pace"], "overrides": {},
+      "joined_year": 2023,
+      "contract": { "until_year": 2026, "salary_eur_year": 2200000, "release_clause_eur": 15000000 }
+    },
+    {
+      "id": "rso_p022", "name": "Jon Aramburu",
+      "birth_date": { "year": 2002, "month": 8, "day": 22 },
+      "nationality": "VE", "positions": ["RB"], "preferred_foot": "R",
+      "tier": "C", "potential_tier": "B", "shirt_number": 22, "captain": false,
+      "traits": ["pace"], "overrides": {},
+      "joined_year": 2023,
+      "contract": { "until_year": 2027, "salary_eur_year": 900000, "release_clause_eur": 20000000 }
+    },
+    {
+      "id": "rso_p003", "name": "Aihen Muñoz",
+      "birth_date": { "year": 1997, "month": 8, "day": 16 },
+      "nationality": "ES", "positions": ["LB"], "preferred_foot": "L",
+      "tier": "B", "potential_tier": "B", "shirt_number": 3, "captain": false,
+      "traits": [], "overrides": {},
+      "joined_year": 2014,
+      "contract": { "until_year": 2027, "salary_eur_year": 1800000, "release_clause_eur": 25000000 }
+    },
+    {
+      "id": "rso_p019", "name": "Sergio Gómez",
+      "birth_date": { "year": 2000, "month": 9, "day": 4 },
+      "nationality": "ES", "positions": ["LB"], "preferred_foot": "L",
+      "tier": "B", "potential_tier": "A", "shirt_number": 19, "captain": false,
+      "traits": ["set_pieces", "pace"], "overrides": {},
+      "joined_year": 2024,
+      "contract": { "until_year": 2029, "salary_eur_year": 2500000, "release_clause_eur": 35000000 }
+    },
+    {
+      "id": "rso_p008", "name": "Mikel Merino",
+      "birth_date": { "year": 1996, "month": 6, "day": 22 },
+      "nationality": "ES", "positions": ["CM", "CDM"], "preferred_foot": "R",
+      "tier": "C", "potential_tier": "B", "shirt_number": 8, "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2025,
+      "contract": { "until_year": 2027, "salary_eur_year": 1500000, "release_clause_eur": 20000000 },
+      "_note": "Mikel Merino se fue al Arsenal verano 2024; usar este slot como hueco a verificar (probable canterano o fichaje verano 2025)."
+    },
+    {
+      "id": "rso_p020", "name": "Beñat Turrientes",
+      "birth_date": { "year": 2002, "month": 4, "day": 29 },
+      "nationality": "ES", "positions": ["CM"], "preferred_foot": "R",
+      "tier": "C", "potential_tier": "B", "shirt_number": 20, "captain": false,
+      "traits": ["stamina"], "overrides": {},
+      "joined_year": 2018,
+      "contract": { "until_year": 2027, "salary_eur_year": 1100000, "release_clause_eur": 20000000 }
+    },
+    {
+      "id": "rso_p018", "name": "Pablo Marín",
+      "birth_date": { "year": 2003, "month": 1, "day": 23 },
+      "nationality": "ES", "positions": ["CM", "CDM"], "preferred_foot": "R",
+      "tier": "C", "potential_tier": "A", "shirt_number": 18, "captain": false,
+      "traits": ["tackling"], "overrides": {},
+      "joined_year": 2018,
+      "contract": { "until_year": 2028, "salary_eur_year": 800000, "release_clause_eur": 30000000 }
+    },
+    {
+      "id": "rso_p021", "name": "Luka Sučić",
+      "birth_date": { "year": 2002, "month": 9, "day": 8 },
+      "nationality": "AT", "positions": ["CM", "CAM"], "preferred_foot": "R",
+      "tier": "B", "potential_tier": "A", "shirt_number": 21, "captain": false,
+      "traits": ["dribbling", "long_shots"], "overrides": {},
+      "joined_year": 2024,
+      "contract": { "until_year": 2029, "salary_eur_year": 2200000, "release_clause_eur": 40000000 }
+    },
+    {
+      "id": "rso_p011", "name": "Brais Méndez",
+      "birth_date": { "year": 1997, "month": 1, "day": 7 },
+      "nationality": "ES", "positions": ["CAM", "RW"], "preferred_foot": "R",
+      "tier": "B", "potential_tier": "A", "shirt_number": 11, "captain": false,
+      "traits": ["long_shots", "set_pieces"], "overrides": {},
+      "joined_year": 2022,
+      "contract": { "until_year": 2027, "salary_eur_year": 3500000, "release_clause_eur": 35000000 }
+    },
+    {
+      "id": "rso_p014", "name": "Takefusa Kubo",
+      "birth_date": { "year": 2001, "month": 6, "day": 4 },
+      "nationality": "JP", "positions": ["RW", "CAM"], "preferred_foot": "L",
+      "tier": "A", "potential_tier": "S", "shirt_number": 14, "captain": false,
+      "traits": ["dribbling", "skill_moves"], "overrides": {},
+      "joined_year": 2022,
+      "contract": { "until_year": 2029, "salary_eur_year": 4500000, "release_clause_eur": 60000000 }
+    },
+    {
+      "id": "rso_p010", "name": "Mikel Oyarzabal",
+      "birth_date": { "year": 1997, "month": 4, "day": 21 },
+      "nationality": "ES", "positions": ["LW", "ST"], "preferred_foot": "R",
+      "tier": "A", "potential_tier": "A", "shirt_number": 10, "captain": true,
+      "traits": ["leader", "finishing", "set_pieces"], "overrides": {},
+      "joined_year": 2014,
+      "contract": { "until_year": 2028, "salary_eur_year": 5500000, "release_clause_eur": 60000000 }
+    },
+    {
+      "id": "rso_p024", "name": "Ander Barrenetxea",
+      "birth_date": { "year": 2001, "month": 12, "day": 27 },
+      "nationality": "ES", "positions": ["LW", "RW"], "preferred_foot": "R",
+      "tier": "B", "potential_tier": "A", "shirt_number": 24, "captain": false,
+      "traits": ["dribbling", "pace"], "overrides": {},
+      "joined_year": 2014,
+      "contract": { "until_year": 2027, "salary_eur_year": 1800000, "release_clause_eur": 30000000 }
+    },
+    {
+      "id": "rso_p007", "name": "Sheraldo Becker",
+      "birth_date": { "year": 1995, "month": 2, "day": 9 },
+      "nationality": "SR", "positions": ["RW", "ST"], "preferred_foot": "L",
+      "tier": "B", "potential_tier": "A", "shirt_number": 7, "captain": false,
+      "traits": ["pace", "finishing"], "overrides": {},
+      "joined_year": 2024,
+      "contract": { "until_year": 2028, "salary_eur_year": 2800000, "release_clause_eur": 25000000 }
+    },
+    {
+      "id": "rso_p009", "name": "Umar Sadiq",
+      "birth_date": { "year": 1997, "month": 2, "day": 2 },
+      "nationality": "NG", "positions": ["ST"], "preferred_foot": "R",
+      "tier": "B", "potential_tier": "A", "shirt_number": 9, "captain": false,
+      "traits": ["aerial_strong", "finishing"], "overrides": {},
+      "joined_year": 2022,
+      "contract": { "until_year": 2027, "salary_eur_year": 2500000, "release_clause_eur": 30000000 }
+    },
+    {
+      "id": "rso_p017", "name": "Orri Óskarsson",
+      "birth_date": { "year": 2004, "month": 8, "day": 29 },
+      "nationality": "IS", "positions": ["ST"], "preferred_foot": "R",
+      "tier": "C", "potential_tier": "A", "shirt_number": 17, "captain": false,
+      "traits": ["finishing"], "overrides": {},
+      "joined_year": 2024,
+      "contract": { "until_year": 2030, "salary_eur_year": 1200000, "release_clause_eur": 50000000 }
+    },
+    {
+      "id": "rso_p027", "name": "Carlos Fernández",
+      "birth_date": { "year": 1996, "month": 5, "day": 22 },
+      "nationality": "ES", "positions": ["ST"], "preferred_foot": "R",
+      "tier": "C", "potential_tier": "B", "shirt_number": 27, "captain": false,
+      "traits": [], "overrides": {},
+      "joined_year": 2022,
+      "contract": { "until_year": 2026, "salary_eur_year": 800000, "release_clause_eur": 8000000 }
+    }
+  ]
+}

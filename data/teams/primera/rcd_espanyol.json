@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Cornellà de Llobregat",
+  "colors": {
+    "primary": "#0066CC",
+    "secondary": "#FFFFFF"
+  },
+  "division": "primera",
+  "finances": {
+    "budget_transfers_eur": 6000000,
+    "tv_revenue_eur_year": 42000000,
+    "wage_budget_eur_year": 38000000
+  },
+  "founded": 1900,
+  "id": "rcd_espanyol",
+  "manager": {
+    "birth_year": 1972,
+    "name": "Manolo González",
+    "nationality": "ES",
+    "preferred_formation": "4-4-2",
+    "preferred_style": "equilibrado"
+  },
+  "name": "Reial Club Deportiu Espanyol",
+  "players": [
+    {
+      "birth_date": {
+        "day": 14,
+        "month": 9,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 3694490,
+        "until_year": 2029
+      },
+      "id": "esp_p001",
+      "joined_year": 2024,
+      "name": "ESP Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "R",
+      "shirt_number": 1,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 15,
+        "month": 4,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1244839,
+        "until_year": 2030
+      },
+      "id": "esp_p002",
+      "joined_year": 2022,
+      "name": "ESP Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 13,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 13,
+        "month": 1,
+        "year": 2009
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 393124,
+        "until_year": 2030
+      },
+      "id": "esp_p003",
+      "joined_year": 2022,
+      "name": "ESP Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 25,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 21,
+        "month": 12,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 4113936,
+        "until_year": 2028
+      },
+      "id": "esp_p004",
+      "joined_year": 2020,
+      "name": "ESP Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "L",
+      "shirt_number": 4,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 3,
+        "month": 6,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 2550159,
+        "until_year": 2028
+      },
+      "id": "esp_p005",
+      "joined_year": 2023,
+      "name": "ESP Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "R",
+      "shirt_number": 5,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 7,
+        "month": 8,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 867175,
+        "until_year": 2030
+      },
+      "id": "esp_p006",
+      "joined_year": 2024,
+      "name": "ESP Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 14,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 6,
+        "year": 2010
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 575524,
+        "until_year": 2028
+      },
+      "id": "esp_p007",
+      "joined_year": 2021,
+      "name": "ESP Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 22,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 5,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2180982,
+        "until_year": 2028
+      },
+      "id": "esp_p008",
+      "joined_year": 2023,
+      "name": "ESP Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "L",
+      "shirt_number": 3,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 21,
+        "month": 6,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2312779,
+        "until_year": 2028
+      },
+      "id": "esp_p009",
+      "joined_year": 2025,
+      "name": "ESP Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 3,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 3240898,
+        "until_year": 2029
+      },
+      "id": "esp_p010",
+      "joined_year": 2026,
+      "name": "ESP Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "R",
+      "shirt_number": 2,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 1,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1940429,
+        "until_year": 2028
+      },
+      "id": "esp_p011",
+      "joined_year": 2024,
+      "name": "ESP Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 16,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 4,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1834290,
+        "until_year": 2028
+      },
+      "id": "esp_p012",
+      "joined_year": 2024,
+      "name": "ESP Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 6,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 16,
+        "month": 5,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1740116,
+        "until_year": 2030
+      },
+      "id": "esp_p013",
+      "joined_year": 2024,
+      "name": "ESP Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 23,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 15,
+        "month": 5,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1569145,
+        "until_year": 2029
+      },
+      "id": "esp_p014",
+      "joined_year": 2026,
+      "name": "ESP Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 8,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 9,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1727987,
+        "until_year": 2031
+      },
+      "id": "esp_p015",
+      "joined_year": 2020,
+      "name": "ESP Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 18,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 9,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 721376,
+        "until_year": 2030
+      },
+      "id": "esp_p016",
+      "joined_year": 2023,
+      "name": "ESP Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 21,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 6,
+        "month": 12,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 4096916,
+        "until_year": 2028
+      },
+      "id": "esp_p017",
+      "joined_year": 2024,
+      "name": "ESP Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "L",
+      "shirt_number": 10,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 12,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 779188,
+        "until_year": 2028
+      },
+      "id": "esp_p018",
+      "joined_year": 2024,
+      "name": "ESP Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 20,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 7,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 4879240,
+        "until_year": 2028
+      },
+      "id": "esp_p019",
+      "joined_year": 2026,
+      "name": "ESP Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "R",
+      "shirt_number": 11,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 1,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2324268,
+        "until_year": 2030
+      },
+      "id": "esp_p020",
+      "joined_year": 2024,
+      "name": "ESP Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 19,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 1,
+        "month": 8,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 2071357,
+        "until_year": 2028
+      },
+      "id": "esp_p021",
+      "joined_year": 2024,
+      "name": "ESP Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "R",
+      "shirt_number": 7,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 2,
+        "month": 5,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1076526,
+        "until_year": 2031
+      },
+      "id": "esp_p022",
+      "joined_year": 2026,
+      "name": "ESP Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 15,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 9,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 2614595,
+        "until_year": 2028
+      },
+      "id": "esp_p023",
+      "joined_year": 2021,
+      "name": "ESP Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "R",
+      "shirt_number": 9,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 21,
+        "month": 5,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2012951,
+        "until_year": 2028
+      },
+      "id": "esp_p024",
+      "joined_year": 2020,
+      "name": "ESP Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 24,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 20,
+        "month": 8,
+        "year": 2006
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 502892,
+        "until_year": 2029
+      },
+      "id": "esp_p025",
+      "joined_year": 2021,
+      "name": "ESP Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "L",
+      "shirt_number": 27,
+      "tier": "Y",
+      "traits": []
+    }
+  ],
+  "reputation": 60,
+  "short_name": "ESP",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 40000,
+    "name": "RCDE Stadium"
+  },
+  "tactics_default": {
+    "formation": "4-4-2",
+    "mentality": "equilibrado",
+    "pressing": "medio",
+    "tempo": "normal",
+    "width": "normal"
+  }
+}

@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Miranda de Ebro",
+  "colors": {
+    "primary": "#C00000",
+    "secondary": "#000000"
+  },
+  "division": "segunda",
+  "finances": {
+    "budget_transfers_eur": 700000,
+    "tv_revenue_eur_year": 5000000,
+    "wage_budget_eur_year": 5000000
+  },
+  "founded": 1927,
+  "id": "cd_mirandes",
+  "manager": {
+    "birth_year": 1975,
+    "name": "Por confirmar",
+    "nationality": "ES",
+    "preferred_formation": "4-3-3",
+    "preferred_style": "posesion"
+  },
+  "name": "Club Deportivo Mirandés",
+  "players": [
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 3,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 666115,
+        "until_year": 2029
+      },
+      "id": "mir_p001",
+      "joined_year": 2022,
+      "name": "MIR Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 1,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 6,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 629218,
+        "until_year": 2031
+      },
+      "id": "mir_p002",
+      "joined_year": 2022,
+      "name": "MIR Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 13,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 25,
+        "month": 1,
+        "year": 2010
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 300893,
+        "until_year": 2031
+      },
+      "id": "mir_p003",
+      "joined_year": 2024,
+      "name": "MIR Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 25,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 21,
+        "month": 2,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 473011,
+        "until_year": 2030
+      },
+      "id": "mir_p004",
+      "joined_year": 2021,
+      "name": "MIR Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 4,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 11,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1064644,
+        "until_year": 2029
+      },
+      "id": "mir_p005",
+      "joined_year": 2024,
+      "name": "MIR Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 5,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 1,
+        "month": 5,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 600732,
+        "until_year": 2028
+      },
+      "id": "mir_p006",
+      "joined_year": 2026,
+      "name": "MIR Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 14,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 24,
+        "month": 6,
+        "year": 2009
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 455236,
+        "until_year": 2028
+      },
+      "id": "mir_p007",
+      "joined_year": 2022,
+      "name": "MIR Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 22,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 2,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 599019,
+        "until_year": 2031
+      },
+      "id": "mir_p008",
+      "joined_year": 2022,
+      "name": "MIR Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 3,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 2,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 415666,
+        "until_year": 2030
+      },
+      "id": "mir_p009",
+      "joined_year": 2026,
+      "name": "MIR Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 12,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 466586,
+        "until_year": 2031
+      },
+      "id": "mir_p010",
+      "joined_year": 2024,
+      "name": "MIR Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 2,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 3,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 719091,
+        "until_year": 2031
+      },
+      "id": "mir_p011",
+      "joined_year": 2026,
+      "name": "MIR Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 16,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 6,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 704652,
+        "until_year": 2030
+      },
+      "id": "mir_p012",
+      "joined_year": 2021,
+      "name": "MIR Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 6,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 1,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 808194,
+        "until_year": 2028
+      },
+      "id": "mir_p013",
+      "joined_year": 2025,
+      "name": "MIR Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 23,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 1,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1507390,
+        "until_year": 2029
+      },
+      "id": "mir_p014",
+      "joined_year": 2025,
+      "name": "MIR Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 8,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 1,
+        "month": 9,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1575766,
+        "until_year": 2030
+      },
+      "id": "mir_p015",
+      "joined_year": 2021,
+      "name": "MIR Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 18,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 7,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 807746,
+        "until_year": 2029
+      },
+      "id": "mir_p016",
+      "joined_year": 2021,
+      "name": "MIR Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 21,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 8,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1772699,
+        "until_year": 2030
+      },
+      "id": "mir_p017",
+      "joined_year": 2024,
+      "name": "MIR Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 10,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 15,
+        "month": 11,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 695878,
+        "until_year": 2030
+      },
+      "id": "mir_p018",
+      "joined_year": 2022,
+      "name": "MIR Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 20,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 13,
+        "month": 4,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 492428,
+        "until_year": 2028
+      },
+      "id": "mir_p019",
+      "joined_year": 2024,
+      "name": "MIR Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 11,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 12,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 820483,
+        "until_year": 2029
+      },
+      "id": "mir_p020",
+      "joined_year": 2023,
+      "name": "MIR Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 19,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 17,
+        "month": 5,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 422075,
+        "until_year": 2030
+      },
+      "id": "mir_p021",
+      "joined_year": 2026,
+      "name": "MIR Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 7,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 1,
+        "month": 3,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 715423,
+        "until_year": 2029
+      },
+      "id": "mir_p022",
+      "joined_year": 2023,
+      "name": "MIR Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 15,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 10,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1040413,
+        "until_year": 2029
+      },
+      "id": "mir_p023",
+      "joined_year": 2025,
+      "name": "MIR Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 9,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 4,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 597951,
+        "until_year": 2029
+      },
+      "id": "mir_p024",
+      "joined_year": 2023,
+      "name": "MIR Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 24,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 7,
+        "month": 7,
+        "year": 2006
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 193813,
+        "until_year": 2031
+      },
+      "id": "mir_p025",
+      "joined_year": 2024,
+      "name": "MIR Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 27,
+      "tier": "Y",
+      "traits": []
+    }
+  ],
+  "reputation": 36,
+  "short_name": "MIR",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 5759,
+    "name": "Anduva"
+  },
+  "tactics_default": {
+    "formation": "4-3-3",
+    "mentality": "equilibrado",
+    "pressing": "medio",
+    "tempo": "normal",
+    "width": "normal"
+  }
+}

@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Pamplona",
+  "colors": {
+    "primary": "#C30C24",
+    "secondary": "#001A47"
+  },
+  "division": "primera",
+  "finances": {
+    "budget_transfers_eur": 8000000,
+    "tv_revenue_eur_year": 45000000,
+    "wage_budget_eur_year": 40000000
+  },
+  "founded": 1920,
+  "id": "ca_osasuna",
+  "manager": {
+    "birth_year": 1974,
+    "name": "Vicente Moreno",
+    "nationality": "ES",
+    "preferred_formation": "4-2-3-1",
+    "preferred_style": "equilibrado"
+  },
+  "name": "Club Atlético Osasuna",
+  "players": [
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 9,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 4453934,
+        "until_year": 2028
+      },
+      "id": "osa_p001",
+      "joined_year": 2026,
+      "name": "OSA Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "R",
+      "shirt_number": 1,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 6,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 918698,
+        "until_year": 2030
+      },
+      "id": "osa_p002",
+      "joined_year": 2024,
+      "name": "OSA Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 13,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 14,
+        "month": 4,
+        "year": 2009
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 232958,
+        "until_year": 2029
+      },
+      "id": "osa_p003",
+      "joined_year": 2023,
+      "name": "OSA Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 25,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 24,
+        "month": 9,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2220308,
+        "until_year": 2030
+      },
+      "id": "osa_p004",
+      "joined_year": 2021,
+      "name": "OSA Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 4,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 25,
+        "month": 2,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1553363,
+        "until_year": 2031
+      },
+      "id": "osa_p005",
+      "joined_year": 2021,
+      "name": "OSA Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 5,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 8,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2186938,
+        "until_year": 2028
+      },
+      "id": "osa_p006",
+      "joined_year": 2022,
+      "name": "OSA Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 14,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 6,
+        "year": 2006
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 745126,
+        "until_year": 2030
+      },
+      "id": "osa_p007",
+      "joined_year": 2026,
+      "name": "OSA Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 22,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 3,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 4516207,
+        "until_year": 2030
+      },
+      "id": "osa_p008",
+      "joined_year": 2026,
+      "name": "OSA Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "L",
+      "shirt_number": 3,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 20,
+        "month": 3,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1934273,
+        "until_year": 2030
+      },
+      "id": "osa_p009",
+      "joined_year": 2021,
+      "name": "OSA Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 6,
+        "month": 6,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1151817,
+        "until_year": 2029
+      },
+      "id": "osa_p010",
+      "joined_year": 2023,
+      "name": "OSA Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 2,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 4,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1082259,
+        "until_year": 2031
+      },
+      "id": "osa_p011",
+      "joined_year": 2024,
+      "name": "OSA Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 16,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 7,
+        "month": 5,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 2573073,
+        "until_year": 2031
+      },
+      "id": "osa_p012",
+      "joined_year": 2021,
+      "name": "OSA Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "L",
+      "shirt_number": 6,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 17,
+        "month": 12,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2074787,
+        "until_year": 2031
+      },
+      "id": "osa_p013",
+      "joined_year": 2020,
+      "name": "OSA Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 23,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 9,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 2568918,
+        "until_year": 2029
+      },
+      "id": "osa_p014",
+      "joined_year": 2024,
+      "name": "OSA Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "L",
+      "shirt_number": 8,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 3,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2285391,
+        "until_year": 2028
+      },
+      "id": "osa_p015",
+      "joined_year": 2025,
+      "name": "OSA Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 18,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 6,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 747467,
+        "until_year": 2030
+      },
+      "id": "osa_p016",
+      "joined_year": 2022,
+      "name": "OSA Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 21,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 4,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 2832390,
+        "until_year": 2030
+      },
+      "id": "osa_p017",
+      "joined_year": 2023,
+      "name": "OSA Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "R",
+      "shirt_number": 10,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 11,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2302945,
+        "until_year": 2029
+      },
+      "id": "osa_p018",
+      "joined_year": 2020,
+      "name": "OSA Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 20,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 4,
+        "month": 5,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 3133052,
+        "until_year": 2028
+      },
+      "id": "osa_p019",
+      "joined_year": 2021,
+      "name": "OSA Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "R",
+      "shirt_number": 11,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 9,
+        "month": 8,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 998736,
+        "until_year": 2029
+      },
+      "id": "osa_p020",
+      "joined_year": 2021,
+      "name": "OSA Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 19,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 2,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 2955172,
+        "until_year": 2028
+      },
+      "id": "osa_p021",
+      "joined_year": 2022,
+      "name": "OSA Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "R",
+      "shirt_number": 7,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 10,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 777775,
+        "until_year": 2028
+      },
+      "id": "osa_p022",
+      "joined_year": 2020,
+      "name": "OSA Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 15,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 3,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 2073080,
+        "until_year": 2029
+      },
+      "id": "osa_p023",
+      "joined_year": 2024,
+      "name": "OSA Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "R",
+      "shirt_number": 9,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 7,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 856916,
+        "until_year": 2031
+      },
+      "id": "osa_p024",
+      "joined_year": 2024,
+      "name": "OSA Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 24,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 2,
+        "month": 2,
+        "year": 2007
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 492592,
+        "until_year": 2028
+      },
+      "id": "osa_p025",
+      "joined_year": 2020,
+      "name": "OSA Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 27,
+      "tier": "Y",
+      "traits": []
+    }
+  ],
+  "reputation": 62,
+  "short_name": "OSA",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 23576,
+    "name": "El Sadar"
+  },
+  "tactics_default": {
+    "formation": "4-2-3-1",
+    "mentality": "equilibrado",
+    "pressing": "alto",
+    "tempo": "normal",
+    "width": "normal"
+  }
+}

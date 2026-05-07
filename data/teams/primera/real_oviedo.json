@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Oviedo",
+  "colors": {
+    "primary": "#1057A1",
+    "secondary": "#FFFFFF"
+  },
+  "division": "primera",
+  "finances": {
+    "budget_transfers_eur": 5000000,
+    "tv_revenue_eur_year": 36000000,
+    "wage_budget_eur_year": 28000000
+  },
+  "founded": 1926,
+  "id": "real_oviedo",
+  "manager": {
+    "birth_year": 1977,
+    "name": "Veljko Paunović",
+    "nationality": "RS",
+    "preferred_formation": "4-2-3-1",
+    "preferred_style": "equilibrado"
+  },
+  "name": "Real Oviedo",
+  "players": [
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 9,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1785913,
+        "until_year": 2031
+      },
+      "id": "ovi_p001",
+      "joined_year": 2022,
+      "name": "OVI Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 1,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 3,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 699401,
+        "until_year": 2031
+      },
+      "id": "ovi_p002",
+      "joined_year": 2020,
+      "name": "OVI Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 13,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 8,
+        "year": 2006
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 190715,
+        "until_year": 2030
+      },
+      "id": "ovi_p003",
+      "joined_year": 2024,
+      "name": "OVI Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 25,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 2,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 861609,
+        "until_year": 2031
+      },
+      "id": "ovi_p004",
+      "joined_year": 2024,
+      "name": "OVI Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 4,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 5,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 4842139,
+        "until_year": 2028
+      },
+      "id": "ovi_p005",
+      "joined_year": 2020,
+      "name": "OVI Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 5,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 2,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1400405,
+        "until_year": 2030
+      },
+      "id": "ovi_p006",
+      "joined_year": 2020,
+      "name": "OVI Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 14,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 3,
+        "year": 2006
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 255531,
+        "until_year": 2028
+      },
+      "id": "ovi_p007",
+      "joined_year": 2021,
+      "name": "OVI Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 22,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 7,
+        "month": 1,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2107451,
+        "until_year": 2029
+      },
+      "id": "ovi_p008",
+      "joined_year": 2022,
+      "name": "OVI Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 3,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 10,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1274931,
+        "until_year": 2029
+      },
+      "id": "ovi_p009",
+      "joined_year": 2020,
+      "name": "OVI Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 24,
+        "month": 8,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2108287,
+        "until_year": 2030
+      },
+      "id": "ovi_p010",
+      "joined_year": 2024,
+      "name": "OVI Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 2,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 9,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 526123,
+        "until_year": 2029
+      },
+      "id": "ovi_p011",
+      "joined_year": 2023,
+      "name": "OVI Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 16,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 9,
+        "month": 12,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1868862,
+        "until_year": 2031
+      },
+      "id": "ovi_p012",
+      "joined_year": 2026,
+      "name": "OVI Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 6,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 10,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 961563,
+        "until_year": 2030
+      },
+      "id": "ovi_p013",
+      "joined_year": 2025,
+      "name": "OVI Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 23,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 15,
+        "month": 6,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 2085067,
+        "until_year": 2030
+      },
+      "id": "ovi_p014",
+      "joined_year": 2020,
+      "name": "OVI Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 8,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 22,
+        "month": 2,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 3820204,
+        "until_year": 2031
+      },
+      "id": "ovi_p015",
+      "joined_year": 2020,
+      "name": "OVI Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "L",
+      "shirt_number": 18,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 9,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 555202,
+        "until_year": 2031
+      },
+      "id": "ovi_p016",
+      "joined_year": 2022,
+      "name": "OVI Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 21,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 13,
+        "month": 9,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2163446,
+        "until_year": 2030
+      },
+      "id": "ovi_p017",
+      "joined_year": 2020,
+      "name": "OVI Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 10,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 4,
+        "month": 12,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 756290,
+        "until_year": 2030
+      },
+      "id": "ovi_p018",
+      "joined_year": 2023,
+      "name": "OVI Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 20,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 9,
+        "month": 8,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 4430821,
+        "until_year": 2029
+      },
+      "id": "ovi_p019",
+      "joined_year": 2024,
+      "name": "OVI Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "L",
+      "shirt_number": 11,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 13,
+        "month": 2,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 724446,
+        "until_year": 2029
+      },
+      "id": "ovi_p020",
+      "joined_year": 2024,
+      "name": "OVI Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 19,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 14,
+        "month": 1,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1459992,
+        "until_year": 2028
+      },
+      "id": "ovi_p021",
+      "joined_year": 2025,
+      "name": "OVI Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 7,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 21,
+        "month": 9,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1013884,
+        "until_year": 2031
+      },
+      "id": "ovi_p022",
+      "joined_year": 2026,
+      "name": "OVI Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 15,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 5,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 967703,
+        "until_year": 2028
+      },
+      "id": "ovi_p023",
+      "joined_year": 2024,
+      "name": "OVI Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 9,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 6,
+        "month": 9,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 540391,
+        "until_year": 2031
+      },
+      "id": "ovi_p024",
+      "joined_year": 2022,
+      "name": "OVI Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 24,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 6,
+        "month": 3,
+        "year": 2009
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 836147,
+        "until_year": 2029
+      },
+      "id": "ovi_p025",
+      "joined_year": 2023,
+      "name": "OVI Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 27,
+      "tier": "D",
+      "traits": []
+    }
+  ],
+  "reputation": 52,
+  "short_name": "OVI",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 30500,
+    "name": "Carlos Tartiere"
+  },
+  "tactics_default": {
+    "formation": "4-2-3-1",
+    "mentality": "equilibrado",
+    "pressing": "medio",
+    "tempo": "normal",
+    "width": "normal"
+  }
+}

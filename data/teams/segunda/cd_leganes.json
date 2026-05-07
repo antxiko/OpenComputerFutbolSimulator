@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Leganés",
+  "colors": {
+    "primary": "#003F87",
+    "secondary": "#FFFFFF"
+  },
+  "division": "segunda",
+  "finances": {
+    "budget_transfers_eur": 3000000,
+    "tv_revenue_eur_year": 10000000,
+    "wage_budget_eur_year": 18000000
+  },
+  "founded": 1928,
+  "id": "cd_leganes",
+  "manager": {
+    "birth_year": 1975,
+    "name": "Por confirmar",
+    "nationality": "ES",
+    "preferred_formation": "4-2-3-1",
+    "preferred_style": "equilibrado"
+  },
+  "name": "Club Deportivo Leganés",
+  "players": [
+    {
+      "birth_date": {
+        "day": 3,
+        "month": 9,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1310670,
+        "until_year": 2028
+      },
+      "id": "leg_p001",
+      "joined_year": 2025,
+      "name": "LEG Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 1,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 12,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 449114,
+        "until_year": 2030
+      },
+      "id": "leg_p002",
+      "joined_year": 2025,
+      "name": "LEG Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "L",
+      "shirt_number": 13,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 8,
+        "year": 2007
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 254724,
+        "until_year": 2030
+      },
+      "id": "leg_p003",
+      "joined_year": 2026,
+      "name": "LEG Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 25,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 1,
+        "month": 10,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1748038,
+        "until_year": 2031
+      },
+      "id": "leg_p004",
+      "joined_year": 2024,
+      "name": "LEG Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 4,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 5,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1192359,
+        "until_year": 2030
+      },
+      "id": "leg_p005",
+      "joined_year": 2024,
+      "name": "LEG Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 5,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 16,
+        "month": 9,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 474071,
+        "until_year": 2029
+      },
+      "id": "leg_p006",
+      "joined_year": 2024,
+      "name": "LEG Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "R",
+      "shirt_number": 14,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 15,
+        "month": 11,
+        "year": 2007
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 343791,
+        "until_year": 2028
+      },
+      "id": "leg_p007",
+      "joined_year": 2020,
+      "name": "LEG Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 22,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 13,
+        "month": 4,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 830864,
+        "until_year": 2030
+      },
+      "id": "leg_p008",
+      "joined_year": 2025,
+      "name": "LEG Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 3,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 7,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 485574,
+        "until_year": 2031
+      },
+      "id": "leg_p009",
+      "joined_year": 2025,
+      "name": "LEG Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 6,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2102499,
+        "until_year": 2031
+      },
+      "id": "leg_p010",
+      "joined_year": 2023,
+      "name": "LEG Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 2,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 6,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 905355,
+        "until_year": 2031
+      },
+      "id": "leg_p011",
+      "joined_year": 2026,
+      "name": "LEG Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 16,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 7,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1899077,
+        "until_year": 2029
+      },
+      "id": "leg_p012",
+      "joined_year": 2026,
+      "name": "LEG Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 6,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 11,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 594657,
+        "until_year": 2028
+      },
+      "id": "leg_p013",
+      "joined_year": 2020,
+      "name": "LEG Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 23,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 4,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1582730,
+        "until_year": 2029
+      },
+      "id": "leg_p014",
+      "joined_year": 2020,
+      "name": "LEG Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 8,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 7,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 817439,
+        "until_year": 2031
+      },
+      "id": "leg_p015",
+      "joined_year": 2020,
+      "name": "LEG Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 18,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 12,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 498638,
+        "until_year": 2031
+      },
+      "id": "leg_p016",
+      "joined_year": 2021,
+      "name": "LEG Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "R",
+      "shirt_number": 21,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 4,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1337393,
+        "until_year": 2029
+      },
+      "id": "leg_p017",
+      "joined_year": 2022,
+      "name": "LEG Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 10,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 12,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 499836,
+        "until_year": 2029
+      },
+      "id": "leg_p018",
+      "joined_year": 2024,
+      "name": "LEG Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 20,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 22,
+        "month": 12,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1849901,
+        "until_year": 2030
+      },
+      "id": "leg_p019",
+      "joined_year": 2026,
+      "name": "LEG Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 11,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 20,
+        "month": 3,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 811990,
+        "until_year": 2030
+      },
+      "id": "leg_p020",
+      "joined_year": 2025,
+      "name": "LEG Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 19,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 10,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1783603,
+        "until_year": 2031
+      },
+      "id": "leg_p021",
+      "joined_year": 2025,
+      "name": "LEG Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 7,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 5,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 811435,
+        "until_year": 2028
+      },
+      "id": "leg_p022",
+      "joined_year": 2024,
+      "name": "LEG Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 15,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 12,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 782367,
+        "until_year": 2031
+      },
+      "id": "leg_p023",
+      "joined_year": 2025,
+      "name": "LEG Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 9,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 1,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 935230,
+        "until_year": 2030
+      },
+      "id": "leg_p024",
+      "joined_year": 2022,
+      "name": "LEG Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 24,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 2,
+        "month": 10,
+        "year": 2010
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 232628,
+        "until_year": 2031
+      },
+      "id": "leg_p025",
+      "joined_year": 2025,
+      "name": "LEG Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 27,
+      "tier": "Y",
+      "traits": []
+    }
+  ],
+  "reputation": 48,
+  "short_name": "LEG",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 12450,
+    "name": "Estadio Municipal de Butarque"
+  },
+  "tactics_default": {
+    "formation": "4-2-3-1",
+    "mentality": "equilibrado",
+    "pressing": "medio",
+    "tempo": "normal",
+    "width": "normal"
+  }
+}

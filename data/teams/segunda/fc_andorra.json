@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Andorra la Vella",
+  "colors": {
+    "primary": "#FFFF00",
+    "secondary": "#BF1530"
+  },
+  "division": "segunda",
+  "finances": {
+    "budget_transfers_eur": 500000,
+    "tv_revenue_eur_year": 4000000,
+    "wage_budget_eur_year": 4000000
+  },
+  "founded": 1942,
+  "id": "fc_andorra",
+  "manager": {
+    "birth_year": 1975,
+    "name": "Por confirmar",
+    "nationality": "ES",
+    "preferred_formation": "4-3-3",
+    "preferred_style": "posesion"
+  },
+  "name": "Fútbol Club Andorra",
+  "players": [
+    {
+      "birth_date": {
+        "day": 1,
+        "month": 10,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 472580,
+        "until_year": 2031
+      },
+      "id": "and_p001",
+      "joined_year": 2020,
+      "name": "AND Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 1,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 9,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 670373,
+        "until_year": 2030
+      },
+      "id": "and_p002",
+      "joined_year": 2022,
+      "name": "AND Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 13,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 21,
+        "month": 8,
+        "year": 2006
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 240983,
+        "until_year": 2028
+      },
+      "id": "and_p003",
+      "joined_year": 2024,
+      "name": "AND Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 25,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 1,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1517460,
+        "until_year": 2028
+      },
+      "id": "and_p004",
+      "joined_year": 2023,
+      "name": "AND Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 4,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 4,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 535372,
+        "until_year": 2031
+      },
+      "id": "and_p005",
+      "joined_year": 2021,
+      "name": "AND Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 5,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 20,
+        "month": 3,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 617268,
+        "until_year": 2030
+      },
+      "id": "and_p006",
+      "joined_year": 2020,
+      "name": "AND Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 14,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 4,
+        "year": 2006
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 657578,
+        "until_year": 2029
+      },
+      "id": "and_p007",
+      "joined_year": 2020,
+      "name": "AND Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 22,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 3,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 797906,
+        "until_year": 2030
+      },
+      "id": "and_p008",
+      "joined_year": 2020,
+      "name": "AND Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 3,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 7,
+        "month": 8,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 578405,
+        "until_year": 2029
+      },
+      "id": "and_p009",
+      "joined_year": 2026,
+      "name": "AND Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 24,
+        "month": 6,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1234818,
+        "until_year": 2029
+      },
+      "id": "and_p010",
+      "joined_year": 2024,
+      "name": "AND Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 2,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 10,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 463518,
+        "until_year": 2030
+      },
+      "id": "and_p011",
+      "joined_year": 2025,
+      "name": "AND Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 16,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 1,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1781516,
+        "until_year": 2031
+      },
+      "id": "and_p012",
+      "joined_year": 2024,
+      "name": "AND Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 6,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 11,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 300949,
+        "until_year": 2030
+      },
+      "id": "and_p013",
+      "joined_year": 2022,
+      "name": "AND Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "L",
+      "shirt_number": 23,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 20,
+        "month": 3,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1173713,
+        "until_year": 2028
+      },
+      "id": "and_p014",
+      "joined_year": 2021,
+      "name": "AND Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 8,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 9,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 983016,
+        "until_year": 2029
+      },
+      "id": "and_p015",
+      "joined_year": 2021,
+      "name": "AND Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 18,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 15,
+        "month": 2,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 427985,
+        "until_year": 2028
+      },
+      "id": "and_p016",
+      "joined_year": 2021,
+      "name": "AND Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "L",
+      "shirt_number": 21,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 7,
+        "month": 2,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 690258,
+        "until_year": 2030
+      },
+      "id": "and_p017",
+      "joined_year": 2026,
+      "name": "AND Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 10,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 4,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 448590,
+        "until_year": 2030
+      },
+      "id": "and_p018",
+      "joined_year": 2024,
+      "name": "AND Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 20,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 9,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1368700,
+        "until_year": 2030
+      },
+      "id": "and_p019",
+      "joined_year": 2022,
+      "name": "AND Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 11,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 4,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 644757,
+        "until_year": 2031
+      },
+      "id": "and_p020",
+      "joined_year": 2025,
+      "name": "AND Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 19,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 22,
+        "month": 10,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 744688,
+        "until_year": 2029
+      },
+      "id": "and_p021",
+      "joined_year": 2024,
+      "name": "AND Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 7,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 2,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 642426,
+        "until_year": 2030
+      },
+      "id": "and_p022",
+      "joined_year": 2023,
+      "name": "AND Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 15,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 3,
+        "month": 3,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 816929,
+        "until_year": 2031
+      },
+      "id": "and_p023",
+      "joined_year": 2022,
+      "name": "AND Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 9,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 22,
+        "month": 2,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 591739,
+        "until_year": 2028
+      },
+      "id": "and_p024",
+      "joined_year": 2026,
+      "name": "AND Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 24,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 2,
+        "year": 2010
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 668404,
+        "until_year": 2028
+      },
+      "id": "and_p025",
+      "joined_year": 2024,
+      "name": "AND Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 27,
+      "tier": "D",
+      "traits": []
+    }
+  ],
+  "reputation": 34,
+  "short_name": "AND",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 3306,
+    "name": "Estadi Nacional"
+  },
+  "tactics_default": {
+    "formation": "4-3-3",
+    "mentality": "equilibrado",
+    "pressing": "medio",
+    "tempo": "normal",
+    "width": "normal"
+  }
+}

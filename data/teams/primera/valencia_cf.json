@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Valencia",
+  "colors": {
+    "primary": "#FF6600",
+    "secondary": "#000000"
+  },
+  "division": "primera",
+  "finances": {
+    "budget_transfers_eur": 12000000,
+    "tv_revenue_eur_year": 55000000,
+    "wage_budget_eur_year": 55000000
+  },
+  "founded": 1919,
+  "id": "valencia_cf",
+  "manager": {
+    "birth_year": 1983,
+    "name": "Carlos Corberán",
+    "nationality": "ES",
+    "preferred_formation": "4-2-3-1",
+    "preferred_style": "contraataque"
+  },
+  "name": "Valencia Club de Fútbol",
+  "players": [
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 6,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1543389,
+        "until_year": 2030
+      },
+      "id": "val_p001",
+      "joined_year": 2020,
+      "name": "VAL Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 1,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 17,
+        "month": 6,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 618320,
+        "until_year": 2029
+      },
+      "id": "val_p002",
+      "joined_year": 2023,
+      "name": "VAL Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 13,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 7,
+        "year": 2007
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 879723,
+        "until_year": 2028
+      },
+      "id": "val_p003",
+      "joined_year": 2020,
+      "name": "VAL Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 25,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 1,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 4921268,
+        "until_year": 2030
+      },
+      "id": "val_p004",
+      "joined_year": 2021,
+      "name": "VAL Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "L",
+      "shirt_number": 4,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 14,
+        "month": 7,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2341546,
+        "until_year": 2030
+      },
+      "id": "val_p005",
+      "joined_year": 2022,
+      "name": "VAL Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 5,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 6,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 1079458,
+        "until_year": 2028
+      },
+      "id": "val_p006",
+      "joined_year": 2020,
+      "name": "VAL Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 14,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 8,
+        "year": 2008
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 342021,
+        "until_year": 2031
+      },
+      "id": "val_p007",
+      "joined_year": 2020,
+      "name": "VAL Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 22,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 2,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1035182,
+        "until_year": 2029
+      },
+      "id": "val_p008",
+      "joined_year": 2025,
+      "name": "VAL Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 3,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 7,
+        "month": 10,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1558669,
+        "until_year": 2031
+      },
+      "id": "val_p009",
+      "joined_year": 2023,
+      "name": "VAL Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 1,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1600625,
+        "until_year": 2029
+      },
+      "id": "val_p010",
+      "joined_year": 2021,
+      "name": "VAL Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 2,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 1,
+        "month": 2,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 878397,
+        "until_year": 2031
+      },
+      "id": "val_p011",
+      "joined_year": 2020,
+      "name": "VAL Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 16,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 8,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 3025066,
+        "until_year": 2030
+      },
+      "id": "val_p012",
+      "joined_year": 2022,
+      "name": "VAL Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "A",
+      "preferred_foot": "R",
+      "shirt_number": 6,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 9,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 993089,
+        "until_year": 2029
+      },
+      "id": "val_p013",
+      "joined_year": 2026,
+      "name": "VAL Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 23,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 10,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2433390,
+        "until_year": 2028
+      },
+      "id": "val_p014",
+      "joined_year": 2020,
+      "name": "VAL Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "L",
+      "shirt_number": 8,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 5,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1677800,
+        "until_year": 2031
+      },
+      "id": "val_p015",
+      "joined_year": 2024,
+      "name": "VAL Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 18,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 2,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1230175,
+        "until_year": 2029
+      },
+      "id": "val_p016",
+      "joined_year": 2022,
+      "name": "VAL Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 21,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 16,
+        "month": 9,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2035058,
+        "until_year": 2028
+      },
+      "id": "val_p017",
+      "joined_year": 2022,
+      "name": "VAL Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "L",
+      "shirt_number": 10,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 25,
+        "month": 11,
+        "year": 2003
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 645671,
+        "until_year": 2029
+      },
+      "id": "val_p018",
+      "joined_year": 2026,
+      "name": "VAL Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 20,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 7,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1596178,
+        "until_year": 2029
+      },
+      "id": "val_p019",
+      "joined_year": 2022,
+      "name": "VAL Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "L",
+      "shirt_number": 11,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 2,
+        "month": 11,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1540304,
+        "until_year": 2031
+      },
+      "id": "val_p020",
+      "joined_year": 2022,
+      "name": "VAL Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 19,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 13,
+        "month": 9,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1977134,
+        "until_year": 2029
+      },
+      "id": "val_p021",
+      "joined_year": 2025,
+      "name": "VAL Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "L",
+      "shirt_number": 7,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 17,
+        "month": 8,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 703527,
+        "until_year": 2030
+      },
+      "id": "val_p022",
+      "joined_year": 2024,
+      "name": "VAL Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 15,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 16,
+        "month": 10,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1640848,
+        "until_year": 2031
+      },
+      "id": "val_p023",
+      "joined_year": 2022,
+      "name": "VAL Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 9,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 5,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2054218,
+        "until_year": 2030
+      },
+      "id": "val_p024",
+      "joined_year": 2020,
+      "name": "VAL Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 24,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 6,
+        "year": 2010
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 570033,
+        "until_year": 2031
+      },
+      "id": "val_p025",
+      "joined_year": 2020,
+      "name": "VAL Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "L",
+      "shirt_number": 27,
+      "tier": "Y",
+      "traits": []
+    }
+  ],
+  "reputation": 68,
+  "short_name": "VAL",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 49430,
+    "name": "Mestalla"
+  },
+  "tactics_default": {
+    "formation": "4-2-3-1",
+    "mentality": "equilibrado",
+    "pressing": "medio",
+    "tempo": "normal",
+    "width": "normal"
+  }
+}

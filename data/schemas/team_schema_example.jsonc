@@ -1,0 +1,92 @@
+// FORMATO DE EQUIPO — ejemplo documentado.
+// Este archivo es .jsonc (JSON con comentarios) solo para documentación.
+// Los archivos reales de equipos en data/teams/ son .json puro (sin comentarios).
+//
+// Cada equipo vive en su propio archivo: data/teams/<division>/<team_id>.json
+//
+// CAMPO `tier` por jugador (sistema simplificado para evitar capturar 8 atributos):
+//   "S"  Élite mundial          (overall ~88-95)
+//   "A"  Top de la liga          (overall ~82-87)
+//   "B"  Bueno / titular indiscutible en equipo medio  (overall ~76-81)
+//   "C"  Medio / suplente en equipo grande              (overall ~70-75)
+//   "D"  Suplente / squad filler                        (overall ~62-69)
+//   "Y"  Cantera / promesa joven  (overall actual bajo, potencial alto)
+//
+// Un script de generación traduce (tier + posición + edad) → atributos concretos
+// con bonus posicional y aleatorización controlada por seed.
+// Si necesitas afinar a un jugador concreto, usa "overrides" (ver abajo).
+
+{
+  "id": "ejemplo_fc",                        // único, snake_case, estable. Usado en referencias cruzadas.
+  "name": "Ejemplo Fútbol Club",
+  "short_name": "EJM",                       // 3 letras, para tablas
+  "city": "Madrid",
+  "founded": 1900,
+  "stadium": {
+    "name": "Estadio de Ejemplo",
+    "capacity": 50000
+  },
+  "colors": {
+    "primary": "#FFFFFF",                    // hex, para visualización 2D
+    "secondary": "#000000"
+  },
+  "division": "primera",                     // "primera" | "segunda"
+  "reputation": 75,                          // 1-100. Afecta a fichajes y atracción de jugadores.
+  "signing_policy": "open",                  // "open" (default) | "basque_only" (Athletic Club). Restringe qué jugadores puede fichar la IA del club.
+  "manager": {
+    "name": "Nombre Entrenador",
+    "nationality": "ES",
+    "preferred_formation": "4-3-3",
+    "preferred_style": "posesion"            // "posesion" | "directo" | "contraataque" | "presion" | "equilibrado"
+  },
+  "tactics_default": {
+    "formation": "4-3-3",
+    "mentality": "equilibrado",              // "muy_defensivo" | "defensivo" | "equilibrado" | "ofensivo" | "muy_ofensivo"
+    "tempo": "normal",                       // "lento" | "normal" | "rapido"
+    "pressing": "medio",                     // "bajo" | "medio" | "alto"
+    "width": "normal"                        // "estrecho" | "normal" | "ancho"
+  },
+  "finances": {
+    "budget_transfers_eur": 100000000,       // presupuesto fichajes
+    "wage_budget_eur_year": 200000000,       // tope salarial anual
+    "tv_revenue_eur_year": 150000000
+  },
+  "players": [
+    {
+      "id": "ejm_p001",                      // ID único global. Convención: <team_short>_p<NNN>.
+      "name": "Nombre Jugador",
+      "birth_date": { "year": 1995, "month": 6, "day": 15 },
+      "nationality": "ES",                   // ISO 3166 alpha-2
+      "positions": ["CB", "LB"],             // primera = principal. Resto = secundarias.
+      "preferred_foot": "R",                 // "L" | "R" | "B" (ambidiestro)
+      "tier": "B",
+      "potential_tier": "B",                 // tier al que puede llegar en su pico (ver curva de aging)
+      "shirt_number": 4,
+      "captain": false,
+      "traits": ["aerial_strong"],           // opcional, lista vacía si no hay. Catálogo en docs/traits.md (futuro).
+      "overrides": {                         // opcional, ajustes manuales sobre el tier. Vacío = usar tier puro.
+        // "tiro": 45,                       // ejemplo: forzar tiro a 45 aunque su tier diga otra cosa
+        // "velocidad": 88
+      },
+      "joined_year": 2020,                   // cuándo se incorporó al club. Para historia/lealtad.
+      "contract": {
+        "until_year": 2028,                  // fin de contrato
+        "salary_eur_year": 5000000,
+        "release_clause_eur": 50000000
+      }
+    }
+    // ... resto de la plantilla. Mínimo recomendado: 22 jugadores. Ideal: 25-28.
+    // Convención de posiciones (mismas siglas que se usan en formaciones):
+    //   GK  Portero
+    //   CB  Central
+    //   LB  Lateral izquierdo       RB  Lateral derecho
+    //   LWB Carrilero izquierdo     RWB Carrilero derecho
+    //   CDM Mediocentro defensivo
+    //   CM  Mediocentro
+    //   CAM Mediapunta
+    //   LM  Mediocampista izquierdo  RM  Mediocampista derecho
+    //   LW  Extremo izquierdo        RW  Extremo derecho
+    //   CF  Segundo delantero / falso 9
+    //   ST  Delantero centro
+  ]
+}

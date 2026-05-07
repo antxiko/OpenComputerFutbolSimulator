@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Albacete",
+  "colors": {
+    "primary": "#FFFFFF",
+    "secondary": "#000000"
+  },
+  "division": "segunda",
+  "finances": {
+    "budget_transfers_eur": 900000,
+    "tv_revenue_eur_year": 5500000,
+    "wage_budget_eur_year": 6500000
+  },
+  "founded": 1940,
+  "id": "albacete_balompie",
+  "manager": {
+    "birth_year": 1975,
+    "name": "Por confirmar",
+    "nationality": "ES",
+    "preferred_formation": "4-4-2",
+    "preferred_style": "equilibrado"
+  },
+  "name": "Albacete Balompié",
+  "players": [
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 4,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 760202,
+        "until_year": 2030
+      },
+      "id": "alb_p001",
+      "joined_year": 2020,
+      "name": "ALB Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 1,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 8,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 602131,
+        "until_year": 2029
+      },
+      "id": "alb_p002",
+      "joined_year": 2026,
+      "name": "ALB Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 13,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 3,
+        "year": 2009
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 316330,
+        "until_year": 2028
+      },
+      "id": "alb_p003",
+      "joined_year": 2021,
+      "name": "ALB Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 25,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 2,
+        "month": 12,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 472418,
+        "until_year": 2031
+      },
+      "id": "alb_p004",
+      "joined_year": 2022,
+      "name": "ALB Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 4,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 22,
+        "month": 7,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 605228,
+        "until_year": 2031
+      },
+      "id": "alb_p005",
+      "joined_year": 2024,
+      "name": "ALB Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 5,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 8,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 457511,
+        "until_year": 2028
+      },
+      "id": "alb_p006",
+      "joined_year": 2023,
+      "name": "ALB Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 14,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 17,
+        "month": 12,
+        "year": 2005
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 510678,
+        "until_year": 2029
+      },
+      "id": "alb_p007",
+      "joined_year": 2021,
+      "name": "ALB Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 22,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 14,
+        "month": 5,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1420713,
+        "until_year": 2030
+      },
+      "id": "alb_p008",
+      "joined_year": 2026,
+      "name": "ALB Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 3,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 4,
+        "month": 11,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 763588,
+        "until_year": 2028
+      },
+      "id": "alb_p009",
+      "joined_year": 2026,
+      "name": "ALB Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 3,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 799809,
+        "until_year": 2028
+      },
+      "id": "alb_p010",
+      "joined_year": 2024,
+      "name": "ALB Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 2,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 5,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 675446,
+        "until_year": 2030
+      },
+      "id": "alb_p011",
+      "joined_year": 2020,
+      "name": "ALB Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 16,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 20,
+        "month": 7,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 705437,
+        "until_year": 2031
+      },
+      "id": "alb_p012",
+      "joined_year": 2020,
+      "name": "ALB Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 6,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 9,
+        "month": 6,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 483302,
+        "until_year": 2029
+      },
+      "id": "alb_p013",
+      "joined_year": 2021,
+      "name": "ALB Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 23,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 12,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 841561,
+        "until_year": 2029
+      },
+      "id": "alb_p014",
+      "joined_year": 2026,
+      "name": "ALB Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 8,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 7,
+        "month": 6,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1891013,
+        "until_year": 2030
+      },
+      "id": "alb_p015",
+      "joined_year": 2023,
+      "name": "ALB Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 18,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 7,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 637064,
+        "until_year": 2029
+      },
+      "id": "alb_p016",
+      "joined_year": 2021,
+      "name": "ALB Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 21,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 9,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1228389,
+        "until_year": 2030
+      },
+      "id": "alb_p017",
+      "joined_year": 2025,
+      "name": "ALB Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 10,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 7,
+        "month": 9,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 257675,
+        "until_year": 2030
+      },
+      "id": "alb_p018",
+      "joined_year": 2024,
+      "name": "ALB Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "L",
+      "shirt_number": 20,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 6,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 553321,
+        "until_year": 2028
+      },
+      "id": "alb_p019",
+      "joined_year": 2022,
+      "name": "ALB Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 11,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 5,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 607448,
+        "until_year": 2029
+      },
+      "id": "alb_p020",
+      "joined_year": 2021,
+      "name": "ALB Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 19,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 7,
+        "month": 9,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 625975,
+        "until_year": 2029
+      },
+      "id": "alb_p021",
+      "joined_year": 2025,
+      "name": "ALB Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 7,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 14,
+        "month": 3,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 548783,
+        "until_year": 2031
+      },
+      "id": "alb_p022",
+      "joined_year": 2025,
+      "name": "ALB Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 15,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 3,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 475697,
+        "until_year": 2030
+      },
+      "id": "alb_p023",
+      "joined_year": 2020,
+      "name": "ALB Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 9,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 9,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 712316,
+        "until_year": 2029
+      },
+      "id": "alb_p024",
+      "joined_year": 2026,
+      "name": "ALB Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 24,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 3,
+        "month": 12,
+        "year": 2009
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 811661,
+        "until_year": 2031
+      },
+      "id": "alb_p025",
+      "joined_year": 2021,
+      "name": "ALB Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 27,
+      "tier": "D",
+      "traits": []
+    }
+  ],
+  "reputation": 38,
+  "short_name": "ALB",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 17524,
+    "name": "Carlos Belmonte"
+  },
+  "tactics_default": {
+    "formation": "4-4-2",
+    "mentality": "equilibrado",
+    "pressing": "medio",
+    "tempo": "normal",
+    "width": "normal"
+  }
+}

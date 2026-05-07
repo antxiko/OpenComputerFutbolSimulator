@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Valencia",
+  "colors": {
+    "primary": "#003366",
+    "secondary": "#BB0011"
+  },
+  "division": "primera",
+  "finances": {
+    "budget_transfers_eur": 5000000,
+    "tv_revenue_eur_year": 38000000,
+    "wage_budget_eur_year": 30000000
+  },
+  "founded": 1909,
+  "id": "levante_ud",
+  "manager": {
+    "birth_year": 1971,
+    "name": "Julián Calero",
+    "nationality": "ES",
+    "preferred_formation": "4-2-3-1",
+    "preferred_style": "directo"
+  },
+  "name": "Levante Unión Deportiva",
+  "players": [
+    {
+      "birth_date": {
+        "day": 5,
+        "month": 4,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 925469,
+        "until_year": 2028
+      },
+      "id": "lev_p001",
+      "joined_year": 2023,
+      "name": "LEV Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 1,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 25,
+        "month": 9,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 764544,
+        "until_year": 2030
+      },
+      "id": "lev_p002",
+      "joined_year": 2026,
+      "name": "LEV Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 13,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 22,
+        "month": 3,
+        "year": 2008
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 263136,
+        "until_year": 2030
+      },
+      "id": "lev_p003",
+      "joined_year": 2025,
+      "name": "LEV Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 25,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 9,
+        "month": 11,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 991812,
+        "until_year": 2028
+      },
+      "id": "lev_p004",
+      "joined_year": 2022,
+      "name": "LEV Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 4,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 14,
+        "month": 2,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1903931,
+        "until_year": 2028
+      },
+      "id": "lev_p005",
+      "joined_year": 2024,
+      "name": "LEV Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 5,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 7,
+        "month": 10,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 531568,
+        "until_year": 2030
+      },
+      "id": "lev_p006",
+      "joined_year": 2025,
+      "name": "LEV Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 14,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 13,
+        "month": 8,
+        "year": 2008
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 268228,
+        "until_year": 2030
+      },
+      "id": "lev_p007",
+      "joined_year": 2023,
+      "name": "LEV Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 22,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 21,
+        "month": 6,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 3549106,
+        "until_year": 2031
+      },
+      "id": "lev_p008",
+      "joined_year": 2022,
+      "name": "LEV Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 3,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 1,
+        "month": 6,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 888478,
+        "until_year": 2030
+      },
+      "id": "lev_p009",
+      "joined_year": 2025,
+      "name": "LEV Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 11,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1590785,
+        "until_year": 2031
+      },
+      "id": "lev_p010",
+      "joined_year": 2026,
+      "name": "LEV Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 2,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 15,
+        "month": 12,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 933576,
+        "until_year": 2029
+      },
+      "id": "lev_p011",
+      "joined_year": 2022,
+      "name": "LEV Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 16,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 2,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1863457,
+        "until_year": 2029
+      },
+      "id": "lev_p012",
+      "joined_year": 2026,
+      "name": "LEV Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 6,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 12,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 642192,
+        "until_year": 2028
+      },
+      "id": "lev_p013",
+      "joined_year": 2024,
+      "name": "LEV Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 23,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 21,
+        "month": 8,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1529030,
+        "until_year": 2030
+      },
+      "id": "lev_p014",
+      "joined_year": 2024,
+      "name": "LEV Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 8,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 8,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2071562,
+        "until_year": 2031
+      },
+      "id": "lev_p015",
+      "joined_year": 2025,
+      "name": "LEV Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 18,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 7,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1642143,
+        "until_year": 2031
+      },
+      "id": "lev_p016",
+      "joined_year": 2021,
+      "name": "LEV Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 21,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 10,
+        "month": 5,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 35000000,
+        "salary_eur_year": 3575203,
+        "until_year": 2029
+      },
+      "id": "lev_p017",
+      "joined_year": 2020,
+      "name": "LEV Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "B",
+      "preferred_foot": "R",
+      "shirt_number": 10,
+      "tier": "B",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 21,
+        "month": 1,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 2227458,
+        "until_year": 2030
+      },
+      "id": "lev_p018",
+      "joined_year": 2022,
+      "name": "LEV Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 20,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 24,
+        "month": 10,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1281194,
+        "until_year": 2030
+      },
+      "id": "lev_p019",
+      "joined_year": 2022,
+      "name": "LEV Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 11,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 8,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 746075,
+        "until_year": 2031
+      },
+      "id": "lev_p020",
+      "joined_year": 2024,
+      "name": "LEV Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 19,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 22,
+        "month": 5,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1564098,
+        "until_year": 2031
+      },
+      "id": "lev_p021",
+      "joined_year": 2024,
+      "name": "LEV Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 7,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 22,
+        "month": 10,
+        "year": 1999
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 645652,
+        "until_year": 2028
+      },
+      "id": "lev_p022",
+      "joined_year": 2020,
+      "name": "LEV Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 15,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 5,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1672576,
+        "until_year": 2029
+      },
+      "id": "lev_p023",
+      "joined_year": 2024,
+      "name": "LEV Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 9,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 21,
+        "month": 9,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1325404,
+        "until_year": 2029
+      },
+      "id": "lev_p024",
+      "joined_year": 2023,
+      "name": "LEV Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 24,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 20,
+        "month": 11,
+        "year": 2006
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 292688,
+        "until_year": 2029
+      },
+      "id": "lev_p025",
+      "joined_year": 2026,
+      "name": "LEV Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 27,
+      "tier": "Y",
+      "traits": []
+    }
+  ],
+  "reputation": 55,
+  "short_name": "LEV",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 26354,
+    "name": "Ciutat de València"
+  },
+  "tactics_default": {
+    "formation": "4-2-3-1",
+    "mentality": "equilibrado",
+    "pressing": "medio",
+    "tempo": "normal",
+    "width": "normal"
+  }
+}

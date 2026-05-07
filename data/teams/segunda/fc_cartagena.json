@@ -1,0 +1,740 @@
+{
+  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "city": "Cartagena",
+  "colors": {
+    "primary": "#000000",
+    "secondary": "#FFD700"
+  },
+  "division": "segunda",
+  "finances": {
+    "budget_transfers_eur": 1000000,
+    "tv_revenue_eur_year": 6000000,
+    "wage_budget_eur_year": 7000000
+  },
+  "founded": 1995,
+  "id": "fc_cartagena",
+  "manager": {
+    "birth_year": 1975,
+    "name": "Por confirmar",
+    "nationality": "ES",
+    "preferred_formation": "4-4-2",
+    "preferred_style": "equilibrado"
+  },
+  "name": "Fútbol Club Cartagena",
+  "players": [
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 9,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 619422,
+        "until_year": 2029
+      },
+      "id": "car_p001",
+      "joined_year": 2021,
+      "name": "CAR Player 1",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 1,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 15,
+        "month": 3,
+        "year": 2001
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 389378,
+        "until_year": 2031
+      },
+      "id": "car_p002",
+      "joined_year": 2026,
+      "name": "CAR Player 2",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "R",
+      "shirt_number": 13,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 18,
+        "month": 9,
+        "year": 2010
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 715785,
+        "until_year": 2028
+      },
+      "id": "car_p003",
+      "joined_year": 2025,
+      "name": "CAR Player 3",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "GK"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 25,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 12,
+        "month": 8,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1331607,
+        "until_year": 2031
+      },
+      "id": "car_p004",
+      "joined_year": 2020,
+      "name": "CAR Player 4",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 4,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 28,
+        "month": 11,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1865529,
+        "until_year": 2029
+      },
+      "id": "car_p005",
+      "joined_year": 2025,
+      "name": "CAR Player 5",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 5,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 17,
+        "month": 6,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 252681,
+        "until_year": 2031
+      },
+      "id": "car_p006",
+      "joined_year": 2022,
+      "name": "CAR Player 6",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "R",
+      "shirt_number": 14,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 15,
+        "month": 3,
+        "year": 2005
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 503106,
+        "until_year": 2028
+      },
+      "id": "car_p007",
+      "joined_year": 2021,
+      "name": "CAR Player 7",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 22,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 24,
+        "month": 6,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 634405,
+        "until_year": 2030
+      },
+      "id": "car_p008",
+      "joined_year": 2021,
+      "name": "CAR Player 8",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 3,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 19,
+        "month": 6,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 559450,
+        "until_year": 2029
+      },
+      "id": "car_p009",
+      "joined_year": 2020,
+      "name": "CAR Player 9",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 17,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 14,
+        "month": 4,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 515979,
+        "until_year": 2029
+      },
+      "id": "car_p010",
+      "joined_year": 2023,
+      "name": "CAR Player 10",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 2,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 7,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 174065,
+        "until_year": 2028
+      },
+      "id": "car_p011",
+      "joined_year": 2026,
+      "name": "CAR Player 11",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RB"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "R",
+      "shirt_number": 16,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 2,
+        "month": 2,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 677247,
+        "until_year": 2030
+      },
+      "id": "car_p012",
+      "joined_year": 2022,
+      "name": "CAR Player 12",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 6,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 11,
+        "month": 5,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 801473,
+        "until_year": 2030
+      },
+      "id": "car_p013",
+      "joined_year": 2022,
+      "name": "CAR Player 13",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CDM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 23,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 27,
+        "month": 12,
+        "year": 1994
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 807866,
+        "until_year": 2031
+      },
+      "id": "car_p014",
+      "joined_year": 2020,
+      "name": "CAR Player 14",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 8,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 25,
+        "month": 5,
+        "year": 2000
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 491982,
+        "until_year": 2028
+      },
+      "id": "car_p015",
+      "joined_year": 2024,
+      "name": "CAR Player 15",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 18,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 21,
+        "month": 7,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 521279,
+        "until_year": 2029
+      },
+      "id": "car_p016",
+      "joined_year": 2021,
+      "name": "CAR Player 16",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 21,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 1,
+        "month": 12,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 855693,
+        "until_year": 2029
+      },
+      "id": "car_p017",
+      "joined_year": 2020,
+      "name": "CAR Player 17",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 10,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 8,
+        "month": 6,
+        "year": 1996
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 324078,
+        "until_year": 2030
+      },
+      "id": "car_p018",
+      "joined_year": 2021,
+      "name": "CAR Player 18",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "CAM"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "R",
+      "shirt_number": 20,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 24,
+        "month": 10,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1633765,
+        "until_year": 2028
+      },
+      "id": "car_p019",
+      "joined_year": 2026,
+      "name": "CAR Player 19",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "L",
+      "shirt_number": 11,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 11,
+        "year": 1997
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 165898,
+        "until_year": 2030
+      },
+      "id": "car_p020",
+      "joined_year": 2026,
+      "name": "CAR Player 20",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "LW"
+      ],
+      "potential_tier": "Y",
+      "preferred_foot": "R",
+      "shirt_number": 19,
+      "tier": "Y",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 2,
+        "month": 5,
+        "year": 2002
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 435494,
+        "until_year": 2029
+      },
+      "id": "car_p021",
+      "joined_year": 2025,
+      "name": "CAR Player 21",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 7,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 17,
+        "month": 10,
+        "year": 2004
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 699980,
+        "until_year": 2030
+      },
+      "id": "car_p022",
+      "joined_year": 2025,
+      "name": "CAR Player 22",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "RW"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "L",
+      "shirt_number": 15,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 26,
+        "month": 7,
+        "year": 1995
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 15000000,
+        "salary_eur_year": 1241933,
+        "until_year": 2028
+      },
+      "id": "car_p023",
+      "joined_year": 2024,
+      "name": "CAR Player 23",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 9,
+      "tier": "C",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 20,
+        "month": 4,
+        "year": 1998
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 7000000,
+        "salary_eur_year": 822961,
+        "until_year": 2030
+      },
+      "id": "car_p024",
+      "joined_year": 2026,
+      "name": "CAR Player 24",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "D",
+      "preferred_foot": "R",
+      "shirt_number": 24,
+      "tier": "D",
+      "traits": []
+    },
+    {
+      "birth_date": {
+        "day": 23,
+        "month": 7,
+        "year": 2006
+      },
+      "captain": false,
+      "contract": {
+        "release_clause_eur": 20000000,
+        "salary_eur_year": 371327,
+        "until_year": 2031
+      },
+      "id": "car_p025",
+      "joined_year": 2024,
+      "name": "CAR Player 25",
+      "nationality": "ES",
+      "overrides": {
+
+      },
+      "positions": [
+        "ST"
+      ],
+      "potential_tier": "C",
+      "preferred_foot": "R",
+      "shirt_number": 27,
+      "tier": "Y",
+      "traits": []
+    }
+  ],
+  "reputation": 40,
+  "short_name": "CAR",
+  "signing_policy": "open",
+  "stadium": {
+    "capacity": 15105,
+    "name": "Estadio Cartagonova"
+  },
+  "tactics_default": {
+    "formation": "4-4-2",
+    "mentality": "equilibrado",
+    "pressing": "medio",
+    "tempo": "normal",
+    "width": "normal"
+  }
+}
