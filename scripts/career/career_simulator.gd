@@ -20,6 +20,8 @@ class SeasonRecord:
 	var primera_top_scorer_team: String = ""
 	var primera_top_scorer_goals: int = 0
 	var segunda_champion_name: String = ""
+	var copa_champion_name: String = ""
+	var copa_runner_up_name: String = ""
 	var promoted_names: Array = []
 	var relegated_names: Array = []
 	var retirements_count: int = 0
@@ -29,6 +31,7 @@ class SeasonRecord:
 	var top_transfer: Dictionary = {}  # { player, from, to, fee }
 	var primera_simulation_secs: float = 0.0
 	var segunda_simulation_secs: float = 0.0
+	var copa_simulation_secs: float = 0.0
 
 
 class History:
@@ -36,6 +39,7 @@ class History:
 	var seasons: Array = []  # Array[SeasonRecord]
 	var primera_titles: Dictionary = {}  # team_id -> count
 	var segunda_titles: Dictionary = {}
+	var copa_titles: Dictionary = {}     # team_name -> count (Copa del Rey)
 	var career_goals: Dictionary = {}  # player_id -> { name, team_short, goals }
 
 
@@ -105,6 +109,16 @@ static func run(all_teams: Array, start_year: int, n_seasons: int, seed_base: in
 			# Actualizar el equipo "actual" al último visto
 			history.career_goals[pid]["team_short"] = String(info["team_name"])
 
+		# 4) Copa del Rey (después de Liga, antes de asc/desc)
+		var t_copa_start: int = Time.get_ticks_msec()
+		var cup_bracket := CupSimulator.run(all_teams, year, seed_base + i * 10 + 5)
+		var t_copa_end: int = Time.get_ticks_msec()
+		record.copa_simulation_secs = (t_copa_end - t_copa_start) / 1000.0
+		record.copa_champion_name = cup_bracket.champion_name
+		record.copa_runner_up_name = cup_bracket.runner_up_name
+		if cup_bracket.champion_name != "":
+			history.copa_titles[cup_bracket.champion_name] = int(history.copa_titles.get(cup_bracket.champion_name, 0)) + 1
+
 		# 4.5) Actualizar reputaciones según resultados
 		ReputationUpdate.apply_after_season(p_result.table, s_result.table, all_teams)
 
@@ -170,25 +184,15 @@ static func _short_for_team_id(teams: Array, team_id: String) -> String:
 
 
 static func _print_year_summary(r: SeasonRecord) -> void:
-	var sim_total: float = r.primera_simulation_secs + r.segunda_simulation_secs
-	var ts: String = ""
-	if not r.top_transfer.is_empty():
-		ts = "%s %s→%s %s" % [
-			String(r.top_transfer["player"]).left(18),
-			String(r.top_transfer["from"]),
-			String(r.top_transfer["to"]),
-			TransferMarket._fmt_eur(int(r.top_transfer["fee"])),
-		]
-	print("  %d-%d  Campeón: %-30s  Pichichi: %-22s (%2dg)  Asc:%-9s  Desc:%-9s  Retiros:%2d  Canteranos:%2d  Top fichaje: %s  [%.1fs]" % [
+	var sim_total: float = r.primera_simulation_secs + r.segunda_simulation_secs + r.copa_simulation_secs
+	print("  %d-%d  Liga: %-28s  Copa: %-28s  Pichichi: %-22s (%2dg)  Retiros:%2d  Canteranos:%2d  [%.1fs]" % [
 		r.year, r.year + 1,
-		r.primera_champion_name.left(30),
+		r.primera_champion_name.left(28),
+		r.copa_champion_name.left(28) if r.copa_champion_name else "(no jugada)",
 		r.primera_top_scorer_name.left(22),
 		r.primera_top_scorer_goals,
-		_short_arr(r.promoted_names),
-		_short_arr(r.relegated_names),
 		r.retirements_count,
 		r.canteranos_added,
-		ts,
 		sim_total,
 	])
 
@@ -217,6 +221,15 @@ static func print_history_summary(history: History, all_teams: Array) -> void:
 				team_name = t.name
 				break
 		print("    %3d  %s" % [int(history.primera_titles[tid]), team_name])
+
+	# Títulos de Copa del Rey
+	if history.copa_titles.size() > 0:
+		print("\n  Títulos de Copa del Rey:")
+		var copa_arr: Array = history.copa_titles.keys()
+		copa_arr.sort_custom(func(a: String, b: String) -> bool:
+			return int(history.copa_titles[a]) > int(history.copa_titles[b]))
+		for name in copa_arr:
+			print("    %3d  %s" % [int(history.copa_titles[name]), name])
 
 	# Top goleadores de carrera
 	print("\n  Máximos goleadores de la carrera:")
