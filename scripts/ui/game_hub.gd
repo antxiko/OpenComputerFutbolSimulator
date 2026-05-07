@@ -29,6 +29,7 @@ const VIEW_FIXTURES := "fixtures"
 const VIEW_TEAM := "team"
 const VIEW_MATCH := "match"
 const VIEW_TACTICS := "tactics"
+const VIEW_MARKET := "market"
 
 
 # --------------------------------------------------------------------------- #
@@ -74,6 +75,8 @@ var view_table_button: Button
 var view_fixtures_button: Button
 var view_team_button: Button
 var view_tactics_button: Button
+var view_market_button: Button
+var market_filter_position: String = "ALL"  # filtro actual de posición en mercado
 var user_team_label: Label
 var content_area: VBoxContainer
 var advance_button: Button
@@ -181,6 +184,8 @@ func _build_ui() -> void:
 	view_tabs.add_child(view_team_button)
 	view_tactics_button = _make_tab_button("Mi alineación", _on_select_view.bind(VIEW_TACTICS))
 	view_tabs.add_child(view_tactics_button)
+	view_market_button = _make_tab_button("Mercado", _on_select_view.bind(VIEW_MARKET))
+	view_tabs.add_child(view_market_button)
 
 	# Indicador de "Mi club"
 	var spacer2 := Control.new()
@@ -584,6 +589,8 @@ func _refresh_ui() -> void:
 	view_team_button.disabled = (current_view == VIEW_TEAM)
 	view_tactics_button.disabled = (current_view == VIEW_TACTICS)
 	view_tactics_button.visible = user_team_id != ""
+	view_market_button.disabled = (current_view == VIEW_MARKET)
+	view_market_button.visible = user_team_id != ""
 
 	# User team label
 	if user_team_id != "":
@@ -602,6 +609,7 @@ func _refresh_ui() -> void:
 		VIEW_TEAM: _render_team_view()
 		VIEW_MATCH: _render_match_view()
 		VIEW_TACTICS: _render_tactics_view()
+		VIEW_MARKET: _render_market_view()
 
 
 # --------------------------------------------------------------------------- #
@@ -1192,6 +1200,244 @@ func _add_option_row(grid: GridContainer, label_text: String, options: Array, cu
 	opt.item_selected.connect(func(idx: int) -> void:
 		callback.call(String(options[idx])))
 	grid.add_child(opt)
+
+
+# =========================================================================== #
+# Vista: Mercado de fichajes
+# =========================================================================== #
+func _render_market_view() -> void:
+	if user_team_id == "":
+		var l := Label.new()
+		l.text = "Selecciona un club para usar el mercado."
+		content_area.add_child(l)
+		return
+	var user_team := _find_team_by_id(user_team_id)
+	if user_team == null:
+		return
+
+	# Header: presupuesto + filtros
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 24)
+	content_area.add_child(header)
+	var budget_label := Label.new()
+	var budget: int = user_team.finances.budget_transfers_eur if user_team.finances else 0
+	budget_label.text = "Presupuesto: %s" % TransferMarket._fmt_eur(budget)
+	budget_label.add_theme_font_size_override("font_size", 16)
+	budget_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	header.add_child(budget_label)
+
+	var filter_label := Label.new()
+	filter_label.text = " · Filtro pos:"
+	header.add_child(filter_label)
+	var filter_opt := OptionButton.new()
+	var positions: Array[String] = ["ALL", "GK", "CB", "LB", "RB", "CDM", "CM", "CAM", "LM", "RM", "LW", "RW", "ST"]
+	for i in positions.size():
+		filter_opt.add_item(positions[i], i)
+		if positions[i] == market_filter_position:
+			filter_opt.selected = i
+	filter_opt.item_selected.connect(func(idx: int) -> void:
+		market_filter_position = positions[idx]
+		_refresh_ui())
+	header.add_child(filter_opt)
+
+	content_area.add_child(HSeparator.new())
+
+	# Sección: comprar
+	var buy_title := Label.new()
+	buy_title.text = "💰 Buscar fichajes"
+	buy_title.add_theme_font_size_override("font_size", 16)
+	content_area.add_child(buy_title)
+
+	var buy_grid := GridContainer.new()
+	buy_grid.columns = 6
+	buy_grid.add_theme_constant_override("h_separation", 14)
+	buy_grid.add_theme_constant_override("v_separation", 3)
+	content_area.add_child(buy_grid)
+	for h in ["Jugador", "Equipo", "Pos", "Edad", "Ovr", "Valor / acción"]:
+		var l := Label.new()
+		l.text = h
+		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		l.add_theme_font_size_override("font_size", 12)
+		buy_grid.add_child(l)
+
+	# Recopilar candidatos: top 30 por overall (filtrado por posición si aplica)
+	var candidates: Array = []
+	for t: Team in all_teams:
+		if t.id == user_team_id:
+			continue
+		for p: Player in t.players:
+			if InjurySystem.is_injured(p):
+				continue
+			if market_filter_position != "ALL" and not (market_filter_position in p.positions):
+				continue
+			var ovr: int = PlayerFactory.compute_overall(p, "")
+			candidates.append({ "player": p, "team": t, "ovr": ovr })
+	candidates.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return int(a["ovr"]) > int(b["ovr"]))
+
+	for i in mini(30, candidates.size()):
+		var c: Dictionary = candidates[i]
+		var p: Player = c["player"]
+		var t: Team = c["team"]
+		var ovr: int = c["ovr"]
+		var value: int = MarketValue.compute(p, year, "")
+		var age: int = p.age_at(year, 7, 1)
+		_market_add_label(buy_grid, p.name, _player_color(p))
+		_market_add_label(buy_grid, t.short_name, _player_color(p))
+		_market_add_label(buy_grid, ", ".join(p.positions).left(15), _player_color(p))
+		_market_add_label(buy_grid, str(age), _player_color(p))
+		_market_add_label(buy_grid, str(ovr), _player_color(p))
+		var btn := Button.new()
+		btn.text = "Ofertar %s" % TransferMarket._fmt_eur(value)
+		btn.disabled = (value > budget)
+		btn.pressed.connect(_on_attempt_buy.bind(p, t, value))
+		buy_grid.add_child(btn)
+
+	content_area.add_child(HSeparator.new())
+
+	# Sección: vender
+	var sell_title := Label.new()
+	sell_title.text = "💸 Mi plantilla — vender"
+	sell_title.add_theme_font_size_override("font_size", 16)
+	content_area.add_child(sell_title)
+
+	var sell_grid := GridContainer.new()
+	sell_grid.columns = 6
+	sell_grid.add_theme_constant_override("h_separation", 14)
+	sell_grid.add_theme_constant_override("v_separation", 3)
+	content_area.add_child(sell_grid)
+	for h in ["Jugador", "Pos", "Edad", "Tier", "Ovr", "Valor / acción"]:
+		var l := Label.new()
+		l.text = h
+		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		l.add_theme_font_size_override("font_size", 12)
+		sell_grid.add_child(l)
+	var my_players: Array[Player] = user_team.players.duplicate()
+	my_players.sort_custom(func(a: Player, b: Player) -> bool:
+		return PlayerFactory.compute_overall(a, "") > PlayerFactory.compute_overall(b, ""))
+	for p in my_players:
+		var ovr: int = PlayerFactory.compute_overall(p, "")
+		var age: int = p.age_at(year, 7, 1)
+		var value: int = MarketValue.compute(p, year, "")
+		_market_add_label(sell_grid, p.name, _player_color(p))
+		_market_add_label(sell_grid, ", ".join(p.positions).left(15), _player_color(p))
+		_market_add_label(sell_grid, str(age), _player_color(p))
+		_market_add_label(sell_grid, p.tier, _player_color(p))
+		_market_add_label(sell_grid, str(ovr), _player_color(p))
+		var btn := Button.new()
+		btn.text = "Vender %s" % TransferMarket._fmt_eur(value)
+		btn.pressed.connect(_on_attempt_sell.bind(p, value))
+		sell_grid.add_child(btn)
+
+
+func _market_add_label(grid: GridContainer, text: String, color: Color) -> void:
+	var l := Label.new()
+	l.text = text
+	l.add_theme_color_override("font_color", color)
+	grid.add_child(l)
+
+
+func _player_color(p: Player) -> Color:
+	if InjurySystem.is_injured(p):
+		return Color(1.0, 0.5, 0.5)
+	match p.tier:
+		"S": return Color(1.0, 0.85, 0.2)
+		"A": return Color(0.6, 1.0, 0.7)
+		"B": return Color(0.6, 0.8, 1.0)
+		"Y": return Color(0.9, 0.7, 1.0)
+	return Color(0.85, 0.85, 0.85)
+
+
+func _on_attempt_buy(player: Player, seller_team: Team, fee: int) -> void:
+	var user_team := _find_team_by_id(user_team_id)
+	if user_team == null:
+		return
+	var budget: int = user_team.finances.budget_transfers_eur
+	if fee > budget:
+		status_label.text = "Presupuesto insuficiente."
+		return
+	# Probabilidad de aceptación del vendedor (misma lógica del mercado IA)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = year * 1000 + hash(player.id)
+	var accept_p: float = TransferMarket._seller_acceptance_prob(player, seller_team, fee, year)
+	var popup := ConfirmationDialog.new()
+	popup.title = "Oferta por %s" % player.name
+	popup.size = Vector2(420, 200)
+	add_child(popup)
+	var box := VBoxContainer.new()
+	popup.add_child(box)
+	var info := Label.new()
+	info.text = "%s (%s, ovr %d, edad %d)\nClub actual: %s\nValor: %s\nProbabilidad de aceptación: %d%%" % [
+		player.name, ", ".join(player.positions),
+		PlayerFactory.compute_overall(player, ""),
+		player.age_at(year, 7, 1),
+		seller_team.name,
+		TransferMarket._fmt_eur(fee),
+		int(accept_p * 100),
+	]
+	box.add_child(info)
+	popup.ok_button_text = "Hacer oferta"
+	popup.cancel_button_text = "Cancelar"
+	popup.confirmed.connect(func() -> void:
+		popup.queue_free()
+		_resolve_buy(player, seller_team, fee, accept_p, rng))
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
+
+
+func _resolve_buy(player: Player, seller_team: Team, fee: int, accept_p: float, rng: RandomNumberGenerator) -> void:
+	var user_team := _find_team_by_id(user_team_id)
+	if user_team == null:
+		return
+	if rng.randf() > accept_p:
+		status_label.text = "❌ %s rechaza la oferta por %s." % [seller_team.short_name, player.name]
+		return
+	# Transfer
+	seller_team.players.erase(player)
+	user_team.players.append(player)
+	player.joined_year = year
+	user_team.finances.budget_transfers_eur -= fee
+	if seller_team.finances:
+		seller_team.finances.budget_transfers_eur += fee
+	status_label.text = "✓ %s fichado por %s. Coste: %s" % [player.name, user_team.short_name, TransferMarket._fmt_eur(fee)]
+	_refresh_ui()
+
+
+func _on_attempt_sell(player: Player, fee: int) -> void:
+	var popup := ConfirmationDialog.new()
+	popup.title = "Vender a %s" % player.name
+	popup.size = Vector2(380, 160)
+	add_child(popup)
+	var box := VBoxContainer.new()
+	popup.add_child(box)
+	var info := Label.new()
+	info.text = "Vendes a %s por %s.\n\nConfirmas?" % [player.name, TransferMarket._fmt_eur(fee)]
+	box.add_child(info)
+	popup.ok_button_text = "Vender"
+	popup.cancel_button_text = "Cancelar"
+	popup.confirmed.connect(func() -> void:
+		popup.queue_free()
+		_resolve_sell(player, fee))
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
+
+
+func _resolve_sell(player: Player, fee: int) -> void:
+	var user_team := _find_team_by_id(user_team_id)
+	if user_team == null:
+		return
+	user_team.players.erase(player)
+	if user_team.finances:
+		user_team.finances.budget_transfers_eur += fee
+	# Quitar del lineup template si está
+	if user_lineup_template.has("eleven_ids"):
+		var ids: Array = user_lineup_template["eleven_ids"]
+		var idx: int = ids.find(player.id)
+		if idx >= 0:
+			# Re-init lineup tras vender un titular
+			_initialize_user_lineup()
+	status_label.text = "✓ %s vendido. Ingresos: %s" % [player.name, TransferMarket._fmt_eur(fee)]
+	_refresh_ui()
 
 
 func _on_change_slot_player(slot_idx: int, slot: String, team: Team) -> void:
