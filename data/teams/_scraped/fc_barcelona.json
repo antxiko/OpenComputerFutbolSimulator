@@ -1,58 +1,46 @@
 {
   "_draft_note": "Plantilla scrapeada de Wikipedia ES (2026-27). Tiers asignados por heurística — verificar y refinar manualmente.",
-  "city": "Burgos",
+  "id": "fc_barcelona",
+  "name": "Fútbol Club Barcelona",
+  "short_name": "FCB",
+  "city": "Barcelona",
+  "founded": 1899,
+  "stadium": {
+    "name": "Spotify Camp Nou",
+    "capacity": 99354
+  },
   "colors": {
-    "primary": "#FFFFFF",
-    "secondary": "#000000"
+    "primary": "#A50044",
+    "secondary": "#004D98"
   },
-  "division": "segunda",
-  "finances": {
-    "budget_transfers_eur": 1200000,
-    "tv_revenue_eur_year": 6000000,
-    "wage_budget_eur_year": 8000000
-  },
-  "founded": 1994,
-  "id": "burgos_cf",
+  "division": "primera",
+  "reputation": 96,
+  "signing_policy": "open",
   "manager": {
-    "birth_year": 1975,
-    "name": "Por confirmar",
-    "nationality": "ES",
-    "preferred_formation": "4-4-2",
-    "preferred_style": "equilibrado"
+    "name": "Hansi Flick",
+    "nationality": "DE",
+    "birth_year": 1965,
+    "preferred_formation": "4-3-3",
+    "preferred_style": "posesion"
   },
-  "name": "Burgos Club de Fútbol",
+  "tactics_default": {
+    "formation": "4-3-3",
+    "mentality": "ofensivo",
+    "tempo": "normal",
+    "pressing": "alto",
+    "width": "ancho"
+  },
+  "finances": {
+    "budget_transfers_eur": 80000000,
+    "wage_budget_eur_year": 280000000,
+    "tv_revenue_eur_year": 160000000
+  },
   "players": [
     {
-      "id": "bur_p001",
-      "name": "\"Chus\" Ruiz",
+      "id": "fcb_p001",
+      "name": "Joan Garcia",
       "birth_date": {
-        "year": 1997,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "GK"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 1,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2027,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p002",
-      "name": "Ander Cantero",
-      "birth_date": {
-        "year": 1995,
+        "year": 2002,
         "month": 6,
         "day": 15
       },
@@ -69,16 +57,42 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
+        "until_year": 2031,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "fcb_p002",
+      "name": "Wojciech Szczęsny",
+      "birth_date": {
+        "year": 1990,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "GK"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 25,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
         "until_year": 2027,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "bur_p003",
-      "name": "\"Álex\" Lizancos",
+      "id": "fcb_p003",
+      "name": "João Cancelo",
       "birth_date": {
-        "year": 2004,
+        "year": 1995,
         "month": 6,
         "day": 15
       },
@@ -97,136 +111,101 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2029,
+        "until_year": 2026,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "bur_p004",
-      "name": "Oier Luengo",
+      "id": "fcb_p004",
+      "name": "Alejandro Balde",
       "birth_date": {
-        "year": 1998,
+        "year": 2004,
         "month": 6,
         "day": 15
       },
       "nationality": "ES",
       "positions": [
-        "CB",
-        "LB",
-        "RB"
+        "LB"
       ],
       "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
+      "tier": "A",
+      "potential_tier": "S",
       "shirt_number": 3,
       "captain": false,
       "traits": [],
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
+        "until_year": 2028,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
       }
     },
     {
-      "id": "bur_p005",
-      "name": "Sergio González",
+      "id": "fcb_p005",
+      "name": "Ronald Araújo",
       "birth_date": {
-        "year": 1998,
+        "year": 1999,
         "month": 6,
         "day": 15
       },
       "nationality": "ES",
       "positions": [
-        "CB",
-        "LB",
-        "RB"
+        "CB"
       ],
       "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 6,
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 4,
       "captain": false,
       "traits": [],
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2027,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
+        "until_year": 2031,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
       }
     },
     {
-      "id": "bur_p006",
-      "name": "\"Grego\" Sierra",
+      "id": "fcb_p006",
+      "name": "Pau Cubarsí",
       "birth_date": {
-        "year": 1993,
+        "year": 2007,
         "month": 6,
         "day": 15
       },
       "nationality": "ES",
       "positions": [
-        "CB",
-        "LB",
-        "RB"
+        "CB"
       ],
       "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 8,
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 5,
       "captain": false,
       "traits": [],
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
+        "until_year": 2029,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
       }
     },
     {
-      "id": "bur_p007",
-      "name": "Florian Miguel",
+      "id": "fcb_p007",
+      "name": "Andreas Christensen",
       "birth_date": {
-        "year": 1997,
+        "year": 1996,
         "month": 6,
         "day": 15
       },
       "nationality": "ES",
       "positions": [
         "CB",
-        "LB",
-        "RB"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 12,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p008",
-      "name": "Aitor Buñuel",
-      "birth_date": {
-        "year": 1998,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CB",
-        "LB",
-        "RB"
+        "CDM"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -243,8 +222,8 @@
       }
     },
     {
-      "id": "bur_p009",
-      "name": "Brais Martínez",
+      "id": "fcb_p008",
+      "name": "Gerard Martín",
       "birth_date": {
         "year": 2002,
         "month": 6,
@@ -252,362 +231,52 @@
       },
       "nationality": "ES",
       "positions": [
-        "CB",
-        "LB",
-        "RB"
+        "LB"
       ],
       "preferred_foot": "R",
       "tier": "C",
       "potential_tier": "B",
-      "shirt_number": 22,
+      "shirt_number": 18,
       "captain": false,
       "traits": [],
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2027,
+        "until_year": 2028,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "bur_p010",
-      "name": "Saúl del Cerro",
+      "id": "fcb_p009",
+      "name": "Jules Koundé",
       "birth_date": {
-        "year": 2005,
+        "year": 1999,
         "month": 6,
         "day": 15
       },
       "nationality": "ES",
       "positions": [
-        "CM",
-        "CDM"
+        "RB",
+        "CB"
       ],
       "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 28,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2027,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p011",
-      "name": "Iván Martínez",
-      "birth_date": {
-        "year": 2005,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 36,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p012",
-      "name": "Pablo Galdames",
-      "birth_date": {
-        "year": 1997,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 4,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2027,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p013",
-      "name": "Miguel Atienza",
-      "birth_date": {
-        "year": 2000,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 5,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p014",
-      "name": "Kévin Appin",
-      "birth_date": {
-        "year": 1998,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 10,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2027,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p015",
-      "name": "David González",
-      "birth_date": {
-        "year": 2003,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 14,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2029,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p016",
-      "name": "\"Curro\" Sánchez",
-      "birth_date": {
-        "year": 1996,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 16,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2027,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p017",
-      "name": "Mario Cantero",
-      "birth_date": {
-        "year": 2002,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 17,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p018",
-      "name": "Iván Morante",
-      "birth_date": {
-        "year": 2001,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
+      "tier": "A",
+      "potential_tier": "A",
       "shirt_number": 23,
       "captain": false,
       "traits": [],
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
+        "until_year": 2030,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
       }
     },
     {
-      "id": "bur_p019",
-      "name": "Ethan Ventosa",
-      "birth_date": {
-        "year": 2004,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 32,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2027,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p020",
-      "name": "Marcelo Expósito",
-      "birth_date": {
-        "year": 2003,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 33,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2028,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p021",
-      "name": "Mateo Mejía",
-      "birth_date": {
-        "year": 2003,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "ST",
-        "LW",
-        "RW"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 7,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2028,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p022",
-      "name": "\"Fer\" Niño",
+      "id": "fcb_p010",
+      "name": "Eric García",
       "birth_date": {
         "year": 2001,
         "month": 6,
@@ -615,70 +284,13 @@
       },
       "nationality": "ES",
       "positions": [
-        "ST",
-        "LW",
-        "RW"
+        "CB",
+        "CDM"
       ],
       "preferred_foot": "R",
       "tier": "C",
       "potential_tier": "B",
-      "shirt_number": 9,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2029,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p023",
-      "name": "Víctor Mollejo",
-      "birth_date": {
-        "year": 2001,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "ST",
-        "LW",
-        "RW"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 11,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2028,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p024",
-      "name": "Mario González",
-      "birth_date": {
-        "year": 1996,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "ST",
-        "LW",
-        "RW"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 20,
+      "shirt_number": 24,
       "captain": false,
       "traits": [],
       "overrides": {},
@@ -690,36 +302,8 @@
       }
     },
     {
-      "id": "bur_p025",
-      "name": "Iñigo Córdoba",
-      "birth_date": {
-        "year": 1997,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "ST",
-        "LW",
-        "RW"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 21,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "bur_p026",
-      "name": "Hugo Cuenca",
+      "id": "fcb_p011",
+      "name": "Gavi",
       "birth_date": {
         "year": 2005,
         "month": 6,
@@ -727,27 +311,52 @@
       },
       "nationality": "ES",
       "positions": [
-        "ST",
-        "LW",
-        "RW"
+        "CM"
       ],
       "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 30,
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 6,
       "captain": false,
       "traits": [],
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
+        "until_year": 2030,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
       }
     },
     {
-      "id": "bur_p027",
-      "name": "Fermín García",
+      "id": "fcb_p012",
+      "name": "Pedri",
+      "birth_date": {
+        "year": 2003,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM",
+        "CAM"
+      ],
+      "preferred_foot": "R",
+      "tier": "S",
+      "potential_tier": "S",
+      "shirt_number": 8,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2030,
+        "salary_eur_year": 12000000,
+        "release_clause_eur": 200000000
+      }
+    },
+    {
+      "id": "fcb_p013",
+      "name": "Fermín",
       "birth_date": {
         "year": 2004,
         "month": 6,
@@ -761,7 +370,7 @@
       "preferred_foot": "R",
       "tier": "A",
       "potential_tier": "S",
-      "shirt_number": 31,
+      "shirt_number": 16,
       "captain": false,
       "traits": [],
       "overrides": {},
@@ -771,20 +380,275 @@
         "salary_eur_year": 6000000,
         "release_clause_eur": 80000000
       }
+    },
+    {
+      "id": "fcb_p014",
+      "name": "Marc Casadó",
+      "birth_date": {
+        "year": 2004,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CDM"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 17,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 2500000,
+        "release_clause_eur": 35000000
+      }
+    },
+    {
+      "id": "fcb_p015",
+      "name": "Dani Olmo",
+      "birth_date": {
+        "year": 1999,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CAM",
+        "LW"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "A",
+      "shirt_number": 20,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2030,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
+      }
+    },
+    {
+      "id": "fcb_p016",
+      "name": "Frenkie de Jong",
+      "birth_date": {
+        "year": 1998,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM",
+        "CDM"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 21,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
+      }
+    },
+    {
+      "id": "fcb_p017",
+      "name": "Marc Bernal",
+      "birth_date": {
+        "year": 2008,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CDM"
+      ],
+      "preferred_foot": "R",
+      "tier": "Y",
+      "potential_tier": "S",
+      "shirt_number": 22,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 300000,
+        "release_clause_eur": 20000000
+      }
+    },
+    {
+      "id": "fcb_p018",
+      "name": "Ferran Torres",
+      "birth_date": {
+        "year": 2000,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "LW",
+        "ST",
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 7,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "fcb_p019",
+      "name": "Robert Lewandowski",
+      "birth_date": {
+        "year": 1989,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 9,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
+      }
+    },
+    {
+      "id": "fcb_p020",
+      "name": "Lamine Yamal",
+      "birth_date": {
+        "year": 2008,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "RW",
+        "LW"
+      ],
+      "preferred_foot": "R",
+      "tier": "S",
+      "potential_tier": "S",
+      "shirt_number": 10,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2031,
+        "salary_eur_year": 12000000,
+        "release_clause_eur": 200000000
+      }
+    },
+    {
+      "id": "fcb_p021",
+      "name": "Raphinha",
+      "birth_date": {
+        "year": 1997,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "LW",
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 11,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
+      }
+    },
+    {
+      "id": "fcb_p022",
+      "name": "Marcus Rashford",
+      "birth_date": {
+        "year": 1998,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "LW",
+        "ST"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "A",
+      "shirt_number": 14,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
+      }
+    },
+    {
+      "id": "fcb_p023",
+      "name": "Roony Bardghji",
+      "birth_date": {
+        "year": 2006,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST",
+        "LW",
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 19,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
     }
-  ],
-  "reputation": 42,
-  "short_name": "BUR",
-  "signing_policy": "open",
-  "stadium": {
-    "capacity": 12643,
-    "name": "El Plantío"
-  },
-  "tactics_default": {
-    "formation": "4-4-2",
-    "mentality": "equilibrado",
-    "pressing": "medio",
-    "tempo": "normal",
-    "width": "normal"
-  }
+  ]
 }

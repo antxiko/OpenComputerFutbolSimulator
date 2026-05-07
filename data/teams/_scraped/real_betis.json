@@ -1,30 +1,44 @@
 {
   "_draft_note": "Plantilla scrapeada de Wikipedia ES (2026-27). Tiers asignados por heurística — verificar y refinar manualmente.",
-  "city": "Oviedo",
+  "id": "real_betis",
+  "name": "Real Betis Balompié",
+  "short_name": "BET",
+  "city": "Sevilla",
+  "founded": 1907,
+  "stadium": {
+    "name": "Estadio Benito Villamarín",
+    "capacity": 60721
+  },
   "colors": {
-    "primary": "#1057A1",
+    "primary": "#0BB363",
     "secondary": "#FFFFFF"
   },
   "division": "primera",
-  "finances": {
-    "budget_transfers_eur": 5000000,
-    "tv_revenue_eur_year": 36000000,
-    "wage_budget_eur_year": 28000000
-  },
-  "founded": 1926,
-  "id": "real_oviedo",
+  "reputation": 72,
+  "signing_policy": "open",
   "manager": {
-    "birth_year": 1977,
-    "name": "Veljko Paunović",
-    "nationality": "RS",
+    "name": "Manuel Pellegrini",
+    "nationality": "CL",
+    "birth_year": 1953,
     "preferred_formation": "4-2-3-1",
-    "preferred_style": "equilibrado"
+    "preferred_style": "posesion"
   },
-  "name": "Real Oviedo",
+  "tactics_default": {
+    "formation": "4-2-3-1",
+    "mentality": "equilibrado",
+    "tempo": "normal",
+    "pressing": "medio",
+    "width": "normal"
+  },
+  "finances": {
+    "budget_transfers_eur": 18000000,
+    "wage_budget_eur_year": 70000000,
+    "tv_revenue_eur_year": 60000000
+  },
   "players": [
     {
-      "id": "ovi_p001",
-      "name": "Horatiu Moldovan",
+      "id": "bet_p001",
+      "name": "Álvaro Valles",
       "birth_date": {
         "year": 1998,
         "month": 6,
@@ -43,16 +57,16 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2026,
+        "until_year": 2030,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p002",
-      "name": "Aarón Escandell",
+      "id": "bet_p002",
+      "name": "Adrián San Miguel",
       "birth_date": {
-        "year": 1996,
+        "year": 1987,
         "month": 6,
         "day": 15
       },
@@ -69,16 +83,16 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2027,
+        "until_year": 2026,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p003",
-      "name": "Miguel Narváez",
+      "id": "bet_p003",
+      "name": "Pau López",
       "birth_date": {
-        "year": 2002,
+        "year": 1995,
         "month": 6,
         "day": 15
       },
@@ -89,22 +103,22 @@
       "preferred_foot": "R",
       "tier": "C",
       "potential_tier": "B",
-      "shirt_number": 31,
+      "shirt_number": 25,
       "captain": false,
       "traits": [],
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2027,
+        "until_year": 2028,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p004",
-      "name": "Eric Bailly",
+      "id": "bet_p004",
+      "name": "Héctor Bellerín",
       "birth_date": {
-        "year": 1994,
+        "year": 1995,
         "month": 6,
         "day": 15
       },
@@ -123,16 +137,16 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2027,
+        "until_year": 2028,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p005",
-      "name": "Rahim Alhassane",
+      "id": "bet_p005",
+      "name": "Diego Llorente",
       "birth_date": {
-        "year": 2002,
+        "year": 1994,
         "month": 6,
         "day": 15
       },
@@ -151,16 +165,16 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2027,
+        "until_year": 2028,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p006",
-      "name": "David Costas",
+      "id": "bet_p006",
+      "name": "Natan de Souza",
       "birth_date": {
-        "year": 1995,
+        "year": 2001,
         "month": 6,
         "day": 15
       },
@@ -179,16 +193,16 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2028,
+        "until_year": 2030,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p007",
-      "name": "Dani Calvo",
+      "id": "bet_p007",
+      "name": "Marc Bartra",
       "birth_date": {
-        "year": 1994,
+        "year": 1991,
         "month": 6,
         "day": 15
       },
@@ -201,6 +215,34 @@
       "preferred_foot": "R",
       "tier": "C",
       "potential_tier": "B",
+      "shirt_number": 5,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "bet_p008",
+      "name": "Ricardo Rodríguez",
+      "birth_date": {
+        "year": 1993,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CB",
+        "LB",
+        "RB"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "A",
       "shirt_number": 12,
       "captain": false,
       "traits": [],
@@ -208,15 +250,15 @@
       "joined_year": 2022,
       "contract": {
         "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
       }
     },
     {
-      "id": "ovi_p008",
-      "name": "David Carmo",
+      "id": "bet_p009",
+      "name": "Valentín Gómez",
       "birth_date": {
-        "year": 2000,
+        "year": 2004,
         "month": 6,
         "day": 15
       },
@@ -235,16 +277,16 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2026,
+        "until_year": 2030,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p009",
-      "name": "Nacho Vidal",
+      "id": "bet_p010",
+      "name": "Junior Firpo",
       "birth_date": {
-        "year": 1995,
+        "year": 1997,
         "month": 6,
         "day": 15
       },
@@ -257,22 +299,22 @@
       "preferred_foot": "R",
       "tier": "C",
       "potential_tier": "B",
-      "shirt_number": 22,
+      "shirt_number": 23,
       "captain": false,
       "traits": [],
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2027,
+        "until_year": 2028,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p010",
-      "name": "Lucas Ahijado",
+      "id": "bet_p011",
+      "name": "Aitor Ruibal",
       "birth_date": {
-        "year": 1995,
+        "year": 1996,
         "month": 6,
         "day": 15
       },
@@ -291,128 +333,44 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "ovi_p011",
-      "name": "Javi López",
-      "birth_date": {
-        "year": 2002,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CB",
-        "LB",
-        "RB"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 25,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "ovi_p012",
-      "name": "Omar Falah",
-      "birth_date": {
-        "year": 2004,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CB",
-        "LB",
-        "RB"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 29,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "ovi_p013",
-      "name": "Marco Esteban",
-      "birth_date": {
-        "year": 2006,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CB",
-        "LB",
-        "RB"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 30,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
         "until_year": 2028,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p014",
-      "name": "Alberto Reina",
+      "id": "bet_p012",
+      "name": "Ángel Ortiz",
       "birth_date": {
-        "year": 1998,
+        "year": 2005,
         "month": 6,
         "day": 15
       },
       "nationality": "ES",
       "positions": [
-        "CM",
-        "CDM",
-        "CAM"
+        "CB",
+        "LB",
+        "RB"
       ],
       "preferred_foot": "R",
       "tier": "C",
       "potential_tier": "B",
-      "shirt_number": 5,
+      "shirt_number": 40,
       "captain": false,
       "traits": [],
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2027,
+        "until_year": 2029,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p015",
-      "name": "Kwasi Sibo",
+      "id": "bet_p013",
+      "name": "Sergi Altimira",
       "birth_date": {
-        "year": 1999,
+        "year": 2002,
         "month": 6,
         "day": 15
       },
@@ -431,16 +389,16 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2026,
+        "until_year": 2029,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p016",
-      "name": "Santi Cazorla",
+      "id": "bet_p014",
+      "name": "Pablo Fornals",
       "birth_date": {
-        "year": 1985,
+        "year": 1996,
         "month": 6,
         "day": 15
       },
@@ -459,72 +417,16 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2026,
+        "until_year": 2029,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p017",
-      "name": "Haissem Hassan",
-      "birth_date": {
-        "year": 2002,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 10,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2027,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "ovi_p018",
-      "name": "Santiago Colombatto",
+      "id": "bet_p015",
+      "name": "Sofyan Amrabat",
       "birth_date": {
         "year": 1997,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 11,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "ovi_p019",
-      "name": "Ovi Ejaria",
-      "birth_date": {
-        "year": 1998,
         "month": 6,
         "day": 15
       },
@@ -549,10 +451,10 @@
       }
     },
     {
-      "id": "ovi_p020",
-      "name": "Thiago Fernández",
+      "id": "bet_p016",
+      "name": "Álvaro Fidalgo",
       "birth_date": {
-        "year": 2004,
+        "year": 1997,
         "month": 6,
         "day": 15
       },
@@ -571,16 +473,71 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2026,
+        "until_year": 2030,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p021",
-      "name": "Leander Dendoncker",
+      "id": "bet_p017",
+      "name": "Rodrigo Riquelme",
       "birth_date": {
-        "year": 1995,
+        "year": 2000,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "RW",
+        "LW"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "A",
+      "shirt_number": 17,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2030,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
+      }
+    },
+    {
+      "id": "bet_p018",
+      "name": "Nelson Deossa",
+      "birth_date": {
+        "year": 2000,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM",
+        "CDM",
+        "CAM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 18,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2030,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "bet_p019",
+      "name": "Giovani Lo Celso",
+      "birth_date": {
+        "year": 1996,
         "month": 6,
         "day": 15
       },
@@ -599,16 +556,16 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2027,
+        "until_year": 2028,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p022",
-      "name": "Luka Ilić",
+      "id": "bet_p020",
+      "name": "Marc Roca",
       "birth_date": {
-        "year": 2000,
+        "year": 1997,
         "month": 6,
         "day": 15
       },
@@ -627,72 +584,44 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "bet_p021",
+      "name": "Isco Alarcón",
+      "birth_date": {
+        "year": 1992,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM",
+        "CDM",
+        "CAM"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 22,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
         "until_year": 2028,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
       }
     },
     {
-      "id": "ovi_p023",
-      "name": "Nicolás Fonseca",
+      "id": "bet_p022",
+      "name": "Antony dos Santos",
       "birth_date": {
-        "year": 1999,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 23,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2026,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "ovi_p024",
-      "name": "Lamine Gueye",
-      "birth_date": {
-        "year": 2005,
-        "month": 6,
-        "day": 15
-      },
-      "nationality": "ES",
-      "positions": [
-        "CM",
-        "CDM",
-        "CAM"
-      ],
-      "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
-      "shirt_number": 28,
-      "captain": false,
-      "traits": [],
-      "overrides": {},
-      "joined_year": 2022,
-      "contract": {
-        "until_year": 2027,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
-      }
-    },
-    {
-      "id": "ovi_p025",
-      "name": "Ilyas Chaira",
-      "birth_date": {
-        "year": 2001,
+        "year": 2000,
         "month": 6,
         "day": 15
       },
@@ -703,24 +632,24 @@
         "RW"
       ],
       "preferred_foot": "R",
-      "tier": "C",
-      "potential_tier": "B",
+      "tier": "A",
+      "potential_tier": "A",
       "shirt_number": 7,
       "captain": false,
       "traits": [],
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2028,
-        "salary_eur_year": 1000000,
-        "release_clause_eur": 15000000
+        "until_year": 2030,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 80000000
       }
     },
     {
-      "id": "ovi_p026",
-      "name": "Fede Viñas",
+      "id": "bet_p023",
+      "name": "Chimy Ávila",
       "birth_date": {
-        "year": 1999,
+        "year": 1994,
         "month": 6,
         "day": 15
       },
@@ -739,14 +668,14 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2026,
+        "until_year": 2027,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     },
     {
-      "id": "ovi_p027",
-      "name": "Thiago Borbas",
+      "id": "bet_p024",
+      "name": "Abde Ezzalzouli",
       "birth_date": {
         "year": 2002,
         "month": 6,
@@ -759,9 +688,37 @@
         "RW"
       ],
       "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 10,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 2500000,
+        "release_clause_eur": 35000000
+      }
+    },
+    {
+      "id": "bet_p025",
+      "name": "Cédric Bakambu",
+      "birth_date": {
+        "year": 1991,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST",
+        "LW",
+        "RW"
+      ],
+      "preferred_foot": "R",
       "tier": "C",
       "potential_tier": "B",
-      "shirt_number": 17,
+      "shirt_number": 11,
       "captain": false,
       "traits": [],
       "overrides": {},
@@ -773,10 +730,10 @@
       }
     },
     {
-      "id": "ovi_p028",
-      "name": "Álex Forés",
+      "id": "bet_p026",
+      "name": "Cucho Hernández",
       "birth_date": {
-        "year": 2001,
+        "year": 1999,
         "month": 6,
         "day": 15
       },
@@ -795,24 +752,38 @@
       "overrides": {},
       "joined_year": 2022,
       "contract": {
-        "until_year": 2026,
+        "until_year": 2030,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "bet_p027",
+      "name": "Pablo García",
+      "birth_date": {
+        "year": 2007,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST",
+        "LW",
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 52,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2029,
         "salary_eur_year": 1000000,
         "release_clause_eur": 15000000
       }
     }
-  ],
-  "reputation": 52,
-  "short_name": "OVI",
-  "signing_policy": "open",
-  "stadium": {
-    "capacity": 30500,
-    "name": "Carlos Tartiere"
-  },
-  "tactics_default": {
-    "formation": "4-2-3-1",
-    "mentality": "equilibrado",
-    "pressing": "medio",
-    "tempo": "normal",
-    "width": "normal"
-  }
+  ]
 }

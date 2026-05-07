@@ -1,5 +1,5 @@
 {
-  "_draft_note": "ESQUELETO generado automáticamente. Reemplazar nombres placeholder por reales y ajustar tiers/dorsales.",
+  "_draft_note": "Plantilla scrapeada de Wikipedia ES (2026-27). Tiers asignados por heurística — verificar y refinar manualmente.",
   "city": "Córdoba",
   "colors": {
     "primary": "#008000",
@@ -23,704 +23,728 @@
   "name": "Córdoba Club de Fútbol",
   "players": [
     {
-      "birth_date": {
-        "day": 22,
-        "month": 9,
-        "year": 1994
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 699687,
-        "until_year": 2029
-      },
       "id": "cor_p001",
-      "joined_year": 2026,
-      "name": "COR Player 1",
-      "nationality": "ES",
-      "overrides": {
-
+      "name": "Iker Álvarez",
+      "birth_date": {
+        "year": 2002,
+        "month": 6,
+        "day": 15
       },
+      "nationality": "ES",
       "positions": [
         "GK"
       ],
-      "potential_tier": "D",
       "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
       "shirt_number": 1,
-      "tier": "D",
-      "traits": []
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
     },
     {
-      "birth_date": {
-        "day": 7,
-        "month": 9,
-        "year": 2002
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 521124,
-        "until_year": 2031
-      },
       "id": "cor_p002",
-      "joined_year": 2024,
-      "name": "COR Player 2",
-      "nationality": "ES",
-      "overrides": {
-
+      "name": "Carlos Marín",
+      "birth_date": {
+        "year": 1997,
+        "month": 6,
+        "day": 15
       },
+      "nationality": "ES",
       "positions": [
         "GK"
       ],
-      "potential_tier": "D",
       "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
       "shirt_number": 13,
-      "tier": "D",
-      "traits": []
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
     },
     {
-      "birth_date": {
-        "day": 7,
-        "month": 2,
-        "year": 2007
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 20000000,
-        "salary_eur_year": 298250,
-        "until_year": 2029
-      },
       "id": "cor_p003",
-      "joined_year": 2020,
-      "name": "COR Player 3",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "GK"
-      ],
-      "potential_tier": "C",
-      "preferred_foot": "L",
-      "shirt_number": 25,
-      "tier": "Y",
-      "traits": []
-    },
-    {
+      "name": "Ignasi Vilarrasa",
       "birth_date": {
-        "day": 15,
-        "month": 3,
-        "year": 2002
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 15000000,
-        "salary_eur_year": 1488920,
-        "until_year": 2030
-      },
-      "id": "cor_p004",
-      "joined_year": 2023,
-      "name": "COR Player 4",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "CB"
-      ],
-      "potential_tier": "C",
-      "preferred_foot": "R",
-      "shirt_number": 4,
-      "tier": "C",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 10,
-        "month": 12,
-        "year": 1996
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 15000000,
-        "salary_eur_year": 1139392,
-        "until_year": 2030
-      },
-      "id": "cor_p005",
-      "joined_year": 2026,
-      "name": "COR Player 5",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "CB"
-      ],
-      "potential_tier": "C",
-      "preferred_foot": "L",
-      "shirt_number": 5,
-      "tier": "C",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 20,
-        "month": 8,
-        "year": 1996
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 583857,
-        "until_year": 2030
-      },
-      "id": "cor_p006",
-      "joined_year": 2024,
-      "name": "COR Player 6",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "CB"
-      ],
-      "potential_tier": "D",
-      "preferred_foot": "R",
-      "shirt_number": 14,
-      "tier": "D",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 11,
-        "month": 7,
-        "year": 2009
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 20000000,
-        "salary_eur_year": 455300,
-        "until_year": 2030
-      },
-      "id": "cor_p007",
-      "joined_year": 2022,
-      "name": "COR Player 7",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "CB"
-      ],
-      "potential_tier": "D",
-      "preferred_foot": "R",
-      "shirt_number": 22,
-      "tier": "Y",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 12,
+        "year": 2000,
         "month": 6,
-        "year": 2001
+        "day": 15
       },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 15000000,
-        "salary_eur_year": 923556,
-        "until_year": 2030
-      },
-      "id": "cor_p008",
-      "joined_year": 2025,
-      "name": "COR Player 8",
       "nationality": "ES",
-      "overrides": {
-
-      },
       "positions": [
-        "LB"
-      ],
-      "potential_tier": "C",
-      "preferred_foot": "R",
-      "shirt_number": 3,
-      "tier": "C",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 7,
-        "month": 5,
-        "year": 2000
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 687752,
-        "until_year": 2028
-      },
-      "id": "cor_p009",
-      "joined_year": 2024,
-      "name": "COR Player 9",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "LB"
-      ],
-      "potential_tier": "D",
-      "preferred_foot": "L",
-      "shirt_number": 17,
-      "tier": "D",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 23,
-        "month": 5,
-        "year": 2001
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 593051,
-        "until_year": 2029
-      },
-      "id": "cor_p010",
-      "joined_year": 2023,
-      "name": "COR Player 10",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
+        "CB",
+        "LB",
         "RB"
       ],
-      "potential_tier": "D",
       "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
       "shirt_number": 2,
-      "tier": "D",
-      "traits": []
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
     },
     {
+      "id": "cor_p004",
+      "name": "Juan María Alcedo",
       "birth_date": {
-        "day": 3,
-        "month": 9,
-        "year": 2004
+        "year": 2001,
+        "month": 6,
+        "day": 15
       },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 20000000,
-        "salary_eur_year": 433312,
-        "until_year": 2028
-      },
-      "id": "cor_p011",
-      "joined_year": 2021,
-      "name": "COR Player 11",
       "nationality": "ES",
-      "overrides": {
-
-      },
       "positions": [
+        "CB",
+        "LB",
         "RB"
       ],
-      "potential_tier": "Y",
-      "preferred_foot": "L",
-      "shirt_number": 16,
-      "tier": "Y",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 2,
-        "month": 3,
-        "year": 1994
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 15000000,
-        "salary_eur_year": 947759,
-        "until_year": 2028
-      },
-      "id": "cor_p012",
-      "joined_year": 2025,
-      "name": "COR Player 12",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "CDM"
-      ],
-      "potential_tier": "C",
-      "preferred_foot": "L",
-      "shirt_number": 6,
-      "tier": "C",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 2,
-        "month": 9,
-        "year": 1996
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 597899,
-        "until_year": 2028
-      },
-      "id": "cor_p013",
-      "joined_year": 2025,
-      "name": "COR Player 13",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "CDM"
-      ],
-      "potential_tier": "D",
       "preferred_foot": "R",
-      "shirt_number": 23,
-      "tier": "D",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 4,
-        "month": 12,
-        "year": 1997
-      },
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 3,
       "captain": false,
-      "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 656140,
-        "until_year": 2030
-      },
-      "id": "cor_p014",
-      "joined_year": 2024,
-      "name": "COR Player 14",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "CM"
-      ],
-      "potential_tier": "D",
-      "preferred_foot": "L",
-      "shirt_number": 8,
-      "tier": "D",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 18,
-        "month": 7,
-        "year": 2001
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 844115,
-        "until_year": 2028
-      },
-      "id": "cor_p015",
-      "joined_year": 2025,
-      "name": "COR Player 15",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "CM"
-      ],
-      "potential_tier": "D",
-      "preferred_foot": "L",
-      "shirt_number": 18,
-      "tier": "D",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 26,
-        "month": 3,
-        "year": 1999
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 20000000,
-        "salary_eur_year": 269856,
-        "until_year": 2030
-      },
-      "id": "cor_p016",
+      "traits": [],
+      "overrides": {},
       "joined_year": 2022,
-      "name": "COR Player 16",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "CM"
-      ],
-      "potential_tier": "Y",
-      "preferred_foot": "R",
-      "shirt_number": 21,
-      "tier": "Y",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 22,
-        "month": 10,
-        "year": 1999
-      },
-      "captain": false,
       "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 816305,
-        "until_year": 2031
-      },
-      "id": "cor_p017",
-      "joined_year": 2021,
-      "name": "COR Player 17",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "CAM"
-      ],
-      "potential_tier": "D",
-      "preferred_foot": "R",
-      "shirt_number": 10,
-      "tier": "D",
-      "traits": []
+        "until_year": 2026,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
     },
     {
+      "id": "cor_p005",
+      "name": "Álex Martín",
       "birth_date": {
-        "day": 25,
-        "month": 5,
-        "year": 2001
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 625230,
-        "until_year": 2031
-      },
-      "id": "cor_p018",
-      "joined_year": 2021,
-      "name": "COR Player 18",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "CAM"
-      ],
-      "potential_tier": "D",
-      "preferred_foot": "R",
-      "shirt_number": 20,
-      "tier": "D",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 23,
-        "month": 11,
-        "year": 2000
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 15000000,
-        "salary_eur_year": 1755237,
-        "until_year": 2028
-      },
-      "id": "cor_p019",
-      "joined_year": 2024,
-      "name": "COR Player 19",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "LW"
-      ],
-      "potential_tier": "C",
-      "preferred_foot": "L",
-      "shirt_number": 11,
-      "tier": "C",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 24,
-        "month": 3,
-        "year": 1999
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 656314,
-        "until_year": 2030
-      },
-      "id": "cor_p020",
-      "joined_year": 2020,
-      "name": "COR Player 20",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "LW"
-      ],
-      "potential_tier": "D",
-      "preferred_foot": "R",
-      "shirt_number": 19,
-      "tier": "D",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 22,
-        "month": 11,
-        "year": 1996
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 15000000,
-        "salary_eur_year": 1856555,
-        "until_year": 2030
-      },
-      "id": "cor_p021",
-      "joined_year": 2022,
-      "name": "COR Player 21",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "RW"
-      ],
-      "potential_tier": "C",
-      "preferred_foot": "R",
-      "shirt_number": 7,
-      "tier": "C",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 7,
-        "month": 12,
-        "year": 2003
-      },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 510625,
-        "until_year": 2029
-      },
-      "id": "cor_p022",
-      "joined_year": 2020,
-      "name": "COR Player 22",
-      "nationality": "ES",
-      "overrides": {
-
-      },
-      "positions": [
-        "RW"
-      ],
-      "potential_tier": "D",
-      "preferred_foot": "L",
-      "shirt_number": 15,
-      "tier": "D",
-      "traits": []
-    },
-    {
-      "birth_date": {
-        "day": 24,
+        "year": 1998,
         "month": 6,
-        "year": 1997
+        "day": 15
       },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 15000000,
-        "salary_eur_year": 1635954,
-        "until_year": 2031
-      },
-      "id": "cor_p023",
-      "joined_year": 2021,
-      "name": "COR Player 23",
       "nationality": "ES",
-      "overrides": {
-
-      },
       "positions": [
-        "ST"
+        "CB",
+        "LB",
+        "RB"
       ],
-      "potential_tier": "C",
       "preferred_foot": "R",
-      "shirt_number": 9,
       "tier": "C",
-      "traits": []
+      "potential_tier": "B",
+      "shirt_number": 4,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
     },
     {
+      "id": "cor_p006",
+      "name": "Franck Fomeyem",
       "birth_date": {
-        "day": 10,
-        "month": 5,
-        "year": 1997
+        "year": 2000,
+        "month": 6,
+        "day": 15
       },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 615389,
-        "until_year": 2030
-      },
-      "id": "cor_p024",
-      "joined_year": 2020,
-      "name": "COR Player 24",
       "nationality": "ES",
-      "overrides": {
-
-      },
       "positions": [
-        "ST"
+        "CB",
+        "LB",
+        "RB"
       ],
-      "potential_tier": "D",
       "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 12,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p007",
+      "name": "\"Xavi\" Sintes",
+      "birth_date": {
+        "year": 2002,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CB",
+        "LB",
+        "RB"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 15,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p008",
+      "name": "Rubén Alves",
+      "birth_date": {
+        "year": 1995,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CB",
+        "LB",
+        "RB"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 16,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p009",
+      "name": "Carlos Albarrán",
+      "birth_date": {
+        "year": 1994,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CB",
+        "LB",
+        "RB"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 21,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2025,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p010",
+      "name": "Álvaro Pérez, \"Trilli\"",
+      "birth_date": {
+        "year": 2004,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CB",
+        "LB",
+        "RB"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 22,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p011",
+      "name": "Théo Zidane",
+      "birth_date": {
+        "year": 2003,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM",
+        "CDM",
+        "CAM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 7,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p012",
+      "name": "\"Isma\" Ruiz",
+      "birth_date": {
+        "year": 2001,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM",
+        "CDM",
+        "CAM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 8,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p013",
+      "name": "Jacobo González",
+      "birth_date": {
+        "year": 1997,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM",
+        "CDM",
+        "CAM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 10,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p014",
+      "name": "Alberto del Moral",
+      "birth_date": {
+        "year": 2001,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM",
+        "CDM",
+        "CAM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 20,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p015",
+      "name": "Pedro Ortiz",
+      "birth_date": {
+        "year": 2001,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM",
+        "CDM",
+        "CAM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
       "shirt_number": 24,
-      "tier": "D",
-      "traits": []
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
     },
     {
+      "id": "cor_p016",
+      "name": "Mikel Goti",
       "birth_date": {
-        "day": 3,
-        "month": 5,
-        "year": 2008
+        "year": 2003,
+        "month": 6,
+        "day": 15
       },
-      "captain": false,
-      "contract": {
-        "release_clause_eur": 7000000,
-        "salary_eur_year": 789610,
-        "until_year": 2028
-      },
-      "id": "cor_p025",
-      "joined_year": 2020,
-      "name": "COR Player 25",
       "nationality": "ES",
-      "overrides": {
-
-      },
       "positions": [
-        "ST"
+        "CM",
+        "CDM",
+        "CAM"
       ],
-      "potential_tier": "C",
       "preferred_foot": "R",
-      "shirt_number": 27,
-      "tier": "D",
-      "traits": []
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 25,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p017",
+      "name": "\"Dani\" Requena",
+      "birth_date": {
+        "year": 2004,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM",
+        "CDM",
+        "CAM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 30,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p018",
+      "name": "Diego Bri",
+      "birth_date": {
+        "year": 2003,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST",
+        "LW",
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 5,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p019",
+      "name": "Diego Percan",
+      "birth_date": {
+        "year": 2002,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST",
+        "LW",
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 6,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p020",
+      "name": "Nikolay Obolskiy",
+      "birth_date": {
+        "year": 1997,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST",
+        "LW",
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 9,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p021",
+      "name": "Kevin Medina",
+      "birth_date": {
+        "year": 2001,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM",
+        "CDM",
+        "CAM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 11,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p022",
+      "name": "Sergi Guardiola",
+      "birth_date": {
+        "year": 1992,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST",
+        "LW",
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 14,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p023",
+      "name": "Adilson Mendes-Martins",
+      "birth_date": {
+        "year": 1997,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST",
+        "LW",
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 17,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p024",
+      "name": "Adrián Fuentes",
+      "birth_date": {
+        "year": 1997,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST",
+        "LW",
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 18,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p025",
+      "name": "Dalisson de Almeida",
+      "birth_date": {
+        "year": 2000,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM",
+        "CDM",
+        "CAM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 19,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
+    },
+    {
+      "id": "cor_p026",
+      "name": "Cristian Carracedo",
+      "birth_date": {
+        "year": 1996,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST",
+        "LW",
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 23,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
+      "joined_year": 2022,
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 15000000
+      }
     }
   ],
   "reputation": 38,
