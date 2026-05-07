@@ -84,6 +84,11 @@ Cosas que sabemos que están a medias o que hay que volver a mirar más adelante
 - Sin sonido.
 - Multi-save con varios slots; ahora solo "autosave".
 
+### Cambio de club entre temporadas (idea v2)
+- En el mundo real un mánager cambia de club cuando recibe oferta o le destituyen.
+- Ahora el club solo se elige en "Nueva partida". El código tiene `_on_pick_user_team` listo pero sin botón asociado.
+- v2: al final de cada temporada (en `_on_reset_season`), evaluar si el usuario podría tener oferta de otro club basado en su rendimiento + reputación del club que ofrece. Modal: "El [club X] está interesado en ti tras tu temporada con [club Y]. ¿Aceptas?"
+
 ### UI a futuro
 - Pantalla de mercado de fichajes (ahora invisible — el mercado se ejecuta en silencio al pulsar "Nueva temporada").
 - Pantalla de finanzas, contratos, salarios.
