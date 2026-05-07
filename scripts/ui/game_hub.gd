@@ -666,12 +666,19 @@ func _render_match_view() -> void:
 		l.add_theme_color_override("font_color", color)
 		content_area.add_child(l)
 
-	# Botón volver
+	# Botones acción
 	content_area.add_child(HSeparator.new())
+	var btns := HBoxContainer.new()
+	btns.add_theme_constant_override("separation", 8)
+	content_area.add_child(btns)
 	var back_btn := Button.new()
 	back_btn.text = "← Volver a resultados"
 	back_btn.pressed.connect(_on_select_view.bind(VIEW_FIXTURES))
-	content_area.add_child(back_btn)
+	btns.add_child(back_btn)
+	var view2d_btn := Button.new()
+	view2d_btn.text = "▶ Ver en 2D"
+	view2d_btn.pressed.connect(_on_open_2d_viewer.bind(r))
+	btns.add_child(view2d_btn)
 
 
 # --------------------------------------------------------------------------- #
@@ -772,6 +779,48 @@ func _on_team_selector_changed(idx: int, st: DivisionState) -> void:
 	if idx >= 0 and idx < st.teams.size():
 		selected_team = st.teams[idx]
 		_refresh_ui()
+
+
+# =========================================================================== #
+# Visor 2D del partido (overlay)
+# =========================================================================== #
+var match_viewer_overlay: Node = null
+
+func _on_open_2d_viewer(result: MatchResult) -> void:
+	if match_viewer_overlay != null:
+		match_viewer_overlay.queue_free()
+		match_viewer_overlay = null
+	# Reconstruir lineups (el resultado no los guarda explícitamente)
+	var home_team := _find_team_by_id(result.home_team_id)
+	var away_team := _find_team_by_id(result.away_team_id)
+	if home_team == null or away_team == null:
+		status_label.text = "No se pudieron reconstruir los lineups del partido."
+		return
+	# Restaurar condition para que AutoLineup escoja a los que jugaron (aprox)
+	for p: Player in home_team.players: p.condition = 100.0
+	for p: Player in away_team.players: p.condition = 100.0
+	var home_lineup: Lineup = null
+	var away_lineup: Lineup = null
+	if home_team.id == user_team_id:
+		home_lineup = _build_user_lineup(home_team)
+	if away_team.id == user_team_id:
+		away_lineup = _build_user_lineup(away_team)
+	if home_lineup == null:
+		home_lineup = AutoLineup.pick(home_team, home_team.tactics_default.formation)
+	if away_lineup == null:
+		away_lineup = AutoLineup.pick(away_team, away_team.tactics_default.formation)
+
+	var scene: PackedScene = load("res://scenes/match_viewer_2d.tscn")
+	var viewer: MatchViewer2D = scene.instantiate()
+	add_child(viewer)
+	match_viewer_overlay = viewer
+	viewer.setup(result, home_lineup, away_lineup, _on_close_2d_viewer)
+
+
+func _on_close_2d_viewer() -> void:
+	if match_viewer_overlay != null:
+		match_viewer_overlay.queue_free()
+		match_viewer_overlay = null
 
 
 # =========================================================================== #
