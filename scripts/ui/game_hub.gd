@@ -450,6 +450,8 @@ func _on_reset_season() -> void:
 
 
 func _simulate_jornada(state: DivisionState) -> void:
+	# Curar lesiones (7 días entre jornadas) antes de empezar
+	InjurySystem.heal_after_days(all_teams, 7)
 	var jornada: Array = state.calendar[state.current_jornada]
 	var team_index: Dictionary = {}
 	for t: Team in state.teams:
@@ -868,12 +870,12 @@ func _render_team_view() -> void:
 
 	# Tabla de plantilla
 	var grid := GridContainer.new()
-	grid.columns = 9
+	grid.columns = 10
 	grid.add_theme_constant_override("h_separation", 14)
 	grid.add_theme_constant_override("v_separation", 3)
 	content_area.add_child(grid)
 
-	var headers: Array[String] = ["#", "Nombre", "Pos", "Edad", "Nac", "Tier", "Pot", "Ovr", "Cont"]
+	var headers: Array[String] = ["#", "Nombre", "Pos", "Edad", "Nac", "Tier", "Pot", "Ovr", "Estado", "Cont"]
 	for h in headers:
 		var l := Label.new()
 		l.text = h
@@ -891,6 +893,7 @@ func _render_team_view() -> void:
 		var age: int = p.age_at(year, 7, 1)
 		var pos_str: String = ", ".join(p.positions)
 		var until_year: int = p.contract.until_year if p.contract != null else 0
+		var injury_str: String = InjurySystem.injury_summary(p)
 		var cells: Array[String] = [
 			str(p.shirt_number),
 			p.name,
@@ -900,6 +903,7 @@ func _render_team_view() -> void:
 			p.tier,
 			p.potential_tier,
 			str(ovr),
+			injury_str if injury_str != "" else "—",
 			str(until_year),
 		]
 		# Color por tier
@@ -909,6 +913,10 @@ func _render_team_view() -> void:
 			"A": color = Color(0.6, 1.0, 0.7)
 			"B": color = Color(0.6, 0.8, 1.0)
 			"Y": color = Color(0.9, 0.7, 1.0)
+		# Si está lesionado, color rojo (sobreescribe)
+		var is_inj: bool = InjurySystem.is_injured(p)
+		if is_inj:
+			color = Color(1.0, 0.5, 0.5)
 		for i in cells.size():
 			var l := Label.new()
 			l.text = cells[i]
@@ -1059,6 +1067,9 @@ func _build_user_lineup(team: Team) -> Lineup:
 		var p: Player = team.find_player(String(eleven_ids[i]))
 		if p == null:
 			# Jugador eliminado del equipo (vendido/retirado): regenerar lineup
+			return null
+		# Si está lesionado, también fallamos al user lineup (para que use AutoLineup que excluye lesionados)
+		if InjurySystem.is_injured(p):
 			return null
 		starting.append(p)
 		slots_typed.append(String(slot_assignments[i]) if i < slot_assignments.size() else "CM")

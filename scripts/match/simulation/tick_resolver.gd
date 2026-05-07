@@ -12,6 +12,7 @@ const TICK_DUR_MAX: int = 50
 const FOUL_BASE_PROB: float = 0.17        # ~28-35 faltas por partido total
 const YELLOW_GIVEN_FOUL: float = 0.16
 const RED_PROB_PER_TICK: float = 0.0005
+const INJURY_BASE_PROB: float = 0.005     # ~0.7-1 lesión por partido en promedio
 
 
 static func resolve(state: MatchState) -> Array[MatchEvent]:
@@ -57,6 +58,7 @@ static func resolve(state: MatchState) -> Array[MatchEvent]:
 
 	# 4) Eventos aleatorios independientes (faltas, tarjetas, lesiones)
 	_maybe_foul(state, def_lineup, events, rng)
+	_maybe_injury(state, events, rng)
 
 	# 5) Avanzar reloj
 	var dur: int = rng.randi_range(TICK_DUR_MIN, TICK_DUR_MAX)
@@ -383,3 +385,28 @@ static func _make_event(state: MatchState, type: String, player_id: String, desc
 static func _make_event_for_team(state: MatchState, team_id: String, type: String, player_id: String, description: String) -> MatchEvent:
 	return MatchEvent.make(state.minute(), state.second_in_minute(), type,
 		team_id, player_id, state.zone, description)
+
+
+# Lesiones aleatorias durante el partido.
+static func _maybe_injury(state: MatchState, events: Array, rng: RandomNumberGenerator) -> void:
+	if rng.randf() >= INJURY_BASE_PROB:
+		return
+	# Escoger jugador en pista (uniforme entre los 22 que jueguen)
+	var candidates: Array = []
+	for lineup in [state.home_lineup, state.away_lineup]:
+		for p: Player in lineup.starting_eleven:
+			if state.on_pitch.get(p.id, false) and not state.red_carded.get(p.id, false):
+				candidates.append({ "player": p, "team_id": lineup.team.id })
+	if candidates.is_empty():
+		return
+	var idx: int = rng.randi() % candidates.size()
+	var pick: Dictionary = candidates[idx]
+	var p: Player = pick["player"]
+	# Si ya está lesionado (caso raro: lesión en tick anterior pero aún visible), saltar
+	if InjurySystem.is_injured(p):
+		return
+	var info: Dictionary = InjurySystem.inflict(p, rng)
+	state.on_pitch[p.id] = false  # se marcha del campo
+	events.append(MatchEvent.make(state.minute(), state.second_in_minute(),
+		MatchEvent.T_INJURY, String(pick["team_id"]), p.id, state.zone,
+		"Lesión %s de %s (%d días)" % [info["tipo"], p.name, int(info["dias_restantes"])]))
