@@ -72,11 +72,25 @@ Cosas que sabemos que están a medias o que hay que volver a mirar más adelante
 
 ## 🎮 UI
 
-- No hay UI todavía. Todo se ejecuta en headless. La pantalla principal debería:
-  - Pre-partido: elegir 11 inicial, formación, mentalidad (penaliza el modo auto si lo dejas).
-  - Visor de partido (al menos vista textual cronológica de eventos, idealmente 2D cenital).
-  - Pantalla de plantilla, calendario, clasificación, mercado, finanzas.
-  - Multi-save.
+- ✅ **Hub principal** con tabs Primera/Segunda + Clasificación/Última jornada/Plantilla/Mi alineación.
+- ✅ **Pre-partido**: configuración persistente de "Mi club" + alineación manual (sin penalización 5%).
+- ✅ **Visor 2D del partido v1**: campo cenital, 22 jugadores estáticos en formación, balón que se mueve entre 3 zonas, log de eventos, marcador, controles play/pausa/velocidad.
+- ✅ **Save/Load** (un slot "autosave" via JSON en `user://saves/`).
+
+### Visor 2D — limitaciones v1 (a mejorar en v2)
+- Los jugadores son estáticos en su posición de formación. Solo el balón se mueve.
+- El balón salta entre 3 zonas (def/mid/atk) en lugar de trazar trayectorias suaves.
+- Sin animación de tiro, parada, regate, ni reacciones de jugadores.
+- Sin sonido.
+- Multi-save con varios slots; ahora solo "autosave".
+
+### UI a futuro
+- Pantalla de mercado de fichajes (ahora invisible — el mercado se ejecuta en silencio al pulsar "Nueva temporada").
+- Pantalla de finanzas, contratos, salarios.
+- Pantalla de calendario completo de la temporada (no solo última jornada).
+- Vista de histórico de carrera (campeones por año, pichichi, etc.).
+- Pre-partido bloqueante (vs configuración persistente actual): que ANTES de cada partido del usuario aparezca un modal con la alineación.
+- Multi-save con varios slots y nombres descriptivos.
 
 ---
 
