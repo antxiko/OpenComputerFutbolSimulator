@@ -13,13 +13,13 @@ static func pick(team: Team, formation: String = "") -> Lineup:
 		formation = "4-3-3"
 
 	var slots: Array = Lineup.FORMATIONS[formation]
-	# Pool prioritario: jugadores SANOS.
+	# Pool prioritario: jugadores SANOS y NO SANCIONADOS.
 	var healthy: Array[Player] = team.players.filter(func(p: Player) -> bool:
-		return not _is_injured(p)
+		return not _is_injured(p) and not CardSystem.is_suspended(p)
 	)
-	# Pool de respaldo: lesionados (si nos quedamos cortos los sacamos a regañadientes).
-	var injured: Array[Player] = team.players.filter(func(p: Player) -> bool:
-		return _is_injured(p)
+	# Pool de respaldo: lesionados o sancionados (si nos quedamos cortos).
+	var unavailable: Array[Player] = team.players.filter(func(p: Player) -> bool:
+		return _is_injured(p) or CardSystem.is_suspended(p)
 	)
 
 	var available: Array[Player] = healthy.duplicate()
@@ -29,10 +29,10 @@ static func pick(team: Team, formation: String = "") -> Lineup:
 	for slot_str: String in slots:
 		var best: Player = _pick_best_for_slot(slot_str, available)
 		if best == null:
-			# Fallback 1: tirar de lesionados (jugadores tocados pero capaces)
-			best = _pick_best_for_slot(slot_str, injured)
+			# Fallback 1: tirar de no-disponibles (lesionados/sancionados, último recurso)
+			best = _pick_best_for_slot(slot_str, unavailable)
 			if best != null:
-				injured.erase(best)
+				unavailable.erase(best)
 		if best == null and selected.size() < 11:
 			# Fallback 2: cualquier jugador del equipo no usado todavía,
 			# para garantizar siempre 11 (incluso si la plantilla es muy fina).

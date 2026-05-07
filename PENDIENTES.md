@@ -62,11 +62,11 @@ Cosas que sabemos que están a medias o que hay que volver a mirar más adelante
 
 ---
 
-## 🏆 Competiciones que faltan
+## 🏆 Competiciones
 
-- **Copa del Rey**: eliminatoria a partido único o doble, con todos los equipos profesionales. No implementada.
-- **Supercopa de España**: torneo Final 4 a inicio de temporada (campeón Liga + finalista Copa + campeón Copa + finalista Liga).
-- **Champions League / Europa League / Conference**: para los top 4-7 de Primera, planeado para v2.
+- ✅ **Copa del Rey**: 6 rondas single-elim con 42 equipos. Empate al 90 → mayor reputación gana.
+- ✅ **Supercopa de España**: Final 4 entre temporadas (top 2 Liga + top 2 Copa).
+- ⏳ **Champions League / Europa / Conference**: planeado para v2. Requiere generar ~12-16 equipos europeos ficticios y un calendario propio. Fase de grupos + KO.
 
 ---
 

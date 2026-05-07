@@ -30,6 +30,7 @@ const VIEW_TEAM := "team"
 const VIEW_MATCH := "match"
 const VIEW_TACTICS := "tactics"
 const VIEW_MARKET := "market"
+const VIEW_CAREER := "career"
 
 
 # --------------------------------------------------------------------------- #
@@ -43,6 +44,8 @@ class DivisionState:
 	var league_table: LeagueTable
 	var last_jornada_results: Array = []  # Array[MatchResult] de la última jugada
 	var seed_counter: int = 0
+	# Goleadores acumulados de la temporada en curso: player_id -> { name, team_short, goals }
+	var season_scorers: Dictionary = {}
 
 
 # --------------------------------------------------------------------------- #
@@ -64,6 +67,10 @@ var user_team_id: String = ""
 #   formation, eleven_ids (Array[String]), slot_assignments (Array[String]),
 #   tactics: { mentality, tempo, pressing, width }
 var user_lineup_template: Dictionary = {}
+# Histórico: una entrada por temporada completada. Cada entrada:
+# { year, division, position, played, won, drawn, lost, gf, ga, points,
+#   top_scorer_name, top_scorer_goals, cup_progress }
+var user_career_history: Array = []
 
 # UI refs (populadas en _build_ui)
 var year_label: Label
@@ -186,6 +193,9 @@ func _build_ui() -> void:
 	view_tabs.add_child(view_tactics_button)
 	view_market_button = _make_tab_button("Mercado", _on_select_view.bind(VIEW_MARKET))
 	view_tabs.add_child(view_market_button)
+	var view_career_button := _make_tab_button("📈 Carrera", _on_select_view.bind(VIEW_CAREER))
+	view_career_button.name = "ViewCareerButton"
+	view_tabs.add_child(view_career_button)
 
 	# Indicador de "Mi club" (solo lectura — el club se elige en Nueva partida)
 	var spacer2 := Control.new()
@@ -299,6 +309,7 @@ func _init_division(state: DivisionState, seed_offset: int) -> void:
 	state.league_table = LeagueTable.new()
 	state.league_table.init_with_teams(state.teams)
 	state.last_jornada_results = []
+	state.season_scorers = {}
 	state.seed_counter = (SEED_BASE + seed_offset) * 1000
 
 
@@ -326,7 +337,161 @@ func _do_advance_jornada() -> void:
 	if not any_advanced:
 		status_label.text = "Temporada completada. Pulsa 'Nueva temporada'."
 		return
+	# Si el usuario tuvo partido, mostrar resumen post-partido
+	var user_result := _find_user_result_in_last_jornada()
+	if user_result != null:
+		_show_post_match_modal(user_result)
 	_refresh_ui()
+
+
+func _find_user_result_in_last_jornada() -> MatchResult:
+	if user_team_id == "":
+		return null
+	for st in [primera_state, segunda_state]:
+		for r: MatchResult in st.last_jornada_results:
+			if r.home_team_id == user_team_id or r.away_team_id == user_team_id:
+				return r
+	return null
+
+
+func _show_post_match_modal(r: MatchResult) -> void:
+	var popup := AcceptDialog.new()
+	popup.title = "Resultado de tu partido"
+	popup.size = Vector2(540, 420)
+	popup.ok_button_text = "Continuar"
+	add_child(popup)
+
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	popup.add_child(box)
+
+	# Marcador
+	var is_user_home: bool = r.home_team_id == user_team_id
+	var user_scored: int = r.score_home if is_user_home else r.score_away
+	var rival_scored: int = r.score_away if is_user_home else r.score_home
+	var verdict: String = "EMPATE"
+	var verdict_color: Color = Color(0.85, 0.85, 0.85)
+	if user_scored > rival_scored:
+		verdict = "VICTORIA"
+		verdict_color = Color(0.4, 1.0, 0.5)
+	elif user_scored < rival_scored:
+		verdict = "DERROTA"
+		verdict_color = Color(1.0, 0.5, 0.5)
+
+	var verdict_label := Label.new()
+	verdict_label.text = verdict
+	verdict_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	verdict_label.add_theme_font_size_override("font_size", 22)
+	verdict_label.add_theme_color_override("font_color", verdict_color)
+	box.add_child(verdict_label)
+
+	var score_label := Label.new()
+	score_label.text = "%s   %d - %d   %s" % [r.home_team_name, r.score_home, r.score_away, r.away_team_name]
+	score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	score_label.add_theme_font_size_override("font_size", 16)
+	box.add_child(score_label)
+
+	box.add_child(HSeparator.new())
+
+	# Goleadores
+	var goal_evs: Array = r.events.filter(func(e: MatchEvent) -> bool: return e.type == MatchEvent.T_GOAL)
+	if goal_evs.size() > 0:
+		var goals_title := Label.new()
+		goals_title.text = "⚽ Goleadores:"
+		goals_title.add_theme_font_size_override("font_size", 13)
+		goals_title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		box.add_child(goals_title)
+		for ev: MatchEvent in goal_evs:
+			var team_short: String = ""
+			if ev.team_id == r.home_team_id:
+				team_short = "[" + r.home_team_name.substr(0, 3).to_upper() + "]"
+			else:
+				team_short = "[" + r.away_team_name.substr(0, 3).to_upper() + "]"
+			var l := Label.new()
+			l.text = "  %s %s %s" % [ev.clock_str(), team_short, ev.description]
+			box.add_child(l)
+	else:
+		var no_goals := Label.new()
+		no_goals.text = "(Sin goles)"
+		no_goals.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+		box.add_child(no_goals)
+
+	# MVP
+	var mvp_id: String = _compute_mvp(r)
+	if mvp_id != "":
+		box.add_child(HSeparator.new())
+		var mvp_player: Player = _find_player_globally(mvp_id)
+		var mvp_team: String = ""
+		# Encontrar a qué equipo pertenece
+		for t: Team in all_teams:
+			if t.find_player(mvp_id) != null:
+				mvp_team = t.short_name
+				break
+		var mvp_label := Label.new()
+		if mvp_player:
+			mvp_label.text = "🏆 MVP del partido: %s (%s)" % [mvp_player.name, mvp_team]
+		else:
+			mvp_label.text = "🏆 MVP: -"
+		mvp_label.add_theme_font_size_override("font_size", 13)
+		mvp_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		box.add_child(mvp_label)
+
+	# Stats compactos
+	box.add_child(HSeparator.new())
+	for tid in r.stats.keys():
+		var s: Dictionary = r.stats[tid]
+		var team_name: String = r.home_team_name if tid == r.home_team_id else r.away_team_name
+		var emoji: String = "🏠" if tid == user_team_id else "⚔️"
+		var stats_label := Label.new()
+		stats_label.text = "%s %s: %d tiros (%d a puerta) · %d corners · %d faltas · %d 🟨 · %d 🟥" % [
+			emoji,
+			team_name.left(20),
+			int(s.get("shots", 0)), int(s.get("shots_on_target", 0)),
+			int(s.get("corners", 0)), int(s.get("fouls", 0)),
+			int(s.get("yellows", 0)), int(s.get("reds", 0)),
+		]
+		stats_label.add_theme_font_size_override("font_size", 11)
+		box.add_child(stats_label)
+
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
+
+
+# Calcula el MVP del partido. Heurística simple:
+#   +5 puntos por gol, +3 por asistencia, +2 por parada (GK), -3 por roja, -1 por amarilla.
+# Devuelve player_id del que más puntos.
+func _compute_mvp(r: MatchResult) -> String:
+	var scores: Dictionary = {}
+	for ev: MatchEvent in r.events:
+		match ev.type:
+			MatchEvent.T_GOAL:
+				scores[ev.player_id] = float(scores.get(ev.player_id, 0)) + 5.0
+				if ev.secondary_player_id != "":
+					scores[ev.secondary_player_id] = float(scores.get(ev.secondary_player_id, 0)) + 3.0
+			MatchEvent.T_SAVE:
+				scores[ev.player_id] = float(scores.get(ev.player_id, 0)) + 2.0
+			MatchEvent.T_RED:
+				scores[ev.player_id] = float(scores.get(ev.player_id, 0)) - 3.0
+			MatchEvent.T_YELLOW:
+				scores[ev.player_id] = float(scores.get(ev.player_id, 0)) - 1.0
+	if scores.is_empty():
+		return ""
+	var best_id: String = ""
+	var best_score: float = -100.0
+	for pid in scores.keys():
+		if float(scores[pid]) > best_score:
+			best_score = float(scores[pid])
+			best_id = String(pid)
+	return best_id
+
+
+func _find_player_globally(player_id: String) -> Player:
+	for t: Team in all_teams:
+		var p: Player = t.find_player(player_id)
+		if p != null:
+			return p
+	return null
 
 
 func _find_user_fixture_in_current_jornada() -> Dictionary:
@@ -442,18 +607,276 @@ func _on_advance_full_season() -> void:
 
 
 func _on_reset_season() -> void:
-	year += 1
-	# Reputación dinámica con la temporada que acaba de terminar
+	# Antes de avanzar: si hay datos de liga, simular Copa y capturar histórico del usuario
+	var cup_bracket: CupBracket = null
+	var sc_qualifiers: Array = []
 	if primera_state.league_table != null and segunda_state.league_table != null:
+		cup_bracket = CupSimulator.run(all_teams, year, SEED_BASE + year * 7)
+		if user_team_id != "":
+			_capture_career_record(cup_bracket)
+		# Capturar clasificados a Supercopa: top 2 Liga + finalistas Copa
+		var liga_sorted: Array = primera_state.league_table.sorted_rows()
+		if liga_sorted.size() >= 1:
+			sc_qualifiers.append(_find_team_by_id(liga_sorted[0].team_id))
+		if liga_sorted.size() >= 2:
+			sc_qualifiers.append(_find_team_by_id(liga_sorted[1].team_id))
+		if cup_bracket and cup_bracket.champion_id != "":
+			sc_qualifiers.append(_find_team_by_id(cup_bracket.champion_id))
+		# Finalista de Copa = el perdedor de la final
+		if cup_bracket and cup_bracket.rounds.size() > 0:
+			var final_round: CupBracket.Round = cup_bracket.rounds[-1]
+			if final_round.fixtures.size() == 1:
+				var ffx: CupBracket.Fixture = final_round.fixtures[0]
+				var loser_id: String = ffx.away_id if ffx.winner_id == ffx.home_id else ffx.home_id
+				sc_qualifiers.append(_find_team_by_id(loser_id))
+		# Reputación dinámica con la temporada que acaba de terminar
 		ReputationUpdate.apply_after_season(primera_state.league_table, segunda_state.league_table, all_teams)
 		PromotionRelegation.apply(primera_state.league_table, segunda_state.league_table, all_teams)
+	year += 1
 	# Aging + retiros + canteranos
 	Aging.age_all(all_teams, year, SEED_BASE * 100)
 	for t: Team in all_teams:
 		Cantera.fill_squad_if_needed(t, year, SEED_BASE * 50)
+	# Reset de amarillas para la nueva temporada
+	CardSystem.reset_yellow_cards(all_teams)
 	# Mercado de fichajes
 	TransferMarket.run(all_teams, year, SEED_BASE * 7)
+	# Supercopa de España (con clasificados de la temporada que acaba de terminar)
+	if sc_qualifiers.size() >= 4:
+		var fallback: Team = null
+		var liga_sorted2: Array = primera_state.league_table.sorted_rows() if primera_state.league_table else []
+		if liga_sorted2.size() >= 3:
+			fallback = _find_team_by_id(liga_sorted2[2].team_id)
+		var sc_result: SupercopaSimulator.SupercopaResult = SupercopaSimulator.run(sc_qualifiers, fallback, year, SEED_BASE * 11)
+		if sc_result != null and user_team_id != "" and sc_result.has_team(user_team_id):
+			_show_supercopa_modal(sc_result)
+		elif sc_result != null:
+			status_label.text = "🏆 Supercopa %d: %s campeón (final vs %s)" % [year, sc_result.champion_name, sc_result.runner_up_name]
 	_start_season()
+
+
+func _show_supercopa_modal(sc: SupercopaSimulator.SupercopaResult) -> void:
+	var popup := AcceptDialog.new()
+	popup.title = "🏆 Supercopa de España %d" % sc.year
+	popup.size = Vector2(520, 360)
+	popup.ok_button_text = "Continuar"
+	add_child(popup)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	popup.add_child(box)
+
+	var champ_label := Label.new()
+	champ_label.text = "Campeón: %s" % sc.champion_name
+	champ_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	champ_label.add_theme_font_size_override("font_size", 18)
+	champ_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	box.add_child(champ_label)
+
+	var sub_label := Label.new()
+	sub_label.text = "Subcampeón: %s" % sc.runner_up_name
+	sub_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	box.add_child(sub_label)
+
+	box.add_child(HSeparator.new())
+
+	for m: Dictionary in sc.matches:
+		var r: MatchResult = m.get("result")
+		var round_name: String = String(m.get("round", "Partido"))
+		var l := Label.new()
+		var marker: String = ""
+		if m.get("home_id") == user_team_id or m.get("away_id") == user_team_id:
+			marker = " 🌟"
+		l.text = "%s%s: %s %d-%d %s" % [
+			round_name, marker,
+			String(m.get("home_name", "?")),
+			r.score_home if r else 0,
+			r.score_away if r else 0,
+			String(m.get("away_name", "?")),
+		]
+		box.add_child(l)
+
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
+
+
+# Captura un snapshot del rendimiento del usuario en la temporada que acaba de terminar.
+func _capture_career_record(cup_bracket: CupBracket) -> void:
+	var user_team := _find_team_by_id(user_team_id)
+	if user_team == null:
+		return
+	# Estado de liga del usuario (busca en su división)
+	var state: DivisionState = primera_state if user_team.division == "primera" else segunda_state
+	var sorted: Array = state.league_table.sorted_rows()
+	var record: Dictionary = {
+		"year": year,
+		"division": user_team.division,
+		"position": 0,
+		"played": 0, "won": 0, "drawn": 0, "lost": 0,
+		"gf": 0, "ga": 0, "points": 0,
+		"top_scorer_name": "—",
+		"top_scorer_goals": 0,
+		"cup_progress": "—",
+	}
+	for i in sorted.size():
+		if sorted[i].team_id == user_team_id:
+			record["position"] = i + 1
+			record["played"] = sorted[i].played
+			record["won"] = sorted[i].won
+			record["drawn"] = sorted[i].drawn
+			record["lost"] = sorted[i].lost
+			record["gf"] = sorted[i].goals_for
+			record["ga"] = sorted[i].goals_against
+			record["points"] = sorted[i].points()
+			break
+	# Pichichi del usuario: top scorer del equipo
+	var team_scorers: Array = []
+	for pid in state.season_scorers.keys():
+		var info: Dictionary = state.season_scorers[pid]
+		if user_team.find_player(pid) != null:
+			team_scorers.append(info)
+	team_scorers.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return int(a["goals"]) > int(b["goals"]))
+	if team_scorers.size() > 0:
+		record["top_scorer_name"] = String(team_scorers[0]["name"])
+		record["top_scorer_goals"] = int(team_scorers[0]["goals"])
+	# Progreso en Copa
+	if cup_bracket != null:
+		record["cup_progress"] = _compute_user_cup_progress(cup_bracket)
+	user_career_history.append(record)
+
+
+func _compute_user_cup_progress(bracket: CupBracket) -> String:
+	if bracket.champion_id == user_team_id:
+		return "🏆 Campeón"
+	# Buscar la última ronda donde el usuario perdió
+	var furthest_round: String = "Eliminado en 1ª"
+	for round_obj: CupBracket.Round in bracket.rounds:
+		# ¿bye?
+		if user_team_id in round_obj.byes:
+			furthest_round = "Bye en %s" % round_obj.name
+			continue
+		for fx: CupBracket.Fixture in round_obj.fixtures:
+			if fx.home_id == user_team_id or fx.away_id == user_team_id:
+				if fx.winner_id == user_team_id:
+					furthest_round = "Pasó %s" % round_obj.name
+				else:
+					furthest_round = "Eliminado en %s" % round_obj.name
+				break
+	return furthest_round
+
+
+# =========================================================================== #
+# Vista: Mi carrera (histórico)
+# =========================================================================== #
+func _render_career_view() -> void:
+	if user_team_id == "":
+		var l := Label.new()
+		l.text = "Sin club seleccionado."
+		content_area.add_child(l)
+		return
+	var user_team := _find_team_by_id(user_team_id)
+
+	var header := Label.new()
+	header.text = "📈 Carrera como mánager de %s" % user_team.name
+	header.add_theme_font_size_override("font_size", 18)
+	header.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	content_area.add_child(header)
+
+	if user_career_history.is_empty():
+		var no_data := Label.new()
+		no_data.text = "Aún no has completado ninguna temporada. Pulsa 'Nueva temp.' al final."
+		content_area.add_child(no_data)
+		return
+
+	# Stats agregados
+	var total_titles: int = 0
+	var total_cup: int = 0
+	var best_pos: int = 999
+	var best_pos_year: int = 0
+	var total_points: int = 0
+	var total_played: int = 0
+	var total_won: int = 0
+	var total_drawn: int = 0
+	var total_lost: int = 0
+	var total_gf: int = 0
+	var total_ga: int = 0
+	for r: Dictionary in user_career_history:
+		var pos: int = int(r["position"])
+		if pos == 1 and r["division"] == "primera":
+			total_titles += 1
+		if String(r.get("cup_progress", "")).contains("Campeón"):
+			total_cup += 1
+		if pos > 0 and pos < best_pos:
+			best_pos = pos
+			best_pos_year = int(r["year"])
+		total_points += int(r["points"])
+		total_played += int(r["played"])
+		total_won += int(r["won"])
+		total_drawn += int(r["drawn"])
+		total_lost += int(r["lost"])
+		total_gf += int(r["gf"])
+		total_ga += int(r["ga"])
+
+	var stats := Label.new()
+	stats.text = "Temporadas: %d  ·  🏆 Ligas: %d  ·  Copas: %d  ·  Mejor posición: #%d (%d-%d)" % [
+		user_career_history.size(), total_titles, total_cup,
+		best_pos if best_pos != 999 else 0,
+		best_pos_year, best_pos_year + 1,
+	]
+	content_area.add_child(stats)
+	var stats2 := Label.new()
+	stats2.text = "Total: %d PJ · %d G · %d E · %d P · GF %d · GC %d · DG %+d" % [
+		total_played, total_won, total_drawn, total_lost,
+		total_gf, total_ga, total_gf - total_ga,
+	]
+	stats2.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	content_area.add_child(stats2)
+
+	content_area.add_child(HSeparator.new())
+
+	# Tabla por temporada
+	var grid := GridContainer.new()
+	grid.columns = 8
+	grid.add_theme_constant_override("h_separation", 16)
+	grid.add_theme_constant_override("v_separation", 3)
+	content_area.add_child(grid)
+	for h in ["Año", "Div", "Pos", "PJ-G-E-P", "GF/GC", "Pts", "Pichichi", "Copa"]:
+		var l := Label.new()
+		l.text = h
+		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		l.add_theme_font_size_override("font_size", 12)
+		grid.add_child(l)
+	# Ordenar por año descendente
+	var sorted_history: Array = user_career_history.duplicate()
+	sorted_history.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return int(a["year"]) > int(b["year"]))
+	for r: Dictionary in sorted_history:
+		var pos: int = int(r["position"])
+		var color: Color = Color(0.85, 0.85, 0.85)
+		if pos == 1 and r["division"] == "primera":
+			color = Color(1.0, 0.85, 0.2)  # oro: campeón
+		elif pos <= 4 and r["division"] == "primera":
+			color = Color(0.6, 1.0, 0.7)  # verde: top 4
+		elif pos <= 6 and r["division"] == "primera":
+			color = Color(0.6, 0.8, 1.0)
+		var cells: Array[String] = [
+			"%d-%d" % [int(r["year"]), int(r["year"]) + 1 - 2000],
+			"1ª" if r["division"] == "primera" else "2ª",
+			"#%d" % pos,
+			"%d-%d-%d-%d" % [int(r["played"]), int(r["won"]), int(r["drawn"]), int(r["lost"])],
+			"%d/%d" % [int(r["gf"]), int(r["ga"])],
+			str(int(r["points"])),
+			"%s (%d)" % [String(r["top_scorer_name"]).left(20), int(r["top_scorer_goals"])],
+			String(r["cup_progress"]),
+		]
+		for c in cells:
+			var l := Label.new()
+			l.text = c
+			l.add_theme_color_override("font_color", color)
+			l.add_theme_font_size_override("font_size", 11)
+			grid.add_child(l)
 
 
 func _simulate_jornada(state: DivisionState) -> void:
@@ -471,6 +894,9 @@ func _simulate_jornada(state: DivisionState) -> void:
 	for fixture: Dictionary in jornada:
 		var home: Team = team_index[fixture["home_id"]]
 		var away: Team = team_index[fixture["away_id"]]
+		# Decrementar sanciones (los suspendidos cumplen ESTE partido)
+		CardSystem.decrement_for_team(home)
+		CardSystem.decrement_for_team(away)
 		# Si el usuario dirige uno de los equipos, usar su alineación personalizada
 		var home_lineup: Lineup = null
 		var away_lineup: Lineup = null
@@ -488,6 +914,24 @@ func _simulate_jornada(state: DivisionState) -> void:
 		if result != null:
 			state.league_table.record_match(result)
 			state.last_jornada_results.append(result)
+			# Procesar tarjetas → posibles sanciones para el próximo partido
+			CardSystem.process_match(result, all_teams)
+			# Acumular goleadores de la temporada
+			for pid in result.scorers.keys():
+				var goals: int = int(result.scorers[pid])
+				if not state.season_scorers.has(pid):
+					var p: Player = _find_player_globally(pid)
+					var team_short: String = ""
+					for t: Team in state.teams:
+						if t.find_player(pid) != null:
+							team_short = t.short_name
+							break
+					state.season_scorers[pid] = {
+						"name": p.name if p else pid,
+						"team_short": team_short,
+						"goals": 0,
+					}
+				state.season_scorers[pid]["goals"] += goals
 	state.current_jornada += 1
 
 
@@ -507,7 +951,7 @@ func _on_save_game() -> void:
 		"autosave", year, all_teams,
 		primera_state.current_jornada, segunda_state.current_jornada,
 		primera_state.league_table, segunda_state.league_table,
-		user_team_id, user_lineup_template)
+		user_team_id, user_lineup_template, user_career_history)
 	if result.get("ok", false):
 		status_label.text = "Partida guardada (autosave) — %s" % result["saved_at"]
 	else:
@@ -539,9 +983,10 @@ func _on_load_game() -> void:
 	primera_state.seed_counter = SEED_BASE * 1000 + primera_state.current_jornada * 100
 	segunda_state.seed_counter = (SEED_BASE + 1) * 1000 + segunda_state.current_jornada * 100
 
-	# Restaurar selección de "mi club" + alineación personal
+	# Restaurar selección de "mi club" + alineación personal + carrera
 	user_team_id = save_data.user_team_id
 	user_lineup_template = save_data.user_lineup_template.duplicate(true)
+	user_career_history = save_data.user_career_history.duplicate(true)
 
 	current_view = VIEW_TABLE
 	selected_team = null
@@ -593,6 +1038,11 @@ func _refresh_ui() -> void:
 	view_tactics_button.visible = user_team_id != ""
 	view_market_button.disabled = (current_view == VIEW_MARKET)
 	view_market_button.visible = user_team_id != ""
+	# Career button (find by name)
+	var career_btn: Button = find_child("ViewCareerButton", true, false)
+	if career_btn:
+		career_btn.disabled = (current_view == VIEW_CAREER)
+		career_btn.visible = user_team_id != ""
 
 	# User team label (short_name para que quepa)
 	if user_team_id != "":
@@ -612,6 +1062,7 @@ func _refresh_ui() -> void:
 		VIEW_MATCH: _render_match_view()
 		VIEW_TACTICS: _render_tactics_view()
 		VIEW_MARKET: _render_market_view()
+		VIEW_CAREER: _render_career_view()
 
 
 # --------------------------------------------------------------------------- #
@@ -915,6 +1366,15 @@ func _render_team_view() -> void:
 		var pos_str: String = ", ".join(p.positions)
 		var until_year: int = p.contract.until_year if p.contract != null else 0
 		var injury_str: String = InjurySystem.injury_summary(p)
+		var status_str: String = "—"
+		if injury_str != "":
+			status_str = "🏥 " + injury_str
+		elif CardSystem.is_suspended(p):
+			status_str = "🟥 sancionado %d" % p.suspended_matches
+		elif p.yellow_cards_season >= 4:
+			status_str = "🟨×%d (riesgo)" % p.yellow_cards_season
+		elif p.yellow_cards_season > 0:
+			status_str = "🟨×%d" % p.yellow_cards_season
 		var cells: Array[String] = [
 			str(p.shirt_number),
 			p.name,
@@ -924,7 +1384,7 @@ func _render_team_view() -> void:
 			p.tier,
 			p.potential_tier,
 			str(ovr),
-			injury_str if injury_str != "" else "—",
+			status_str,
 			str(until_year),
 		]
 		# Color por tier
@@ -934,9 +1394,10 @@ func _render_team_view() -> void:
 			"A": color = Color(0.6, 1.0, 0.7)
 			"B": color = Color(0.6, 0.8, 1.0)
 			"Y": color = Color(0.9, 0.7, 1.0)
-		# Si está lesionado, color rojo (sobreescribe)
+		# Si está lesionado o sancionado, color rojo (sobreescribe)
 		var is_inj: bool = InjurySystem.is_injured(p)
-		if is_inj:
+		var is_susp: bool = CardSystem.is_suspended(p)
+		if is_inj or is_susp:
 			color = Color(1.0, 0.5, 0.5)
 		for i in cells.size():
 			var l := Label.new()

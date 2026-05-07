@@ -25,11 +25,16 @@ static func run(teams: Array, season_year: int, seed_value: int) -> CupBracket:
 				p.condition = 100.0
 			for p: Player in away.players:
 				p.condition = 100.0
+			# Decrementar sanciones (en Copa también)
+			CardSystem.decrement_for_team(home)
+			CardSystem.decrement_for_team(away)
 			var home_lineup := AutoLineup.pick(home, home.tactics_default.formation)
 			var away_lineup := AutoLineup.pick(away, away.tactics_default.formation)
 			match_seed += 1
 			var result: MatchResult = MatchEngine.simulate(home_lineup, away_lineup, match_seed)
 			fx.result = result
+			if result != null:
+				CardSystem.process_match(result, teams)
 			# Determinar ganador
 			if result.score_home > result.score_away:
 				fx.winner_id = home.id

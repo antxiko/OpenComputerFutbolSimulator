@@ -28,6 +28,7 @@ class SaveData:
 	var segunda_table_snapshot: Dictionary = {}
 	var user_team_id: String = ""
 	var user_lineup_template: Dictionary = {}
+	var user_career_history: Array = []
 
 
 # ============================================================================
@@ -36,7 +37,8 @@ class SaveData:
 static func save_game(slot_name: String, year: int, all_teams: Array,
 		primera_jornada: int, segunda_jornada: int,
 		primera_table: LeagueTable, segunda_table: LeagueTable,
-		user_team_id: String = "", user_lineup_template: Dictionary = {}) -> Dictionary:
+		user_team_id: String = "", user_lineup_template: Dictionary = {},
+		user_career_history: Array = []) -> Dictionary:
 	# Crear directorio
 	if not DirAccess.dir_exists_absolute(SAVE_DIR):
 		var err: int = DirAccess.make_dir_recursive_absolute(SAVE_DIR)
@@ -53,6 +55,7 @@ static func save_game(slot_name: String, year: int, all_teams: Array,
 		"segunda_table_snapshot": _serialize_table(segunda_table),
 		"user_team_id": user_team_id,
 		"user_lineup_template": user_lineup_template.duplicate(true),
+		"user_career_history": user_career_history.duplicate(true),
 		"teams": all_teams.map(func(t: Team) -> Dictionary: return _team_to_dict(t)),
 	}
 
@@ -91,6 +94,7 @@ static func load_game(slot_name: String) -> SaveData:
 	save_data.segunda_table_snapshot = parsed.get("segunda_table_snapshot", {}).duplicate()
 	save_data.user_team_id = String(parsed.get("user_team_id", ""))
 	save_data.user_lineup_template = parsed.get("user_lineup_template", {}).duplicate(true)
+	save_data.user_career_history = parsed.get("user_career_history", []).duplicate(true)
 	# Reconstruir equipos desde el dict
 	save_data.teams = []
 	for team_dict in parsed.get("teams", []):
@@ -179,6 +183,8 @@ static func _team_from_dict(d: Dictionary) -> Team:
 		p.condition = float(pd.get("condition", 100.0))
 		p.morale = float(pd.get("morale", 70.0))
 		p.injury = pd.get("injury", {}).duplicate()
+		p.yellow_cards_season = int(pd.get("yellow_cards_season", 0))
+		p.suspended_matches = int(pd.get("suspended_matches", 0))
 		p.history = pd.get("history", []).duplicate()
 	return t
 
@@ -199,6 +205,8 @@ static func _player_to_dict(p: Player) -> Dictionary:
 		"potential": p.potential,
 		"condition": p.condition, "morale": p.morale,
 		"injury": p.injury.duplicate(),
+		"yellow_cards_season": p.yellow_cards_season,
+		"suspended_matches": p.suspended_matches,
 		"history": p.history.duplicate(),
 		"contract": _contract_to_dict(p.contract),
 	}

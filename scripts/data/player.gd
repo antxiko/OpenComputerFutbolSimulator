@@ -25,6 +25,8 @@ class_name Player extends Resource
 @export var condition: float = 100.0  # fatiga 0-100, 100 = fresco
 @export var morale: float = 70.0  # moral 0-100
 @export var injury: Dictionary = {}  # vacío = sano; si no { tipo, dias_restantes }
+@export var yellow_cards_season: int = 0  # acumuladas en la temporada actual
+@export var suspended_matches: int = 0  # partidos pendientes de sanción
 
 # Historial estadístico por temporada — se rellena al final de cada temporada
 @export var history: Array = []

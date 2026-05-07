@@ -51,6 +51,8 @@ static func run(all_teams: Array, start_year: int, n_seasons: int, seed_base: in
 		var year: int = start_year + i
 		var record := SeasonRecord.new()
 		record.year = year
+		# Reset de amarillas al inicio de la temporada
+		CardSystem.reset_yellow_cards(all_teams)
 
 		# 1) Split por división actual
 		var primera: Array = []
