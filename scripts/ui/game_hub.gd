@@ -88,7 +88,30 @@ func _ready() -> void:
 	segunda_state.division = "segunda"
 	_build_ui()
 	_load_data()
-	_start_season()
+	# Aplicar configuración de GameSession (si venimos del menú principal)
+	if GameSession.start_mode == "new_game":
+		user_team_id = GameSession.pending_user_team_id
+		_initialize_user_lineup()
+		GameSession.consume()
+		_start_season()
+		_show_welcome_message()
+	elif GameSession.start_mode == "load":
+		GameSession.consume()
+		_start_season()
+		_on_load_game()
+	else:
+		# Modo default: arrancar nueva temporada sin equipo seleccionado
+		_start_season()
+
+
+func _show_welcome_message() -> void:
+	var team := _find_team_by_id(user_team_id)
+	if team == null:
+		return
+	status_label.text = "¡Bienvenido como mánager de %s! Configura 'Mi alineación' antes de empezar." % team.name
+	# Forzar pestaña Mi alineación de bienvenida
+	current_view = VIEW_TACTICS
+	_refresh_ui()
 
 
 # =========================================================================== #
@@ -222,6 +245,11 @@ func _build_ui() -> void:
 	load_button.pressed.connect(_on_load_game)
 	footer.add_child(load_button)
 
+	var menu_button := Button.new()
+	menu_button.text = "🏠 Menú"
+	menu_button.pressed.connect(_on_back_to_menu)
+	footer.add_child(menu_button)
+
 
 func _make_tab_button(text: String, callback: Callable) -> Button:
 	var b := Button.new()
@@ -271,6 +299,16 @@ func _init_division(state: DivisionState, seed_offset: int) -> void:
 # Acciones de simulación
 # =========================================================================== #
 func _on_advance_jornada() -> void:
+	# Si el usuario tiene un partido en esta jornada, mostrar modal de pre-partido
+	if user_team_id != "":
+		var user_fx: Dictionary = _find_user_fixture_in_current_jornada()
+		if not user_fx.is_empty():
+			_show_pre_match_modal(user_fx)
+			return  # esperamos a que el modal continúe
+	_do_advance_jornada()
+
+
+func _do_advance_jornada() -> void:
 	var any_advanced := false
 	if primera_state.current_jornada < primera_state.calendar.size():
 		_simulate_jornada(primera_state)
@@ -282,6 +320,102 @@ func _on_advance_jornada() -> void:
 		status_label.text = "Temporada completada. Pulsa 'Nueva temporada'."
 		return
 	_refresh_ui()
+
+
+func _find_user_fixture_in_current_jornada() -> Dictionary:
+	for st in [primera_state, segunda_state]:
+		if st.current_jornada >= st.calendar.size():
+			continue
+		var jornada: Array = st.calendar[st.current_jornada]
+		for fixture: Dictionary in jornada:
+			if fixture["home_id"] == user_team_id or fixture["away_id"] == user_team_id:
+				return { "fixture": fixture, "jornada_num": st.current_jornada + 1, "division": st.division }
+	return {}
+
+
+func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
+	var fixture: Dictionary = user_fx_data["fixture"]
+	var is_home: bool = fixture["home_id"] == user_team_id
+	var opponent_id: String = fixture["away_id"] if is_home else fixture["home_id"]
+	var user_team := _find_team_by_id(user_team_id)
+	var opponent := _find_team_by_id(opponent_id)
+	if user_team == null or opponent == null:
+		_do_advance_jornada()
+		return
+
+	var popup := ConfirmationDialog.new()
+	popup.title = "Pre-partido — Jornada %d (%s)" % [user_fx_data["jornada_num"], String(user_fx_data["division"]).capitalize()]
+	popup.size = Vector2(540, 320)
+	popup.ok_button_text = "▶ Jugar partido"
+	popup.cancel_button_text = "Configurar alineación"
+	add_child(popup)
+
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 10)
+	popup.add_child(content)
+
+	# Cabecera del partido
+	var header := Label.new()
+	header.text = "%s   vs   %s" % [user_team.name, opponent.name]
+	header.add_theme_font_size_override("font_size", 18)
+	header.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(header)
+
+	var loc := Label.new()
+	loc.text = "Juegas como %s · Estadio: %s" % [
+		"LOCAL" if is_home else "VISITANTE",
+		(user_team.stadium.name if is_home else opponent.stadium.name) if user_team.stadium else "?",
+	]
+	loc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	loc.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	content.add_child(loc)
+
+	content.add_child(HSeparator.new())
+
+	# Resumen alineación
+	if user_lineup_template.is_empty():
+		_initialize_user_lineup()
+	var l_form := Label.new()
+	l_form.text = "Tu formación: %s" % user_lineup_template.get("formation", "4-3-3")
+	content.add_child(l_form)
+	var tactics: Dictionary = user_lineup_template.get("tactics", {})
+	var l_tact := Label.new()
+	l_tact.text = "Mentalidad: %s · Pressing: %s · Tempo: %s · Anchura: %s" % [
+		tactics.get("mentality", "equilibrado"),
+		tactics.get("pressing", "medio"),
+		tactics.get("tempo", "normal"),
+		tactics.get("width", "normal"),
+	]
+	l_tact.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+	content.add_child(l_tact)
+
+	# Once inicial (compactado)
+	var eleven_ids: Array = user_lineup_template.get("eleven_ids", [])
+	var slot_assignments: Array = user_lineup_template.get("slot_assignments", [])
+	var lineup_text: Array[String] = []
+	for i in eleven_ids.size():
+		var p: Player = user_team.find_player(String(eleven_ids[i]))
+		var slot: String = String(slot_assignments[i]) if i < slot_assignments.size() else "?"
+		var name: String = p.name if p else "?"
+		lineup_text.append("%s:%s" % [slot, name.split(" ")[-1]])  # solo apellido para que quepa
+	var l_eleven := Label.new()
+	l_eleven.text = "Once: " + ", ".join(lineup_text)
+	l_eleven.autowrap_mode = TextServer.AUTOWRAP_WORD
+	l_eleven.add_theme_font_size_override("font_size", 11)
+	content.add_child(l_eleven)
+
+	popup.confirmed.connect(func() -> void:
+		popup.queue_free()
+		_do_advance_jornada()
+	)
+	popup.canceled.connect(func() -> void:
+		popup.queue_free()
+		# Llevar al usuario a la pestaña de alineación para que ajuste
+		current_view = VIEW_TACTICS
+		_refresh_ui()
+	)
+	popup.popup_centered()
 
 
 func _on_advance_full_season() -> void:
@@ -832,6 +966,11 @@ func _on_close_2d_viewer() -> void:
 	if match_viewer_overlay != null:
 		match_viewer_overlay.queue_free()
 		match_viewer_overlay = null
+
+
+func _on_back_to_menu() -> void:
+	# Volver al menú principal sin guardar (si quieres guardar pulsa antes 💾)
+	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 
 
 # =========================================================================== #
