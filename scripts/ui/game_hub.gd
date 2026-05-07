@@ -68,6 +68,8 @@ var content_area: VBoxContainer
 var advance_button: Button
 var advance_all_button: Button
 var reset_button: Button
+var save_button: Button
+var load_button: Button
 
 
 func _ready() -> void:
@@ -183,6 +185,16 @@ func _build_ui() -> void:
 	reset_button.text = "Nueva temporada"
 	reset_button.pressed.connect(_on_reset_season)
 	footer.add_child(reset_button)
+
+	save_button = Button.new()
+	save_button.text = "💾 Guardar"
+	save_button.pressed.connect(_on_save_game)
+	footer.add_child(save_button)
+
+	load_button = Button.new()
+	load_button.text = "📂 Cargar"
+	load_button.pressed.connect(_on_load_game)
+	footer.add_child(load_button)
 
 
 func _make_tab_button(text: String, callback: Callable) -> Button:
@@ -304,6 +316,54 @@ func _set_buttons_disabled(d: bool) -> void:
 	advance_button.disabled = d
 	advance_all_button.disabled = d
 	reset_button.disabled = d
+	save_button.disabled = d
+	load_button.disabled = d
+
+
+# =========================================================================== #
+# Save / Load
+# =========================================================================== #
+func _on_save_game() -> void:
+	var result: Dictionary = SaveSystem.save_game(
+		"autosave", year, all_teams,
+		primera_state.current_jornada, segunda_state.current_jornada,
+		primera_state.league_table, segunda_state.league_table)
+	if result.get("ok", false):
+		status_label.text = "Partida guardada (autosave) — %s" % result["saved_at"]
+	else:
+		status_label.text = "ERROR al guardar: %s" % result.get("error", "?")
+
+
+func _on_load_game() -> void:
+	var save_data: SaveSystem.SaveData = SaveSystem.load_game("autosave")
+	if save_data == null:
+		status_label.text = "No hay partida guardada (slot 'autosave')."
+		return
+
+	# Reemplazar estado del juego con los datos cargados
+	all_teams = save_data.teams
+	year = save_data.year
+	primera_state.teams = all_teams.filter(func(t: Team) -> bool: return t.division == "primera")
+	segunda_state.teams = all_teams.filter(func(t: Team) -> bool: return t.division == "segunda")
+	# Regenerar calendarios desde el seed (deterministas)
+	var primera_ids: Array = primera_state.teams.map(func(t: Team) -> String: return t.id)
+	var segunda_ids: Array = segunda_state.teams.map(func(t: Team) -> String: return t.id)
+	primera_state.calendar = CalendarGenerator.generate(primera_ids, SEED_BASE)
+	segunda_state.calendar = CalendarGenerator.generate(segunda_ids, SEED_BASE + 1)
+	primera_state.current_jornada = save_data.primera_jornada
+	segunda_state.current_jornada = save_data.segunda_jornada
+	primera_state.league_table = SaveSystem.restore_table(save_data.primera_table_snapshot, primera_state.teams)
+	segunda_state.league_table = SaveSystem.restore_table(save_data.segunda_table_snapshot, segunda_state.teams)
+	primera_state.last_jornada_results = []
+	segunda_state.last_jornada_results = []
+	primera_state.seed_counter = SEED_BASE * 1000 + primera_state.current_jornada * 100
+	segunda_state.seed_counter = (SEED_BASE + 1) * 1000 + segunda_state.current_jornada * 100
+
+	current_view = VIEW_TABLE
+	selected_team = null
+	selected_match = null
+	status_label.text = "Partida cargada — %s, jornada %d" % [save_data.saved_at, save_data.primera_jornada]
+	_refresh_ui()
 
 
 # =========================================================================== #
