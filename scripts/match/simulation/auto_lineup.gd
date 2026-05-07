@@ -13,25 +13,35 @@ static func pick(team: Team, formation: String = "") -> Lineup:
 		formation = "4-3-3"
 
 	var slots: Array = Lineup.FORMATIONS[formation]
-	var available: Array[Player] = team.players.duplicate()
-	# Excluir lesionados a más de 0 días
-	available = available.filter(func(p: Player) -> bool:
+	# Pool prioritario: jugadores SANOS.
+	var healthy: Array[Player] = team.players.filter(func(p: Player) -> bool:
 		return not _is_injured(p)
 	)
+	# Pool de respaldo: lesionados (si nos quedamos cortos los sacamos a regañadientes).
+	var injured: Array[Player] = team.players.filter(func(p: Player) -> bool:
+		return _is_injured(p)
+	)
 
+	var available: Array[Player] = healthy.duplicate()
 	var selected: Array[Player] = []
 	var assigned: Array[String] = []
 
 	for slot_str: String in slots:
-		var best: Player = null
-		var best_score: float = -1.0
-		for p in available:
-			var score: float = _fit_score(p, slot_str)
-			if score > best_score:
-				best_score = score
-				best = p
+		var best: Player = _pick_best_for_slot(slot_str, available)
 		if best == null:
-			push_error("No hay candidato para slot %s en %s" % [slot_str, team.name])
+			# Fallback 1: tirar de lesionados (jugadores tocados pero capaces)
+			best = _pick_best_for_slot(slot_str, injured)
+			if best != null:
+				injured.erase(best)
+		if best == null and selected.size() < 11:
+			# Fallback 2: cualquier jugador del equipo no usado todavía,
+			# para garantizar siempre 11 (incluso si la plantilla es muy fina).
+			for p in team.players:
+				if not (p in selected):
+					best = p
+					break
+		if best == null:
+			push_warning("No fue posible llenar slot %s en %s" % [slot_str, team.name])
 			continue
 		selected.append(best)
 		assigned.append(slot_str)
@@ -57,6 +67,17 @@ static func _fit_score(player: Player, slot: String) -> float:
 	# Penalizamos algo más a los Y (juveniles) para que la IA prefiera senior salvo si Y es muy bueno
 	var youth_penalty: float = 0.92 if player.tier == "Y" else 1.0
 	return float(overall_at_slot) * familiarity * youth_penalty
+
+
+static func _pick_best_for_slot(slot: String, pool: Array) -> Player:
+	var best: Player = null
+	var best_score: float = -1.0
+	for p in pool:
+		var score: float = _fit_score(p, slot)
+		if score > best_score:
+			best_score = score
+			best = p
+	return best
 
 
 static func _is_injured(player: Player) -> bool:

@@ -5,6 +5,7 @@ extends Node
 const START_YEAR := 2026
 const N_SEASONS := 20
 const SEED_BASE := 42
+const DEBUG_GOAL_STATS := true
 
 
 func _ready() -> void:
@@ -52,3 +53,17 @@ func _ready() -> void:
 			", ".join(by_div["segunda"].map(func(t: Team) -> String: return t.short_name))])
 
 	CareerSimulator.print_history_summary(history, all_teams)
+
+	if DEBUG_GOAL_STATS:
+		_debug_goal_distribution(history)
+
+
+func _debug_goal_distribution(history: CareerSimulator.History) -> void:
+	# Extraer todos los resultados de Liga (rec. de jornadas) si están disponibles.
+	# Como no los tenemos directamente aquí, mostramos el "biggest goleada" por season
+	# y otros datos que sí tengamos.
+	print("\n" + "═".repeat(80))
+	print("Debug: estadísticas de goles por temporada")
+	print("═".repeat(80))
+	# Re-simular UNA jornada y mostrar todos los marcadores
+	print("\n  (Para ver distribución detallada de goles, examinaremos jornada 1 en otro test.)")

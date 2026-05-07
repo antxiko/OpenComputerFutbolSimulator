@@ -174,15 +174,15 @@ static func _resolve_shot(
 	var ataque: int = int(shooter.attributes.get("ataque", 50))
 	var mentalidad: int = int(shooter.attributes.get("mentalidad", 50))
 
-	# 1) ¿Es a portería? Modulado por tiro+composure (calibrado para ~32-40% on-target)
-	var on_target_p: float = 0.10 + (float(tiro) / 100.0) * 0.38 + (float(mentalidad) / 100.0) * 0.05
+	# 1) ¿Es a portería? Modulado por tiro+composure (target ~32-38% on-target)
+	var on_target_p: float = 0.09 + (float(tiro) / 100.0) * 0.35 + (float(mentalidad) / 100.0) * 0.05
 	if from_set_piece:
 		on_target_p *= 0.85  # ángulos más cerrados desde córner
 
 	# 2) ¿Es bloqueado por defensores?
 	var def_str: float = PositionContribution.zone_strength(defense, "defense", "def")
 	var atk_str: float = PositionContribution.zone_strength(poss, "attack", "atk")
-	var block_p: float = 0.12 + clampf((def_str - atk_str) / maxf(atk_str + def_str, 1.0), -0.08, 0.13)
+	var block_p: float = 0.13 + clampf((def_str - atk_str) / maxf(atk_str + def_str, 1.0), -0.08, 0.14)
 
 	var roll1: float = rng.randf()
 	if roll1 < block_p:
@@ -206,11 +206,11 @@ static func _resolve_shot(
 	if keeper != null:
 		var porteria: int = int(keeper.attributes.get("porteria", 50))
 		var keeper_mental: int = int(keeper.attributes.get("mentalidad", 50))
-		# Calibrado para ~65-70% de paradas vs tiros normales
-		save_p = 0.28 + (float(porteria) / 100.0) * 0.50 + (float(keeper_mental) / 100.0) * 0.05
+		# Calibrado para ~62-68% de paradas (target ~2.5-2.8 goles/partido)
+		save_p = 0.30 + (float(porteria) / 100.0) * 0.50 + (float(keeper_mental) / 100.0) * 0.05
 		# Tiro del shooter rebaja la chance de parada
-		save_p -= (float(tiro) / 100.0) * 0.12
-		save_p = clampf(save_p, 0.20, 0.92)
+		save_p -= (float(tiro) / 100.0) * 0.10
+		save_p = clampf(save_p, 0.22, 0.93)
 
 	if rng.randf() < save_p and keeper != null:
 		state.stats[state.other_team_id(state.possession_team_id)]["saves"] += 1
