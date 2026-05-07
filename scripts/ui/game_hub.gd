@@ -1,54 +1,87 @@
 extends Control
 
-# Pantalla principal del simulador (MVP).
+# Pantalla principal del simulador — Iteración 2.
 #
-# Lo que hace:
-# - Carga los 42 equipos al iniciar.
-# - Muestra la tabla de Primera y la jornada actual.
-# - Botones para avanzar 1 jornada o la temporada completa.
-# - Botón para resetear y empezar otra temporada.
+# Layout:
+#   ┌─────────────────────────────────────────────────────┐
+#   │  TITLE                  YEAR · JORNADA               │
+#   ├─────────────────────────────────────────────────────┤
+#   │  [Primera] [Segunda]   ← tabs de división           │
+#   │  [Tabla] [Última jornada] [Plantilla]  ← tabs vista │
+#   ├─────────────────────────────────────────────────────┤
+#   │                                                       │
+#   │            CONTENT AREA (cambia con la pestaña)      │
+#   │                                                       │
+#   ├─────────────────────────────────────────────────────┤
+#   │  STATUS               [Siguiente] [Toda] [Nueva]      │
+#   └─────────────────────────────────────────────────────┘
 #
-# La UI se construye programáticamente en _build_ui(). Cuando ya tengamos un
-# diseño estable la podemos extraer a una .tscn editable en el inspector de Godot.
+# Notas Godot:
+# - Construcción programática (sin .tscn editable) por simplicidad de iteración.
+# - "VIEW_*" constantes para identificar la vista activa.
+# - El último set de resultados se guarda por división para click-to-view.
 
 const SEASON_YEAR_INITIAL := 2026
 const SEED_BASE := 42
 
-# Estado del juego
-var all_teams: Array = []
-var primera: Array = []
-var segunda: Array = []
-var calendar_primera: Array = []
-var current_jornada: int = 0
-var league_table: LeagueTable
-var year: int = SEASON_YEAR_INITIAL
-var match_seed_counter: int = 0
-var division_view: String = "primera"  # "primera" | "segunda" — de momento solo Primera
+const VIEW_TABLE := "table"
+const VIEW_FIXTURES := "fixtures"
+const VIEW_TEAM := "team"
+const VIEW_MATCH := "match"
 
-# Referencias UI (asignadas en _build_ui)
+
+# --------------------------------------------------------------------------- #
+# Estado por división
+# --------------------------------------------------------------------------- #
+class DivisionState:
+	var division: String  # "primera" | "segunda"
+	var teams: Array = []
+	var calendar: Array = []  # Array[Jornada]
+	var current_jornada: int = 0  # próxima a jugarse
+	var league_table: LeagueTable
+	var last_jornada_results: Array = []  # Array[MatchResult] de la última jugada
+	var seed_counter: int = 0
+
+
+# --------------------------------------------------------------------------- #
+# Estado del juego
+# --------------------------------------------------------------------------- #
+var all_teams: Array = []
+var primera_state: DivisionState = DivisionState.new()
+var segunda_state: DivisionState = DivisionState.new()
+var year: int = SEASON_YEAR_INITIAL
+var selected_division: String = "primera"
+var current_view: String = VIEW_TABLE
+var selected_team: Team = null
+var selected_match: MatchResult = null
+
+# UI refs (populadas en _build_ui)
 var year_label: Label
 var jornada_label: Label
-var division_label: Label
 var status_label: Label
-var table_grid: GridContainer
+var primera_div_button: Button
+var segunda_div_button: Button
+var view_table_button: Button
+var view_fixtures_button: Button
+var view_team_button: Button
+var content_area: VBoxContainer
 var advance_button: Button
 var advance_all_button: Button
 var reset_button: Button
-var primera_tab_button: Button
-var segunda_tab_button: Button
 
 
 func _ready() -> void:
+	primera_state.division = "primera"
+	segunda_state.division = "segunda"
 	_build_ui()
 	_load_data()
 	_start_season()
 
 
-# ============================================================================
-# Construcción de UI (programática)
-# ============================================================================
+# =========================================================================== #
+# UI: construcción
+# =========================================================================== #
 func _build_ui() -> void:
-	# El nodo raíz (este Control) ocupa todo el viewport.
 	anchor_right = 1.0
 	anchor_bottom = 1.0
 
@@ -62,96 +95,106 @@ func _build_ui() -> void:
 	add_child(margin)
 
 	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 12)
+	vbox.add_theme_constant_override("separation", 10)
 	margin.add_child(vbox)
 
-	# Top bar: título + año + jornada
-	var top_bar := HBoxContainer.new()
-	top_bar.add_theme_constant_override("separation", 24)
-	vbox.add_child(top_bar)
+	# --- Header ---
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 24)
+	vbox.add_child(header)
 
-	var title_label := Label.new()
-	title_label.text = "OpenComputerFutbolSimulator"
-	title_label.add_theme_font_size_override("font_size", 22)
-	top_bar.add_child(title_label)
+	var title := Label.new()
+	title.text = "OpenComputerFutbolSimulator"
+	title.add_theme_font_size_override("font_size", 22)
+	header.add_child(title)
 
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	top_bar.add_child(spacer)
+	header.add_child(spacer)
 
 	year_label = Label.new()
-	year_label.add_theme_font_size_override("font_size", 18)
-	top_bar.add_child(year_label)
+	year_label.add_theme_font_size_override("font_size", 16)
+	header.add_child(year_label)
 
 	jornada_label = Label.new()
-	jornada_label.add_theme_font_size_override("font_size", 18)
-	top_bar.add_child(jornada_label)
+	jornada_label.add_theme_font_size_override("font_size", 16)
+	header.add_child(jornada_label)
 
-	# Separador visual
-	var separator := HSeparator.new()
-	vbox.add_child(separator)
+	vbox.add_child(HSeparator.new())
 
-	# Selector de división (botones tipo tab)
-	var tab_bar := HBoxContainer.new()
-	tab_bar.add_theme_constant_override("separation", 4)
-	vbox.add_child(tab_bar)
+	# --- División tabs ---
+	var div_tabs := HBoxContainer.new()
+	div_tabs.add_theme_constant_override("separation", 4)
+	vbox.add_child(div_tabs)
 
-	primera_tab_button = Button.new()
-	primera_tab_button.text = "  Primera  "
-	primera_tab_button.pressed.connect(_on_select_division.bind("primera"))
-	tab_bar.add_child(primera_tab_button)
+	primera_div_button = _make_tab_button("Primera", _on_select_division.bind("primera"))
+	div_tabs.add_child(primera_div_button)
+	segunda_div_button = _make_tab_button("Segunda", _on_select_division.bind("segunda"))
+	div_tabs.add_child(segunda_div_button)
 
-	segunda_tab_button = Button.new()
-	segunda_tab_button.text = "  Segunda  "
-	segunda_tab_button.pressed.connect(_on_select_division.bind("segunda"))
-	tab_bar.add_child(segunda_tab_button)
+	# --- View tabs ---
+	var view_tabs := HBoxContainer.new()
+	view_tabs.add_theme_constant_override("separation", 4)
+	vbox.add_child(view_tabs)
 
-	division_label = Label.new()
-	division_label.add_theme_font_size_override("font_size", 14)
-	division_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-	tab_bar.add_child(division_label)
+	view_table_button = _make_tab_button("Clasificación", _on_select_view.bind(VIEW_TABLE))
+	view_tabs.add_child(view_table_button)
+	view_fixtures_button = _make_tab_button("Última jornada", _on_select_view.bind(VIEW_FIXTURES))
+	view_tabs.add_child(view_fixtures_button)
+	view_team_button = _make_tab_button("Plantilla", _on_select_view.bind(VIEW_TEAM))
+	view_tabs.add_child(view_team_button)
 
-	# Tabla — usamos ScrollContainer + GridContainer
+	vbox.add_child(HSeparator.new())
+
+	# --- Content area (cambia según la vista) ---
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	vbox.add_child(scroll)
 
-	table_grid = GridContainer.new()
-	table_grid.columns = 10  # Pos, Equipo, PJ, G, E, P, GF, GC, DG, Pts
-	table_grid.add_theme_constant_override("h_separation", 18)
-	table_grid.add_theme_constant_override("v_separation", 4)
-	scroll.add_child(table_grid)
+	content_area = VBoxContainer.new()
+	content_area.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(content_area)
 
-	# Bottom bar: status + botones
-	var bottom_bar := HBoxContainer.new()
-	bottom_bar.add_theme_constant_override("separation", 12)
-	vbox.add_child(bottom_bar)
+	vbox.add_child(HSeparator.new())
+
+	# --- Footer: status + botones ---
+	var footer := HBoxContainer.new()
+	footer.add_theme_constant_override("separation", 12)
+	vbox.add_child(footer)
 
 	status_label = Label.new()
 	status_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	status_label.add_theme_color_override("font_color", Color(0.7, 0.85, 0.7))
-	bottom_bar.add_child(status_label)
+	footer.add_child(status_label)
 
 	advance_button = Button.new()
 	advance_button.text = "Siguiente jornada"
 	advance_button.pressed.connect(_on_advance_jornada)
-	bottom_bar.add_child(advance_button)
+	footer.add_child(advance_button)
 
 	advance_all_button = Button.new()
 	advance_all_button.text = "Toda la temporada"
 	advance_all_button.pressed.connect(_on_advance_full_season)
-	bottom_bar.add_child(advance_all_button)
+	footer.add_child(advance_all_button)
 
 	reset_button = Button.new()
 	reset_button.text = "Nueva temporada"
 	reset_button.pressed.connect(_on_reset_season)
-	bottom_bar.add_child(reset_button)
+	footer.add_child(reset_button)
 
 
-# ============================================================================
-# Carga inicial de datos
-# ============================================================================
+func _make_tab_button(text: String, callback: Callable) -> Button:
+	var b := Button.new()
+	b.text = "  %s  " % text
+	b.pressed.connect(callback)
+	return b
+
+
+# =========================================================================== #
+# Carga + temporada
+# =========================================================================== #
 func _load_data() -> void:
 	var loaded := DataLoader.load_all_teams(year)
 	if loaded.errors.size() > 0:
@@ -160,164 +203,461 @@ func _load_data() -> void:
 			push_error(e)
 		return
 	all_teams = loaded.teams.values()
-	primera = all_teams.filter(func(t: Team) -> bool: return t.division == "primera")
-	segunda = all_teams.filter(func(t: Team) -> bool: return t.division == "segunda")
 	status_label.text = "Cargados %d equipos, %d jugadores." % [
 		all_teams.size(), loaded.player_id_index.size()]
 
 
-# ============================================================================
-# Gestión de la temporada
-# ============================================================================
 func _start_season() -> void:
-	primera = all_teams.filter(func(t: Team) -> bool: return t.division == "primera")
-	segunda = all_teams.filter(func(t: Team) -> bool: return t.division == "segunda")
-	var primera_ids: Array = primera.map(func(t: Team) -> String: return t.id)
-	calendar_primera = CalendarGenerator.generate(primera_ids, SEED_BASE)
-	current_jornada = 0
-	league_table = LeagueTable.new()
-	league_table.init_with_teams(primera)
-	match_seed_counter = SEED_BASE * 1000
+	# Re-particionar equipos por división actual
+	primera_state.teams = all_teams.filter(func(t: Team) -> bool: return t.division == "primera")
+	segunda_state.teams = all_teams.filter(func(t: Team) -> bool: return t.division == "segunda")
+	_init_division(primera_state, SEED_BASE)
+	_init_division(segunda_state, SEED_BASE + 1)
+	current_view = VIEW_TABLE
+	selected_team = null
+	selected_match = null
 	_refresh_ui()
 
 
+func _init_division(state: DivisionState, seed_offset: int) -> void:
+	var ids: Array = state.teams.map(func(t: Team) -> String: return t.id)
+	state.calendar = CalendarGenerator.generate(ids, SEED_BASE + seed_offset)
+	state.current_jornada = 0
+	state.league_table = LeagueTable.new()
+	state.league_table.init_with_teams(state.teams)
+	state.last_jornada_results = []
+	state.seed_counter = (SEED_BASE + seed_offset) * 1000
+
+
+# =========================================================================== #
+# Acciones de simulación
+# =========================================================================== #
 func _on_advance_jornada() -> void:
-	if current_jornada >= calendar_primera.size():
-		status_label.text = "Temporada completada. Pulsa 'Nueva temporada' para reiniciar."
+	var any_advanced := false
+	if primera_state.current_jornada < primera_state.calendar.size():
+		_simulate_jornada(primera_state)
+		any_advanced = true
+	if segunda_state.current_jornada < segunda_state.calendar.size():
+		_simulate_jornada(segunda_state)
+		any_advanced = true
+	if not any_advanced:
+		status_label.text = "Temporada completada. Pulsa 'Nueva temporada'."
 		return
-	_simulate_jornada(current_jornada)
-	current_jornada += 1
 	_refresh_ui()
 
 
 func _on_advance_full_season() -> void:
-	advance_button.disabled = true
-	advance_all_button.disabled = true
-	reset_button.disabled = true
-	# Yield al refresco cada 3 jornadas para que la UI se actualice durante el cómputo.
-	while current_jornada < calendar_primera.size():
-		_simulate_jornada(current_jornada)
-		current_jornada += 1
-		if current_jornada % 3 == 0:
+	_set_buttons_disabled(true)
+	while primera_state.current_jornada < primera_state.calendar.size() \
+			or segunda_state.current_jornada < segunda_state.calendar.size():
+		if primera_state.current_jornada < primera_state.calendar.size():
+			_simulate_jornada(primera_state)
+		if segunda_state.current_jornada < segunda_state.calendar.size():
+			_simulate_jornada(segunda_state)
+		# Yield a la UI cada 3 jornadas para refrescar progreso
+		if primera_state.current_jornada % 3 == 0:
 			_refresh_ui()
 			await get_tree().process_frame
 	_refresh_ui()
-	advance_button.disabled = false
-	advance_all_button.disabled = false
-	reset_button.disabled = false
+	_set_buttons_disabled(false)
 
 
 func _on_reset_season() -> void:
 	year += 1
-	# Aging + retiros + canteranos antes de la siguiente temporada
+	# Reputación dinámica con la temporada que acaba de terminar
+	if primera_state.league_table != null and segunda_state.league_table != null:
+		ReputationUpdate.apply_after_season(primera_state.league_table, segunda_state.league_table, all_teams)
+		PromotionRelegation.apply(primera_state.league_table, segunda_state.league_table, all_teams)
+	# Aging + retiros + canteranos
 	Aging.age_all(all_teams, year, SEED_BASE * 100)
-	for t in all_teams:
+	for t: Team in all_teams:
 		Cantera.fill_squad_if_needed(t, year, SEED_BASE * 50)
-	# (Por simplicidad v1 no aplicamos asc/desc desde la UI; lo añadimos cuando integremos CareerSimulator)
+	# Mercado de fichajes
+	TransferMarket.run(all_teams, year, SEED_BASE * 7)
 	_start_season()
 
 
-func _on_select_division(div: String) -> void:
-	division_view = div
-	_refresh_ui()
-
-
-func _simulate_jornada(jornada_idx: int) -> void:
-	var jornada: Array = calendar_primera[jornada_idx]
+func _simulate_jornada(state: DivisionState) -> void:
+	var jornada: Array = state.calendar[state.current_jornada]
 	var team_index: Dictionary = {}
-	for t: Team in primera:
+	for t: Team in state.teams:
 		team_index[t.id] = t
-		# Restablecer condition antes de cada jornada (simplificación v1)
+		# Restablecer condición antes de la jornada
 		for p: Player in t.players:
 			p.condition = 100.0
 
+	state.last_jornada_results = []
 	for fixture: Dictionary in jornada:
 		var home: Team = team_index[fixture["home_id"]]
 		var away: Team = team_index[fixture["away_id"]]
 		var home_lineup := AutoLineup.pick(home, home.tactics_default.formation)
 		var away_lineup := AutoLineup.pick(away, away.tactics_default.formation)
-		match_seed_counter += 1
-		var result: MatchResult = MatchEngine.simulate(home_lineup, away_lineup, match_seed_counter)
+		state.seed_counter += 1
+		var result: MatchResult = MatchEngine.simulate(home_lineup, away_lineup, state.seed_counter)
 		if result != null:
-			league_table.record_match(result)
+			state.league_table.record_match(result)
+			state.last_jornada_results.append(result)
+	state.current_jornada += 1
 
 
-# ============================================================================
-# Refresco de UI
-# ============================================================================
+func _set_buttons_disabled(d: bool) -> void:
+	advance_button.disabled = d
+	advance_all_button.disabled = d
+	reset_button.disabled = d
+
+
+# =========================================================================== #
+# Navegación
+# =========================================================================== #
+func _on_select_division(div: String) -> void:
+	selected_division = div
+	# Si estábamos en una vista contextual a un equipo/partido, volvemos a la tabla
+	if current_view in [VIEW_TEAM, VIEW_MATCH]:
+		current_view = VIEW_TABLE
+	_refresh_ui()
+
+
+func _on_select_view(view: String) -> void:
+	current_view = view
+	if view == VIEW_TEAM and selected_team == null:
+		# Por defecto el primero de la división
+		var st := _current_state()
+		if st.teams.size() > 0:
+			selected_team = st.teams[0]
+	_refresh_ui()
+
+
+func _current_state() -> DivisionState:
+	return primera_state if selected_division == "primera" else segunda_state
+
+
+# =========================================================================== #
+# Refresco
+# =========================================================================== #
 func _refresh_ui() -> void:
 	year_label.text = "Temporada %d-%d" % [year, year + 1]
-	jornada_label.text = "Jornada %d / %d" % [current_jornada, calendar_primera.size()]
-	division_label.text = "(viendo: %s)" % division_view.capitalize()
-	# Estilo botones de tabs activos
-	primera_tab_button.disabled = (division_view == "primera")
-	segunda_tab_button.disabled = (division_view == "segunda")
-	_populate_table()
+	var st := _current_state()
+	jornada_label.text = "Jornada %d / %d (%s)" % [
+		st.current_jornada, st.calendar.size(), selected_division.capitalize()]
 
+	primera_div_button.disabled = (selected_division == "primera")
+	segunda_div_button.disabled = (selected_division == "segunda")
+	view_table_button.disabled = (current_view == VIEW_TABLE)
+	view_fixtures_button.disabled = (current_view == VIEW_FIXTURES)
+	view_team_button.disabled = (current_view == VIEW_TEAM)
 
-func _populate_table() -> void:
-	# Limpiar contenido previo
-	for c in table_grid.get_children():
+	# Limpiar contenido
+	for c in content_area.get_children():
 		c.queue_free()
 
-	# Cabecera
+	match current_view:
+		VIEW_TABLE: _render_table_view()
+		VIEW_FIXTURES: _render_fixtures_view()
+		VIEW_TEAM: _render_team_view()
+		VIEW_MATCH: _render_match_view()
+
+
+# --------------------------------------------------------------------------- #
+# Vista: Clasificación
+# --------------------------------------------------------------------------- #
+func _render_table_view() -> void:
+	var grid := GridContainer.new()
+	grid.columns = 10
+	grid.add_theme_constant_override("h_separation", 18)
+	grid.add_theme_constant_override("v_separation", 4)
+	content_area.add_child(grid)
+
 	var headers: Array[String] = ["Pos", "Equipo", "PJ", "G", "E", "P", "GF", "GC", "DG", "Pts"]
 	for h in headers:
 		var l := Label.new()
 		l.text = h
 		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 		l.add_theme_font_size_override("font_size", 13)
-		table_grid.add_child(l)
+		grid.add_child(l)
 
-	# Para v1 solo mostramos Primera (la tabla de Segunda la activamos cuando tengamos calendar_segunda)
-	if division_view == "segunda":
-		# Mostrar mensaje placeholder
-		for i in 10:
-			var l := Label.new()
-			if i == 1:
-				l.text = "Vista de Segunda — pendiente. Cambia a Primera por ahora."
-			table_grid.add_child(l)
+	var st := _current_state()
+	if st.league_table == null:
 		return
-
-	# Filas Primera ordenadas
-	if league_table == null:
-		return
-	var sorted: Array = league_table.sorted_rows()
+	var sorted: Array = st.league_table.sorted_rows()
 	var pos: int = 1
+	var n_teams := sorted.size()
 	for row: LeagueTable.TeamRow in sorted:
-		_add_row(pos, row)
+		_add_table_row(grid, pos, row, n_teams)
 		pos += 1
 
 
-func _add_row(pos: int, row: LeagueTable.TeamRow) -> void:
-	var cells: Array[String] = [
-		str(pos),
-		row.team_name,
-		str(row.played),
-		str(row.won),
-		str(row.drawn),
-		str(row.lost),
-		str(row.goals_for),
-		str(row.goals_against),
-		"%+d" % row.goal_diff(),
-		str(row.points()),
-	]
-	# Color por posición: verde top 4 (Champions), azul 5-6 (Europa), rojo último 3 (descenso)
+func _add_table_row(grid: GridContainer, pos: int, row: LeagueTable.TeamRow, n_teams: int) -> void:
 	var color: Color = Color(1, 1, 1)
 	if pos <= 4:
 		color = Color(0.6, 1.0, 0.7)
 	elif pos <= 6:
 		color = Color(0.6, 0.8, 1.0)
-	elif pos >= 18:
+	elif pos > n_teams - 3:
 		color = Color(1.0, 0.65, 0.65)
 
-	for i in cells.size():
+	var team_button := Button.new()
+	team_button.text = row.team_name
+	team_button.flat = true
+	team_button.add_theme_color_override("font_color", color)
+	team_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	team_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	team_button.pressed.connect(_on_team_clicked.bind(row.team_id))
+
+	var cells_pre: Array[String] = [str(pos)]
+	var cells_post: Array[String] = [
+		str(row.played), str(row.won), str(row.drawn), str(row.lost),
+		str(row.goals_for), str(row.goals_against),
+		"%+d" % row.goal_diff(), str(row.points()),
+	]
+	# Pos
+	var l_pos := Label.new()
+	l_pos.text = cells_pre[0]
+	l_pos.add_theme_color_override("font_color", color)
+	l_pos.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	grid.add_child(l_pos)
+	# Equipo (botón clickable)
+	grid.add_child(team_button)
+	# Resto
+	for c in cells_post:
 		var l := Label.new()
-		l.text = cells[i]
+		l.text = c
 		l.add_theme_color_override("font_color", color)
-		# Equipo alineado a la izquierda, números centrados/derecha
-		if i == 1:
-			l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		else:
-			l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		table_grid.add_child(l)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		grid.add_child(l)
+
+
+func _on_team_clicked(team_id: String) -> void:
+	var st := _current_state()
+	for t: Team in st.teams:
+		if t.id == team_id:
+			selected_team = t
+			current_view = VIEW_TEAM
+			_refresh_ui()
+			return
+
+
+# --------------------------------------------------------------------------- #
+# Vista: Última jornada (fixtures con resultados)
+# --------------------------------------------------------------------------- #
+func _render_fixtures_view() -> void:
+	var st := _current_state()
+	var title := Label.new()
+	title.add_theme_font_size_override("font_size", 16)
+	if st.last_jornada_results.is_empty():
+		title.text = "No hay resultados todavía. Pulsa 'Siguiente jornada'."
+		content_area.add_child(title)
+		return
+	title.text = "Resultados de la jornada %d" % st.current_jornada
+	content_area.add_child(title)
+	content_area.add_child(HSeparator.new())
+
+	for r: MatchResult in st.last_jornada_results:
+		var btn := Button.new()
+		btn.flat = true
+		btn.alignment = HORIZONTAL_ALIGNMENT_CENTER
+		btn.text = "  %-30s   %d   -   %d   %s  " % [
+			r.home_team_name.left(30),
+			r.score_home, r.score_away,
+			r.away_team_name,
+		]
+		btn.pressed.connect(_on_match_clicked.bind(r))
+		content_area.add_child(btn)
+
+
+func _on_match_clicked(result: MatchResult) -> void:
+	selected_match = result
+	current_view = VIEW_MATCH
+	_refresh_ui()
+
+
+# --------------------------------------------------------------------------- #
+# Vista: Detalle de partido
+# --------------------------------------------------------------------------- #
+func _render_match_view() -> void:
+	if selected_match == null:
+		var l := Label.new()
+		l.text = "No hay partido seleccionado."
+		content_area.add_child(l)
+		return
+	var r: MatchResult = selected_match
+
+	# Header con marcador
+	var hbox := HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 24)
+	content_area.add_child(hbox)
+
+	var home_label := Label.new()
+	home_label.text = r.home_team_name
+	home_label.add_theme_font_size_override("font_size", 18)
+	hbox.add_child(home_label)
+
+	var score_label := Label.new()
+	score_label.text = " %d - %d " % [r.score_home, r.score_away]
+	score_label.add_theme_font_size_override("font_size", 22)
+	score_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	hbox.add_child(score_label)
+
+	var away_label := Label.new()
+	away_label.text = r.away_team_name
+	away_label.add_theme_font_size_override("font_size", 18)
+	hbox.add_child(away_label)
+
+	content_area.add_child(HSeparator.new())
+
+	# Stats compactos
+	var stats_row := HBoxContainer.new()
+	stats_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	stats_row.add_theme_constant_override("separation", 30)
+	content_area.add_child(stats_row)
+	for tid in [r.home_team_id, r.away_team_id]:
+		var s: Dictionary = r.stats.get(tid, {})
+		var team_name: String = r.home_team_name if tid == r.home_team_id else r.away_team_name
+		var stats_label := Label.new()
+		stats_label.text = "%s — Tiros %d (%d a puerta) · Corners %d · Faltas %d · TA %d TR %d" % [
+			team_name.left(30),
+			int(s.get("shots", 0)), int(s.get("shots_on_target", 0)),
+			int(s.get("corners", 0)), int(s.get("fouls", 0)),
+			int(s.get("yellows", 0)), int(s.get("reds", 0)),
+		]
+		stats_label.add_theme_font_size_override("font_size", 12)
+		content_area.add_child(stats_label)
+
+	content_area.add_child(HSeparator.new())
+
+	# Eventos cronológicos
+	var events_title := Label.new()
+	events_title.text = "Eventos del partido"
+	events_title.add_theme_font_size_override("font_size", 14)
+	content_area.add_child(events_title)
+
+	var key_types: Array[String] = [
+		MatchEvent.T_GOAL, MatchEvent.T_SHOT_ON, MatchEvent.T_SHOT_OFF,
+		MatchEvent.T_SHOT_BLOCKED, MatchEvent.T_SAVE,
+		MatchEvent.T_YELLOW, MatchEvent.T_RED,
+		MatchEvent.T_SUBSTITUTION,
+		MatchEvent.T_HALFTIME, MatchEvent.T_FULLTIME,
+	]
+	for ev: MatchEvent in r.events:
+		if not (ev.type in key_types):
+			continue
+		var l := Label.new()
+		var color: Color = Color(0.85, 0.85, 0.85)
+		if ev.type == MatchEvent.T_GOAL:
+			color = Color(0.4, 1.0, 0.5)
+		elif ev.type == MatchEvent.T_RED:
+			color = Color(1.0, 0.4, 0.4)
+		elif ev.type == MatchEvent.T_YELLOW:
+			color = Color(1.0, 0.85, 0.2)
+		elif ev.type == MatchEvent.T_HALFTIME or ev.type == MatchEvent.T_FULLTIME:
+			color = Color(0.6, 0.8, 1.0)
+		l.text = "  %s   %s" % [ev.clock_str(), ev.description]
+		l.add_theme_color_override("font_color", color)
+		content_area.add_child(l)
+
+	# Botón volver
+	content_area.add_child(HSeparator.new())
+	var back_btn := Button.new()
+	back_btn.text = "← Volver a resultados"
+	back_btn.pressed.connect(_on_select_view.bind(VIEW_FIXTURES))
+	content_area.add_child(back_btn)
+
+
+# --------------------------------------------------------------------------- #
+# Vista: Plantilla
+# --------------------------------------------------------------------------- #
+func _render_team_view() -> void:
+	# Selector de equipo (OptionButton)
+	var selector_row := HBoxContainer.new()
+	selector_row.add_theme_constant_override("separation", 12)
+	content_area.add_child(selector_row)
+
+	var label := Label.new()
+	label.text = "Equipo:"
+	selector_row.add_child(label)
+
+	var option := OptionButton.new()
+	var st := _current_state()
+	for i in st.teams.size():
+		option.add_item(st.teams[i].name, i)
+		if selected_team != null and selected_team.id == st.teams[i].id:
+			option.selected = i
+	option.item_selected.connect(_on_team_selector_changed.bind(st))
+	selector_row.add_child(option)
+
+	if selected_team == null and st.teams.size() > 0:
+		selected_team = st.teams[0]
+	if selected_team == null:
+		return
+
+	content_area.add_child(HSeparator.new())
+
+	# Cabecera del equipo
+	var header := Label.new()
+	header.text = "%s · Manager: %s · Reputación: %d · %d jugadores" % [
+		selected_team.name,
+		selected_team.manager.name if selected_team.manager else "",
+		selected_team.reputation,
+		selected_team.players.size(),
+	]
+	header.add_theme_font_size_override("font_size", 14)
+	content_area.add_child(header)
+
+	# Tabla de plantilla
+	var grid := GridContainer.new()
+	grid.columns = 9
+	grid.add_theme_constant_override("h_separation", 14)
+	grid.add_theme_constant_override("v_separation", 3)
+	content_area.add_child(grid)
+
+	var headers: Array[String] = ["#", "Nombre", "Pos", "Edad", "Nac", "Tier", "Pot", "Ovr", "Cont"]
+	for h in headers:
+		var l := Label.new()
+		l.text = h
+		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		l.add_theme_font_size_override("font_size", 12)
+		grid.add_child(l)
+
+	# Ordenar por overall descendente
+	var sorted_players: Array[Player] = selected_team.players.duplicate()
+	sorted_players.sort_custom(func(a: Player, b: Player) -> bool:
+		return PlayerFactory.compute_overall(a, "") > PlayerFactory.compute_overall(b, ""))
+
+	for p: Player in sorted_players:
+		var ovr: int = PlayerFactory.compute_overall(p, "")
+		var age: int = p.age_at(year, 7, 1)
+		var pos_str: String = ", ".join(p.positions)
+		var until_year: int = p.contract.until_year if p.contract != null else 0
+		var cells: Array[String] = [
+			str(p.shirt_number),
+			p.name,
+			pos_str,
+			str(age),
+			p.nationality,
+			p.tier,
+			p.potential_tier,
+			str(ovr),
+			str(until_year),
+		]
+		# Color por tier
+		var color: Color = Color(0.85, 0.85, 0.85)
+		match p.tier:
+			"S": color = Color(1.0, 0.85, 0.2)  # oro
+			"A": color = Color(0.6, 1.0, 0.7)
+			"B": color = Color(0.6, 0.8, 1.0)
+			"Y": color = Color(0.9, 0.7, 1.0)
+		for i in cells.size():
+			var l := Label.new()
+			l.text = cells[i]
+			l.add_theme_color_override("font_color", color)
+			if i == 1:
+				l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			elif i == 0 or i >= 3:
+				l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			grid.add_child(l)
+
+
+func _on_team_selector_changed(idx: int, st: DivisionState) -> void:
+	if idx >= 0 and idx < st.teams.size():
+		selected_team = st.teams[idx]
+		_refresh_ui()
