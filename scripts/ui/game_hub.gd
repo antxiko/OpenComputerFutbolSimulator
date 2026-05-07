@@ -592,6 +592,22 @@ func _render_match_view() -> void:
 		return
 	var r: MatchResult = selected_match
 
+	# Botones de acción ARRIBA (siempre visibles sin scroll)
+	var top_btns := HBoxContainer.new()
+	top_btns.add_theme_constant_override("separation", 8)
+	content_area.add_child(top_btns)
+	var back_btn_top := Button.new()
+	back_btn_top.text = "← Volver a resultados"
+	back_btn_top.pressed.connect(_on_select_view.bind(VIEW_FIXTURES))
+	top_btns.add_child(back_btn_top)
+	var view2d_btn_top := Button.new()
+	view2d_btn_top.text = "▶ Ver partido en 2D"
+	view2d_btn_top.add_theme_color_override("font_color", Color(0.4, 1.0, 0.5))
+	view2d_btn_top.pressed.connect(_on_open_2d_viewer.bind(r))
+	top_btns.add_child(view2d_btn_top)
+
+	content_area.add_child(HSeparator.new())
+
 	# Header con marcador
 	var hbox := HBoxContainer.new()
 	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -666,19 +682,7 @@ func _render_match_view() -> void:
 		l.add_theme_color_override("font_color", color)
 		content_area.add_child(l)
 
-	# Botones acción
-	content_area.add_child(HSeparator.new())
-	var btns := HBoxContainer.new()
-	btns.add_theme_constant_override("separation", 8)
-	content_area.add_child(btns)
-	var back_btn := Button.new()
-	back_btn.text = "← Volver a resultados"
-	back_btn.pressed.connect(_on_select_view.bind(VIEW_FIXTURES))
-	btns.add_child(back_btn)
-	var view2d_btn := Button.new()
-	view2d_btn.text = "▶ Ver en 2D"
-	view2d_btn.pressed.connect(_on_open_2d_viewer.bind(r))
-	btns.add_child(view2d_btn)
+	# (Los botones de acción ya están arriba, no hace falta repetirlos.)
 
 
 # --------------------------------------------------------------------------- #
