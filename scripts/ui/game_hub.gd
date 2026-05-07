@@ -562,11 +562,18 @@ func _render_fixtures_view() -> void:
 	content_area.add_child(title)
 	content_area.add_child(HSeparator.new())
 
+	var hint := Label.new()
+	hint.text = "(Pulsa cualquier partido para ver eventos y abrir el visor 2D)"
+	hint.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	hint.add_theme_font_size_override("font_size", 12)
+	content_area.add_child(hint)
+	content_area.add_child(HSeparator.new())
+
 	for r: MatchResult in st.last_jornada_results:
 		var btn := Button.new()
-		btn.flat = true
+		btn.flat = false  # con borde para que se vea claro que es clickable
 		btn.alignment = HORIZONTAL_ALIGNMENT_CENTER
-		btn.text = "  %-30s   %d   -   %d   %s  " % [
+		btn.text = "  %-30s   %d   -   %d   %s   →" % [
 			r.home_team_name.left(30),
 			r.score_home, r.score_away,
 			r.away_team_name,
