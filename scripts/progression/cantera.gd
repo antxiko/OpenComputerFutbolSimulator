@@ -76,8 +76,15 @@ static func _generate_youth(team: Team, slot: String, season_year: int, rng: Ran
 	var year_short: int = season_year % 100
 	var idx: int = team.players.size() + 1
 	p.id = "%s_y%02d_%03d" % [team.short_name.to_lower(), year_short, idx]
-	# Nombre placeholder; en una iteración futura usaremos pools de nombres
-	p.name = "%s Canterano %d-%d" % [team.short_name, season_year, idx]
+	# Nombre + nacionalidad desde el pool internacional (40% ES, 60% extranjero).
+	# Excepción: Athletic (basque_only) genera siempre canteranos ES.
+	var name_data: Dictionary
+	if team.signing_policy == "basque_only":
+		name_data = NamePool.generate_spanish(rng)
+	else:
+		name_data = NamePool.generate(rng)
+	p.name = String(name_data["name"])
+	p.nationality = String(name_data["nationality"])
 	# Edad 17-19
 	var age: int = rng.randi_range(17, 19)
 	p.birth_date = {
@@ -85,7 +92,6 @@ static func _generate_youth(team: Team, slot: String, season_year: int, rng: Ran
 		"month": rng.randi_range(1, 12),
 		"day": rng.randi_range(1, 28),
 	}
-	p.nationality = "ES"  # canteranos suelen ser locales
 	p.positions = [slot]
 	p.preferred_foot = "L" if rng.randf() < 0.30 else "R"
 	# Tier: Y siempre (juvenil); potencial: depende de reputación del club

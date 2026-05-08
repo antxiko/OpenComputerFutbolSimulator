@@ -1,0 +1,271 @@
+{
+  "_meta": {
+    "description": "Pool de nombres y apellidos por nacionalidad para generar canteranos. Pesos suman 1.0. ~500 nombres + ~500 apellidos.",
+    "spanish_share": 0.40,
+    "source": "INE (España, top frecuentes) + nombres comunes en fútbol internacional"
+  },
+  "weights": {
+    "ES": 0.40,
+    "BR": 0.08,
+    "AR": 0.06,
+    "FR": 0.06,
+    "PT": 0.04,
+    "DE": 0.03,
+    "GB-ENG": 0.04,
+    "IT": 0.03,
+    "NL": 0.02,
+    "PL": 0.015,
+    "TR": 0.015,
+    "MA": 0.05,
+    "SN": 0.03,
+    "NG": 0.02,
+    "GH": 0.015,
+    "CI": 0.015,
+    "JP": 0.015,
+    "KR": 0.01,
+    "US": 0.015,
+    "BE": 0.015,
+    "DK": 0.01,
+    "NO": 0.01,
+    "SE": 0.01,
+    "CH": 0.01,
+    "HR": 0.01,
+    "RS": 0.01
+  },
+  "first_names": {
+    "ES": [
+      "Antonio", "Manuel", "José", "Francisco", "David", "Juan", "Javier", "Carlos", "Daniel", "Miguel",
+      "Rafael", "Pedro", "Alejandro", "Ángel", "Fernando", "Pablo", "Sergio", "Jorge", "Luis", "Alberto",
+      "Álvaro", "Ramón", "Vicente", "Eduardo", "Andrés", "Diego", "Adrián", "Raúl", "Iván", "Rubén",
+      "Óscar", "Enrique", "Joaquín", "Jaime", "Mario", "Víctor", "Alfonso", "Hugo", "Marcos", "Roberto",
+      "Cristian", "Dani", "Eric", "Gonzalo", "Guillermo", "Héctor", "Ignacio", "Joel", "Jonathan", "Julián",
+      "Lucas", "Marc", "Martín", "Mateo", "Mauro", "Nacho", "Nico", "Pol", "Salva", "Saúl",
+      "Sergi", "Toni", "Unai", "Xabi", "Xavi", "Yago", "Yeray", "Iker", "Mikel", "Aitor",
+      "Asier", "Borja", "Joseba", "Bruno", "Aleix", "Pau", "Oriol", "Albert", "Quim", "Roger",
+      "Pere", "Marçal", "Arnau", "Gerard", "Ferran", "Biel", "Jordi", "Xabier", "Beñat", "Jon",
+      "Imanol", "Ander", "Eneko", "Iago", "Brais", "Antón", "Roi", "Hugo", "Izan", "Liam",
+      "Leo", "Noah", "Aaron", "Ian", "Erik", "Theo", "Mateusz", "Aday", "Adrián", "Ainhoa",
+      "Aleix", "Aleksandar", "Alejo", "Aleix", "Alex", "Álex", "Aimar", "Ekain", "Iñaki", "Iñigo",
+      "Javi", "Jonan", "Mendi", "Patxi", "Peio", "Telmo", "Unai", "Urko", "Xavi", "Xabi",
+      "Aleix", "Cesc", "Edu", "Geri", "Ivo", "Jordi", "Marçal", "Nil", "Pol", "Toni",
+      "Adrián", "Aitor", "Borja", "Brais", "Bruno", "Cristian", "Dani", "Diego", "Eric", "Iker",
+      "Jaime", "Joel", "Joseba", "Mateo", "Pol", "Roger", "Saúl", "Yeray", "Aday", "Carles",
+      "Marc", "Pau", "Rafa", "Mario", "Cristóbal", "Ismael", "Genaro", "Lorenzo", "Tomás", "Esteban",
+      "Adolfo", "Agustín", "Casimiro", "Damián", "Eladio", "Ezequiel", "Florentino", "Gabriel", "Gerardo", "Gilberto",
+      "Gregorio", "Hilario", "Honorato", "Hortensio", "Isidro", "Justo", "Lázaro", "Leopoldo", "Marcelo", "Marcial",
+      "Mariano", "Modesto", "Moisés", "Narciso", "Nicolás", "Ovidio", "Patricio", "Pedro", "Quintín", "Reyes"
+    ],
+    "BR": [
+      "Gabriel", "Lucas", "Pedro", "João", "Felipe", "Bruno", "Rafael", "Matheus", "Carlos", "Diego",
+      "Eduardo", "André", "Vinícius", "Leandro", "Ronaldo", "Roberto", "Thiago", "Rodrigo", "Fernando", "Gustavo",
+      "Renato", "Marcelo", "Luís", "Igor", "Paulo", "Daniel", "Alex", "Júnior", "Ricardo", "Alan",
+      "Anderson", "Caio", "Davi", "Enzo", "Gabriel", "Henrique", "Kauã", "Murilo", "Yago", "Talles"
+    ],
+    "AR": [
+      "Mateo", "Joaquín", "Lautaro", "Gonzalo", "Santiago", "Tomás", "Franco", "Agustín", "Lionel", "Diego",
+      "Rodrigo", "Sergio", "Maxi", "Nahuel", "Ángel", "Bruno", "Cristian", "Damián", "Ezequiel", "Facundo",
+      "Federico", "Giuliano", "Hernán", "Iván", "Javier", "Julián", "Leandro", "Lisandro", "Manuel", "Nicolás"
+    ],
+    "FR": [
+      "Antoine", "Théo", "Lucas", "Hugo", "Léo", "Mathéo", "Mathis", "Nathan", "Raphaël", "Adam",
+      "Louis", "Léo", "Aaron", "Julien", "Maxime", "Thomas", "Quentin", "Romain", "Baptiste", "Clément",
+      "Aurélien", "Olivier", "Yannick", "Pierre", "Florian", "Jules", "Maxence", "Tristan", "Alexis", "Robin"
+    ],
+    "PT": [
+      "João", "Bruno", "Rui", "Pedro", "Tiago", "Diogo", "Fábio", "Ricardo", "Miguel", "André",
+      "Hugo", "Nuno", "Filipe", "Luís", "Rafael", "Daniel", "Bernardo", "Gonçalo", "Paulo", "Vitor",
+      "Carlos", "Cristiano", "Renato", "Sérgio", "Jorge"
+    ],
+    "DE": [
+      "Lukas", "Felix", "Max", "Leon", "Paul", "Finn", "Jonas", "Tim", "Niklas", "Tobias",
+      "Kai", "Marco", "Sebastian", "Florian", "Stefan", "Manuel", "Thomas", "Toni", "Mario", "Mats"
+    ],
+    "GB-ENG": [
+      "Jack", "Harry", "Oliver", "George", "Charlie", "Tommy", "James", "Ethan", "Mason", "Alfie",
+      "Henry", "Theo", "Luke", "Daniel", "Joseph", "Joshua", "Marcus", "Trent", "Phil", "Jude",
+      "Declan", "Bukayo", "Reece", "Conor", "Jordan"
+    ],
+    "IT": [
+      "Marco", "Luca", "Alessandro", "Andrea", "Matteo", "Federico", "Davide", "Lorenzo", "Riccardo", "Simone",
+      "Stefano", "Francesco", "Gianluca", "Roberto", "Antonio", "Giorgio", "Salvatore", "Vincenzo", "Filippo", "Tommaso"
+    ],
+    "NL": [
+      "Daan", "Sem", "Lucas", "Finn", "Levi", "Liam", "Bram", "Stijn", "Tijn", "Ruben",
+      "Mees", "Sander", "Wesley", "Memphis", "Frenkie", "Donny", "Virgil"
+    ],
+    "PL": [
+      "Piotr", "Kamil", "Robert", "Krzysztof", "Łukasz", "Jakub", "Mateusz", "Tomasz", "Wojciech", "Adam"
+    ],
+    "TR": [
+      "Mehmet", "Ahmet", "Mustafa", "Hakan", "Burak", "Cengiz", "Yusuf", "Emre", "Arda", "Ozan"
+    ],
+    "MA": [
+      "Youssef", "Mohamed", "Achraf", "Hakim", "Bilal", "Ilias", "Ayoub", "Anass", "Imane", "Hassan",
+      "Karim", "Mehdi", "Adam", "Younes", "Soufiane", "Reda", "Ismail", "Nordin", "Tarik", "Nayef",
+      "Brahim", "Oussama", "Marwane", "Hamza", "Rachid"
+    ],
+    "SN": [
+      "Cheikh", "Mamadou", "Sadio", "Idrissa", "Pape", "Kalidou", "Aliou", "Moussa", "Bouna", "Papiss",
+      "Demba", "Lamine", "Ibrahima", "Krépin", "Aboubacar"
+    ],
+    "NG": [
+      "Chinedu", "Tobias", "Victor", "Samuel", "Daniel", "Emmanuel", "Joseph", "John", "Michael", "Peter",
+      "Wilfred", "Kelechi", "Odion", "Alex", "Wilfried"
+    ],
+    "GH": [
+      "Kwame", "Kofi", "Yaw", "Kojo", "Kwesi", "Mubarak", "Inaki", "Daniel", "Jordan", "Andre"
+    ],
+    "CI": [
+      "Yaya", "Didier", "Salomon", "Wilfried", "Serge", "Eric", "Cheick", "Sébastien", "Nicolas", "Aurier"
+    ],
+    "JP": [
+      "Hiroshi", "Takumi", "Yuto", "Daichi", "Shoya", "Takefusa", "Wataru", "Hidemasa", "Kaoru", "Maya",
+      "Kosuke", "Ritsu", "Tomiyasu", "Junya", "Ko"
+    ],
+    "KR": [
+      "Heung-min", "Min-jae", "In-beom", "Jae-sung", "Hee-chan", "Woo-young", "Sang-ho", "Ki-sung", "Tae-hwan", "Min-woo"
+    ],
+    "US": [
+      "Christian", "Tyler", "Tim", "Weston", "Yunus", "Sergiño", "Brenden", "Tyler", "Ricardo", "Daryl"
+    ],
+    "BE": [
+      "Kevin", "Eden", "Romelu", "Thibaut", "Dries", "Yannick", "Axel", "Jan", "Toby", "Thorgan"
+    ],
+    "DK": [
+      "Christian", "Pierre-Emile", "Andreas", "Kasper", "Mikkel", "Jonas", "Yussuf", "Pierre", "Joachim", "Rasmus"
+    ],
+    "NO": [
+      "Erling", "Martin", "Alexander", "Sander", "Leo", "Aron", "Joshua", "Jonas", "Kristoffer", "Stefan"
+    ],
+    "SE": [
+      "Alexander", "Viktor", "Robin", "Emil", "Anton", "Jesper", "Pontus", "Mattias", "Markus", "Sebastian"
+    ],
+    "CH": [
+      "Granit", "Xherdan", "Yann", "Manuel", "Stephan", "Breel", "Remo", "Nico", "Ricardo", "Steven"
+    ],
+    "HR": [
+      "Luka", "Ivan", "Mateo", "Marcelo", "Dejan", "Mario", "Andrej", "Borna", "Lovro", "Josip"
+    ],
+    "RS": [
+      "Aleksandar", "Dušan", "Nemanja", "Filip", "Sergej", "Lazar", "Strahinja", "Andrija", "Veljko", "Miloš"
+    ]
+  },
+  "last_names": {
+    "ES": [
+      "García", "Martínez", "López", "González", "Hernández", "Pérez", "Sánchez", "Romero", "Torres", "Domínguez",
+      "Vázquez", "Ramos", "Gil", "Ramírez", "Serrano", "Blanco", "Suárez", "Molina", "Morales", "Ortega",
+      "Delgado", "Castro", "Ortiz", "Rubio", "Marín", "Sanz", "Iglesias", "Medina", "Garrido", "Cortés",
+      "Castillo", "Santos", "Lozano", "Guerrero", "Cano", "Prieto", "Méndez", "Cruz", "Calvo", "Gallego",
+      "Vidal", "Vega", "León", "Herrera", "Márquez", "Peña", "Flores", "Cabrera", "Campos", "Fuentes",
+      "Carrasco", "Diez", "Caballero", "Reyes", "Nieto", "Aguilar", "Pascual", "Soto", "Hidalgo", "Lorenzo",
+      "Montero", "Bravo", "Rivera", "Esteban", "Pardo", "Carmona", "Crespo", "Velasco", "Cabello", "Aparicio",
+      "Saavedra", "Sáez", "Roldán", "Soriano", "Bernal", "Alonso", "Ferrer", "Vargas", "Plaza", "Rivas",
+      "Estévez", "Castaño", "Trujillo", "Andrés", "Aguado", "Robles", "Vera", "Asensio", "Lara", "Moya",
+      "Casado", "Fernández", "Espinosa", "Heredia", "Macías", "Salgado", "Jiménez", "Bermúdez", "Salazar", "Vallejo",
+      "Núñez", "Mora", "Guzmán", "Aranda", "Beltrán", "Bueno", "Camacho", "Cano", "Carrillo", "Carvajal",
+      "Cerdá", "Coronado", "Daza", "Egea", "Escudero", "Espino", "Estrada", "Esquivel", "Falcó", "Figueroa",
+      "Folch", "Galindo", "Gallardo", "Garcés", "Gimeno", "Giménez", "Goñi", "Granados", "Heras", "Higuera",
+      "Huerta", "Izquierdo", "Jara", "Jurado", "Juárez", "Lago", "Lamas", "Largo", "Lasso", "Lema",
+      "Linares", "Lobato", "Lobo", "López", "Luengo", "Luna", "Madrid", "Maestre", "Magaña", "Maíz",
+      "Mancera", "Manjón", "Manso", "Marcos", "Mariño", "Marrero", "Marroquín", "Martí", "Mata", "Maturana",
+      "Mayo", "Maza", "Medel", "Mejía", "Melchor", "Melgar", "Membrives", "Menchero", "Merino", "Mira",
+      "Miralles", "Miranda", "Mochón", "Mojica", "Molero", "Monedero", "Monge", "Monje", "Monteagudo", "Montilla",
+      "Mora", "Morán", "Morera", "Mosquera", "Munguía", "Muñiz", "Muñoz", "Naranjo", "Navarro", "Negrín",
+      "Olivares", "Olmos", "Onieva", "Oreja", "Orejón", "Otero", "Padilla", "Palacios", "Pajares", "Palomo"
+    ],
+    "BR": [
+      "Silva", "Santos", "Oliveira", "Souza", "Pereira", "Costa", "Lima", "Almeida", "Carvalho", "Barbosa",
+      "Cardoso", "Dias", "Fonseca", "Gomes", "Gonçalves", "Júnior", "Machado", "Mendes", "Moreira", "Nascimento",
+      "Pinto", "Ramos", "Ribeiro", "Rocha", "Rodrigues", "Sousa", "Teixeira", "Vieira", "Alves", "Andrade",
+      "Araújo", "Cavalcante", "Coelho", "Correia", "Cunha", "Faria", "Ferreira", "Freitas", "Henriques", "Leite"
+    ],
+    "AR": [
+      "Pérez", "González", "Rodríguez", "Fernández", "López", "Martínez", "Sánchez", "Romero", "Sosa", "Álvarez",
+      "Torres", "Ruiz", "Ramírez", "Flores", "Acosta", "Benítez", "Medina", "Suárez", "Aguirre", "Castro",
+      "Domínguez", "Ferrer", "Galván", "Gutiérrez", "Herrera", "Jiménez", "Maldonado", "Méndez", "Molina", "Mora"
+    ],
+    "FR": [
+      "Martin", "Bernard", "Dubois", "Thomas", "Robert", "Richard", "Petit", "Durand", "Leroy", "Moreau",
+      "Simon", "Laurent", "Lefebvre", "Michel", "Garcia", "David", "Bertrand", "Roux", "Vincent", "Fournier",
+      "Morel", "Girard", "Andre", "Lefevre", "Mercier", "Dupont", "Lambert", "Bonnet", "Francois", "Martinez"
+    ],
+    "PT": [
+      "Silva", "Santos", "Ferreira", "Pereira", "Oliveira", "Costa", "Rodrigues", "Martins", "Jesus", "Sousa",
+      "Fernandes", "Gonçalves", "Gomes", "Lopes", "Marques", "Alves", "Almeida", "Ribeiro", "Pinto", "Carvalho",
+      "Teixeira", "Moreira", "Correia", "Mendes", "Nunes"
+    ],
+    "DE": [
+      "Müller", "Schmidt", "Schneider", "Fischer", "Weber", "Meyer", "Wagner", "Becker", "Schulz", "Hoffmann",
+      "Schäfer", "Koch", "Bauer", "Richter", "Klein", "Wolf", "Schröder", "Neuer", "Götze", "Reus"
+    ],
+    "GB-ENG": [
+      "Smith", "Jones", "Williams", "Brown", "Taylor", "Davies", "Wilson", "Evans", "Thomas", "Roberts",
+      "Johnson", "Lewis", "Walker", "Robinson", "Wood", "Thompson", "White", "Harrison", "Edwards", "Turner",
+      "Sterling", "Kane", "Foden", "Bellingham", "Saka"
+    ],
+    "IT": [
+      "Rossi", "Russo", "Ferrari", "Esposito", "Bianchi", "Romano", "Colombo", "Ricci", "Marino", "Greco",
+      "Bruno", "Gallo", "Conti", "De Luca", "Mancini", "Costa", "Giordano", "Rizzo", "Lombardi", "Moretti"
+    ],
+    "NL": [
+      "de Jong", "van Dijk", "de Vries", "van den Berg", "Bakker", "Janssen", "Visser", "Smit", "Meijer", "Mulder",
+      "de Boer", "Hendriks", "Brouwer", "Dijkstra", "van Beek", "Maas", "van Leeuwen"
+    ],
+    "PL": [
+      "Nowak", "Kowalski", "Wiśniewski", "Wójcik", "Lewandowski", "Kamiński", "Zieliński", "Szymański", "Woźniak", "Dąbrowski"
+    ],
+    "TR": [
+      "Yılmaz", "Kaya", "Demir", "Şahin", "Çelik", "Yıldız", "Aydın", "Özdemir", "Arslan", "Doğan"
+    ],
+    "MA": [
+      "El Aaraj", "Bouhaddouz", "El Kaabi", "Hakimi", "Mazraoui", "Saiss", "Ziyech", "Amrabat", "Chair", "El Khannouss",
+      "Aguerd", "Ounahi", "Ezzalzouli", "Boufal", "Akhomach", "Diaz", "Sabiri", "Belmadi", "Allaoui", "Bennoun",
+      "Bouhmidi", "Cherkaoui", "Drioueche", "El Yamiq", "Faraj"
+    ],
+    "SN": [
+      "Mané", "Koulibaly", "Cissé", "Gueye", "Mendy", "Diallo", "Diatta", "Kouyaté", "Niang", "Sarr",
+      "Ndiaye", "Camara", "Ba", "Sow", "Faye"
+    ],
+    "NG": [
+      "Adebayo", "Okonkwo", "Eze", "Iheanacho", "Osimhen", "Lookman", "Ndidi", "Chukwueze", "Aribo", "Okocha",
+      "Mikel", "Babayaro", "Iwobi", "Akpan", "Ekong"
+    ],
+    "GH": [
+      "Asamoah", "Boateng", "Mensah", "Owusu", "Adjei", "Annan", "Sulemana", "Odoi", "Inaki", "Ayew"
+    ],
+    "CI": [
+      "Touré", "Drogba", "Kalou", "Bony", "Gradel", "Aurier", "Bailly", "Pépé", "Diabaté", "Konan"
+    ],
+    "JP": [
+      "Sato", "Suzuki", "Tanaka", "Watanabe", "Ito", "Yamamoto", "Nakamura", "Kobayashi", "Kato", "Yoshida",
+      "Yamada", "Sasaki", "Kubo", "Tomiyasu", "Mitoma"
+    ],
+    "KR": [
+      "Kim", "Lee", "Park", "Choi", "Jung", "Cho", "Kang", "Yoon", "Han", "Hwang"
+    ],
+    "US": [
+      "Pulisic", "Adams", "Reyna", "McKennie", "Musah", "Dest", "Robinson", "Aaronson", "Pepi", "Sargent"
+    ],
+    "BE": [
+      "De Bruyne", "Hazard", "Lukaku", "Courtois", "Mertens", "Carrasco", "Witsel", "Vermaelen", "Alderweireld", "Tielemans"
+    ],
+    "DK": [
+      "Eriksen", "Højbjerg", "Christensen", "Schmeichel", "Kjær", "Dolberg", "Poulsen", "Jensen", "Andersen", "Wind"
+    ],
+    "NO": [
+      "Haaland", "Ødegaard", "Sørloth", "Berge", "Elyounoussi", "Helland", "King", "Singo", "Linnes", "Strand"
+    ],
+    "SE": [
+      "Isak", "Forsberg", "Kulusevski", "Olsen", "Bengtsson", "Augustinsson", "Larsson", "Andersson", "Nilsson", "Eriksson"
+    ],
+    "CH": [
+      "Xhaka", "Shaqiri", "Sommer", "Akanji", "Embolo", "Freuler", "Lang", "Steffen", "Rodriguez", "Zakaria"
+    ],
+    "HR": [
+      "Modrić", "Kovačić", "Brozović", "Perišić", "Lovren", "Vrsaljko", "Ćaleta-Car", "Sosa", "Majer", "Pašalić"
+    ],
+    "RS": [
+      "Mitrović", "Tadić", "Vlahović", "Milinković-Savić", "Pavlović", "Lukić", "Maksimović", "Veljković", "Babić", "Živković"
+    ]
+  }
+}
