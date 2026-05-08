@@ -308,7 +308,112 @@ func _start_season() -> void:
 	current_view = VIEW_TABLE
 	selected_team = null
 	selected_match = null
+	# Pre-temporada: 3 amistosos para el equipo del usuario antes de la jornada 1
+	if user_team_id != "":
+		_run_preseason_friendlies()
 	_refresh_ui()
+
+
+# =========================================================================== #
+# Pre-temporada: amistosos antes de empezar la liga
+# =========================================================================== #
+func _run_preseason_friendlies() -> void:
+	var user_team := _find_team_by_id(user_team_id)
+	if user_team == null:
+		return
+	# Elige 3 rivales: uno de Primera (no el del usuario), uno de Segunda y uno europeo si los hay,
+	# o si no, 3 de la división contraria a user_team.
+	var rng := RandomNumberGenerator.new()
+	rng.seed = SEED_BASE * 19 + year
+	var pool: Array = []
+	for t: Team in all_teams:
+		if t.id == user_team_id:
+			continue
+		# Solo rivales con plantilla suficiente
+		if t.players.size() >= 11:
+			pool.append(t)
+	if pool.size() < 3:
+		return
+	pool.shuffle()
+	var rivals: Array = pool.slice(0, 3)
+
+	var results: Array = []
+	var match_seed: int = SEED_BASE * 41 + year
+	for rival: Team in rivals:
+		# Restaurar condition para los amistosos
+		for p: Player in user_team.players:
+			p.condition = 100.0
+		for p: Player in rival.players:
+			p.condition = 100.0
+		var home_lineup := AutoLineup.pick(user_team, user_team.tactics_default.formation)
+		var away_lineup := AutoLineup.pick(rival, rival.tactics_default.formation)
+		match_seed += 1
+		var result: MatchResult = MatchEngine.simulate(home_lineup, away_lineup, match_seed)
+		results.append({"rival": rival.name, "result": result})
+	# Reset condition para empezar liga frescos
+	for p: Player in user_team.players:
+		p.condition = 100.0
+	_show_preseason_modal(user_team, results)
+
+
+func _show_preseason_modal(user_team: Team, results: Array) -> void:
+	var popup := AcceptDialog.new()
+	popup.title = "🟢 Pre-temporada %d-%d" % [year, year + 1]
+	popup.size = Vector2(560, 380)
+	popup.ok_button_text = "Empezar Liga"
+	add_child(popup)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	popup.add_child(box)
+
+	var title := Label.new()
+	title.text = "Amistosos de %s" % user_team.name
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 16)
+	title.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+	box.add_child(title)
+
+	var subtitle := Label.new()
+	subtitle.text = "Sin efecto en la clasificación, pero te dan ritmo de cara al primer partido."
+	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	subtitle.add_theme_font_size_override("font_size", 11)
+	subtitle.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	box.add_child(subtitle)
+
+	box.add_child(HSeparator.new())
+
+	var won: int = 0
+	var drawn: int = 0
+	var lost: int = 0
+	for r in results:
+		var rival: String = String(r["rival"])
+		var res: MatchResult = r["result"]
+		if res == null:
+			continue
+		var line := Label.new()
+		var icon: String = "🟰"
+		if res.score_home > res.score_away:
+			icon = "✅"
+			won += 1
+		elif res.score_home < res.score_away:
+			icon = "❌"
+			lost += 1
+		else:
+			drawn += 1
+		line.text = "%s  %s  %d-%d  %s" % [icon, user_team.name, res.score_home, res.score_away, rival]
+		line.add_theme_font_size_override("font_size", 13)
+		box.add_child(line)
+
+	var summary := Label.new()
+	summary.text = "Balance: %d V · %d E · %d D" % [won, drawn, lost]
+	summary.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	summary.add_theme_font_size_override("font_size", 12)
+	summary.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	box.add_child(summary)
+
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
 
 
 func _init_division(state: DivisionState, seed_offset: int) -> void:
@@ -685,6 +790,9 @@ func _on_reset_season() -> void:
 			_show_supercopa_modal(sc_result)
 		elif sc_result != null:
 			status_label.text = "🏆 Supercopa %d: %s campeón (final vs %s)" % [year, sc_result.champion_name, sc_result.runner_up_name]
+	# Ofertas de cambio de club al usuario tras temporada notable
+	if user_team_id != "":
+		_evaluate_manager_offers(cup_bracket)
 	_start_season()
 
 
@@ -732,6 +840,219 @@ func _show_supercopa_modal(sc: SupercopaSimulator.SupercopaResult) -> void:
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
 	popup.popup_centered()
+
+
+# =========================================================================== #
+# Ofertas de mánager (cambio de club entre temporadas)
+# =========================================================================== #
+func _evaluate_manager_offers(cup_bracket: CupBracket) -> void:
+	var user_team := _find_team_by_id(user_team_id)
+	if user_team == null:
+		return
+
+	var score: int = _compute_manager_score(user_team, cup_bracket)
+	if score < 5:
+		return  # rendimiento insuficiente para generar interés
+
+	# Candidatos: clubes de Primera con reputación dentro de un rango razonable
+	var candidates: Array = []
+	for t: Team in all_teams:
+		if t.id == user_team_id:
+			continue
+		if t.division != "primera":
+			continue
+		# El usuario solo recibe ofertas de equipos con rep similar o algo mayor
+		# (no equipos mucho peores ni mucho mejores que él).
+		var rep_diff: int = t.reputation - user_team.reputation
+		if rep_diff < -5:
+			continue  # equipo muy inferior al actual: no interesa al manager
+		if rep_diff > 12 + score:
+			continue  # equipo top que solo te ficharía con éxito enorme
+		candidates.append(t)
+
+	if candidates.is_empty():
+		return
+
+	# Mezclar y elegir 1-3 ofertas según score
+	var rng := RandomNumberGenerator.new()
+	rng.seed = SEED_BASE * 31 + year
+	candidates.shuffle()
+	var n_offers: int = 1
+	if score >= 8:
+		n_offers = min(3, candidates.size())
+	elif score >= 6:
+		n_offers = min(2, candidates.size())
+	var offers: Array = candidates.slice(0, n_offers)
+
+	_show_manager_offers_modal(user_team, offers, score)
+
+
+func _compute_manager_score(user_team: Team, cup_bracket: CupBracket) -> int:
+	var score: int = 0
+	# Posición Liga
+	var state: DivisionState = primera_state if user_team.division == "primera" else segunda_state
+	if state.league_table != null:
+		var sorted: Array = state.league_table.sorted_rows()
+		for i in sorted.size():
+			if sorted[i].team_id == user_team_id:
+				var pos: int = i + 1
+				if user_team.division == "primera":
+					if pos == 1: score += 10
+					elif pos == 2: score += 8
+					elif pos == 3: score += 6
+					elif pos == 4: score += 5
+					elif pos <= 6: score += 3
+					elif pos <= 10: score += 1
+					elif pos >= 18: score -= 3
+				else:
+					# Segunda: ascender es muy notable
+					if pos == 1: score += 9
+					elif pos == 2: score += 7
+					elif pos <= 6: score += 4  # zona playoff
+				break
+	# Copa
+	if cup_bracket != null:
+		if cup_bracket.champion_id == user_team_id:
+			score += 5
+		elif cup_bracket.rounds.size() > 0:
+			var final_round: CupBracket.Round = cup_bracket.rounds[-1]
+			if final_round.fixtures.size() == 1:
+				var fx: CupBracket.Fixture = final_round.fixtures[0]
+				if fx.home_id == user_team_id or fx.away_id == user_team_id:
+					score += 3  # finalista
+	# Champions (si jugó la temporada anterior, que se acaba de simular)
+	if champions_state != null:
+		if champions_state.champion_id == user_team_id:
+			score += 8
+		else:
+			for r: ChampionsBracket.KORound in champions_state.ko_rounds:
+				if r.name == "Final":
+					for fx: ChampionsBracket.KOFixture in r.fixtures:
+						if (fx.home_id == user_team_id or fx.away_id == user_team_id) and fx.winner_id != user_team_id:
+							score += 4  # subcampeón
+				elif r.name == "Semifinales":
+					for fx: ChampionsBracket.KOFixture in r.fixtures:
+						if (fx.home_id == user_team_id or fx.away_id == user_team_id) and fx.winner_id == user_team_id:
+							score += 2  # llegó a final
+				elif r.name == "Cuartos":
+					for fx: ChampionsBracket.KOFixture in r.fixtures:
+						if (fx.home_id == user_team_id or fx.away_id == user_team_id) and fx.winner_id == user_team_id:
+							score += 1  # llegó a semis
+	return score
+
+
+func _show_manager_offers_modal(current_team: Team, offers: Array, score: int) -> void:
+	var popup := AcceptDialog.new()
+	popup.title = "📨 Ofertas de mánager"
+	popup.size = Vector2(640, 480)
+	popup.ok_button_text = "Quedarme en %s" % current_team.short_name
+	add_child(popup)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	popup.add_child(box)
+
+	var header := Label.new()
+	header.text = "Tras la temporada en %s, otros clubes se interesan por ti." % current_team.name
+	header.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	header.add_theme_font_size_override("font_size", 13)
+	header.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+	box.add_child(header)
+
+	var subheader := Label.new()
+	subheader.text = "Puntuación de tu temporada: %d. Cuanto mayor, mejores ofertas." % score
+	subheader.add_theme_font_size_override("font_size", 11)
+	subheader.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	box.add_child(subheader)
+
+	box.add_child(HSeparator.new())
+
+	for offer_team: Team in offers:
+		box.add_child(_make_offer_row(current_team, offer_team, popup))
+
+	box.add_child(HSeparator.new())
+
+	var hint := Label.new()
+	hint.text = "Si aceptas una oferta, dirigirás al nuevo club desde la próxima temporada.\nSi pulsas 'Quedarme', sigues en %s." % current_team.name
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint.add_theme_font_size_override("font_size", 10)
+	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	box.add_child(hint)
+
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
+
+
+func _make_offer_row(current_team: Team, offer_team: Team, popup: AcceptDialog) -> Control:
+	var panel := PanelContainer.new()
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Color(0.15, 0.18, 0.22)
+	bg.border_color = Color(0.4, 0.45, 0.5)
+	bg.set_border_width_all(1)
+	bg.set_corner_radius_all(4)
+	bg.content_margin_left = 8
+	bg.content_margin_right = 8
+	bg.content_margin_top = 6
+	bg.content_margin_bottom = 6
+	panel.add_theme_stylebox_override("panel", bg)
+	var hbox := HBoxContainer.new()
+	hbox.add_theme_constant_override("separation", 12)
+	panel.add_child(hbox)
+
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hbox.add_child(info)
+
+	var name_label := Label.new()
+	name_label.text = offer_team.name
+	name_label.add_theme_font_size_override("font_size", 14)
+	name_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4))
+	info.add_child(name_label)
+
+	var stars: String = "★".repeat(int(offer_team.reputation / 20))
+	var details := Label.new()
+	details.text = "%s · %s · Reputación %d %s" % [
+		offer_team.city, offer_team.division.capitalize(), offer_team.reputation, stars]
+	details.add_theme_font_size_override("font_size", 11)
+	details.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	info.add_child(details)
+
+	var rep_diff: int = offer_team.reputation - current_team.reputation
+	var diff_str: String = "(+%d rep)" % rep_diff if rep_diff > 0 else (
+			"(%d rep)" % rep_diff if rep_diff < 0 else "(misma rep)")
+	var diff_label := Label.new()
+	diff_label.text = "vs tu club actual: %s" % diff_str
+	diff_label.add_theme_font_size_override("font_size", 10)
+	diff_label.add_theme_color_override("font_color",
+			Color(0.7, 1.0, 0.7) if rep_diff > 0 else (Color(1.0, 0.7, 0.7) if rep_diff < 0 else Color(0.85, 0.85, 0.85)))
+	info.add_child(diff_label)
+
+	var accept_btn := Button.new()
+	accept_btn.text = "✅ Aceptar"
+	accept_btn.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+	var offer_id: String = offer_team.id
+	var offer_name: String = offer_team.name
+	accept_btn.pressed.connect(func() -> void:
+		_accept_manager_offer(offer_id, offer_name)
+		popup.queue_free()
+	)
+	hbox.add_child(accept_btn)
+	return panel
+
+
+func _accept_manager_offer(new_team_id: String, new_team_name: String) -> void:
+	var old_team := _find_team_by_id(user_team_id)
+	user_team_id = new_team_id
+	# Resetear alineación personal: el nuevo club tiene jugadores distintos
+	user_lineup_template = {}
+	_initialize_user_lineup()
+	# Forzar refresco UI
+	current_view = VIEW_TABLE
+	selected_team = null
+	status_label.text = "✅ Has aceptado dirigir a %s%s" % [
+			new_team_name,
+			" (dejas %s)" % old_team.short_name if old_team else ""]
+	_refresh_ui()
 
 
 # Captura un snapshot del rendimiento del usuario en la temporada que acaba de terminar.
