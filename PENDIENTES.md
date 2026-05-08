@@ -109,11 +109,18 @@ Cosas que sabemos que están a medias o que hay que volver a mirar más adelante
 
 ## ✅ COMPLETADO recientemente
 
-- **Posiciones reales por jugador (Transfermarkt 25-26)**: scrapeadas 39/42 clubes, ~849 jugadores con position específica (era 25%, ahora 89%). Ya no hay un central marcado como `[CB,LB,RB]` ni un delantero como `[ST,LW,RW]`. Cobertura completa de los 10 slots esenciales en todos los equipos.
-  - Quedan ~122 con positions genéricas heredadas: apodos entre comillas (`"Capi"`, `"Chuki"`, `"Suso"`) y jugadores ya transferidos no presentes en TM 25-26.
-  - Las Palmas regenerado entero (su plantilla estaba corrupta: `name = "27 años"` para todos).
-  - 3 equipos del repo no están en TM 25-26 (Eldense, Cartagena, Tenerife): TM tiene en su lugar Deportivo, Cultural Leonesa. Mantenemos los nuestros.
-- **Pool internacional de nombres para canteranos** (40% ES, 60% internacional). Athletic fuerza ES por basque_only. Ya no hay nombres placeholder feos.
+**2026-05-08 — Bloque grande de features (1 sesión):**
+- **🏆 Champions League**: 12 europeos ficticios (Bayern, City, PSG, Arsenal, Inter, Milan, Liverpool, Chelsea, Dortmund, Porto, Benfica, Juventus) con plantillas procedurales + 4 spanish top clasificados de Liga. Formato: 4 grupos de 4 (solo IDA, 3 jornadas) → Cuartos → Semis → Final. UI completa en pestaña 🏆 con grupos, standings y bracket KO. Modal post-Champions cuando el usuario clasificó.
+- **📨 Ofertas de mánager** entre temporadas: tras una temporada notable (score >= 5 según posición Liga, Copa y Champions), 1-3 clubes te ofrecen el puesto. Modal con info del club + reputación. Aceptas → cambias de equipo y resetea alineación. Rechazas → sigues.
+- **🟢 Pre-temporada amistosos**: 3 amistosos contra rivales aleatorios al inicio de cada temporada para el equipo del usuario. Modal con resultados + balance V/E/D. Sin efecto en clasificación.
+- **Visor 2D v2**: balón con interpolación suave + estela; jugadores con offsets dinámicos (atacan/repliegan según posesión); animación de tiros (balón vuela hacia portería); aro de posesión bajo el equipo con balón.
+- **Multi-save** con slots nombrados: `SaveLoadDialog` reutilizable (modos save/load) con lista de slots, info por save (año, jornada, equipo, fecha, temporadas completadas), acciones por slot (Cargar/Sobreescribir/Eliminar) + crear nuevo. `SaveSystem.sanitize_slot_name` + `slot_exists`. Main menu "Continuar" abre el modal.
+
+**2026-05-08 — Datos:**
+- **Posiciones reales por jugador (Transfermarkt 25-26)**: scrapeadas 39/42 clubes, ~849 jugadores con position específica (era 25%, ahora 89%). Cobertura completa de los 10 slots esenciales en todos los equipos. Las Palmas regenerado entero (estaba corrupto). 3 equipos del repo no están en TM 25-26 (Eldense, Cartagena, Tenerife): mantenemos los nuestros.
+
+**Sesión anterior:**
+- **Pool internacional de nombres para canteranos** (40% ES, 60% internacional). Athletic fuerza ES por basque_only.
 - **Sistema de aggression** con scrape Marca + tarjetas concentradas en agresivos (max 11 TA real).
 - **Sanciones por tarjetas** + Mini-resumen post-partido + Histórico carrera + Supercopa Final 4.
 
