@@ -37,9 +37,14 @@ func _init() -> void:
 			var hl := AutoLineup.pick(home, home.tactics_default.formation)
 			var al := AutoLineup.pick(away, away.tactics_default.formation)
 			seed_counter += 1
+			# Decrementar sanciones (1 partido por sanción cada vez que el equipo juega)
+			CardSystem.decrement_for_team(home)
+			CardSystem.decrement_for_team(away)
 			var r: MatchResult = MatchEngine.simulate(hl, al, seed_counter)
 			if r == null:
 				continue
+			# Procesar tarjetas para tracking
+			CardSystem.process_match(r, primera)
 			var t: int = r.score_home + r.score_away
 			goal_dist[t] = int(goal_dist.get(t, 0)) + 1
 			total_goals += t
@@ -79,5 +84,25 @@ func _init() -> void:
 	print("\n  Resultados de la PRIMERA jornada (los 10 partidos):")
 	for b in jornada1_results:
 		print("    %s %d-%d %s" % [String(b["home"]), int(b["sh"]), int(b["sa"]), String(b["away"])])
+
+	# Distribución de tarjetas por jugador
+	print("\n  Top 15 jugadores con más amarillas tras la temporada:")
+	var card_holders: Array = []
+	for t: Team in primera:
+		for p: Player in t.players:
+			if p.yellow_cards_season > 0 or p.red_cards_season > 0:
+				card_holders.append({
+					"name": p.name,
+					"team": t.short_name,
+					"yellows": p.yellow_cards_season,
+					"reds": p.red_cards_season,
+					"agg": p.aggression,
+				})
+	card_holders.sort_custom(func(a, b): return int(a["yellows"]) > int(b["yellows"]))
+	for i in mini(15, card_holders.size()):
+		var c: Dictionary = card_holders[i]
+		print("    %2dTA + %dTR  agg=%2d  %-25s  %s" % [
+			int(c["yellows"]), int(c["reds"]), int(c["agg"]),
+			String(c["name"]).left(25), String(c["team"])])
 
 	quit(0)

@@ -10,8 +10,8 @@ const TICK_DUR_MAX: int = 50
 
 # Probabilidades de evento per-tick (independientes del outcome principal)
 const FOUL_BASE_PROB: float = 0.17        # ~28-35 faltas por partido total
-const YELLOW_GIVEN_FOUL: float = 0.16
-const RED_PROB_PER_TICK: float = 0.0005
+const YELLOW_GIVEN_FOUL: float = 0.085    # base; modulado por aggression
+const RED_PROB_PER_TICK: float = 0.00008  # rojas muy raras (~0.15/partido total)
 const INJURY_BASE_PROB: float = 0.005     # ~0.7-1 lesión por partido en promedio
 
 
@@ -249,16 +249,19 @@ static func _resolve_shot(
 static func _maybe_foul(state: MatchState, def_lineup: Lineup, events: Array[MatchEvent], rng: RandomNumberGenerator) -> void:
 	if rng.randf() >= FOUL_BASE_PROB:
 		return
-	# El defensor comete falta
-	var fouler: Player = _pick_actor(def_lineup, "defense", _inverse_zone(state.zone), rng)
+	# El defensor comete falta — selección ponderada por (presencia × aggression)
+	var fouler: Player = _pick_fouler(def_lineup, _inverse_zone(state.zone), rng)
 	if fouler == null:
 		return
 	state.stats[def_lineup.team.id]["fouls"] += 1
 	events.append(_make_event_for_team(state, def_lineup.team.id, MatchEvent.T_FOUL,
 		fouler.id, "Falta de %s" % fouler.name))
 
-	# ¿Tarjeta?
-	if rng.randf() < YELLOW_GIVEN_FOUL:
+	# ¿Tarjeta? Probabilidad escala con aggression del jugador.
+	# Factor: 0.75 (agg=10) a 1.30 (agg=99) — amplificación moderada.
+	var agg: int = fouler.aggression if fouler.aggression > 0 else 50
+	var yellow_p: float = YELLOW_GIVEN_FOUL * (0.7 + (float(agg) / 100.0) * 0.6)
+	if rng.randf() < yellow_p:
 		state.yellow_count[fouler.id] = state.yellow_count.get(fouler.id, 0) + 1
 		state.stats[def_lineup.team.id]["yellows"] += 1
 		events.append(_make_event_for_team(state, def_lineup.team.id, MatchEvent.T_YELLOW,
@@ -270,13 +273,44 @@ static func _maybe_foul(state: MatchState, def_lineup: Lineup, events: Array[Mat
 			state.stats[def_lineup.team.id]["reds"] += 1
 			events.append(_make_event_for_team(state, def_lineup.team.id, MatchEvent.T_RED,
 				fouler.id, "Roja por doble amarilla a %s" % fouler.name))
-	# Roja directa rara
-	if rng.randf() < RED_PROB_PER_TICK and not state.red_carded.get(fouler.id, false):
+	# Roja directa: muy rara incluso para los más agresivos
+	# Factor: 0.7 (agg=10) a 1.20 (agg=99)
+	var red_p: float = RED_PROB_PER_TICK * (0.7 + (float(agg) / 100.0) * 0.5)
+	if rng.randf() < red_p and not state.red_carded.get(fouler.id, false):
 		state.red_carded[fouler.id] = true
 		state.on_pitch[fouler.id] = false
 		state.stats[def_lineup.team.id]["reds"] += 1
 		events.append(_make_event_for_team(state, def_lineup.team.id, MatchEvent.T_RED,
 			fouler.id, "Roja directa a %s" % fouler.name))
+
+
+# Como _pick_actor pero ponderando también por aggression — quién comete la falta.
+static func _pick_fouler(lineup: Lineup, zone: String, rng: RandomNumberGenerator) -> Player:
+	var weights: Array = []
+	var players: Array = []
+	var total: float = 0.0
+	for i in lineup.starting_eleven.size():
+		var p: Player = lineup.starting_eleven[i]
+		var slot: String = lineup.slot_assignments[i]
+		var presence: float = PositionContribution.actor_weight(p, slot, "defense", zone)
+		if presence <= 0.0:
+			continue
+		var agg: int = p.aggression if p.aggression > 0 else 50
+		# Factor 0.5 (agg=10) a 1.5 (agg=99)
+		var agg_factor: float = 0.5 + (float(agg) / 100.0)
+		var w: float = presence * agg_factor
+		weights.append(w)
+		players.append(p)
+		total += w
+	if total <= 0.0:
+		return null
+	var roll: float = rng.randf() * total
+	var acc: float = 0.0
+	for i in players.size():
+		acc += weights[i]
+		if roll <= acc:
+			return players[i]
+	return players[-1]
 
 
 # ============================================================================

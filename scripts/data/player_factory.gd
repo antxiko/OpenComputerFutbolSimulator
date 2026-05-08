@@ -86,6 +86,8 @@ static func generate_attributes(player: Player, season_year: int, seed_value: in
 	# Potencial numérico = potencial base + el mejor modificador posicional aplicable
 	# (el techo del jugador en su atributo principal)
 	player.potential = clampi(base_potential + _best_modifier(modifiers), 1, 99)
+	# Inicializar aggression si no está (lookup en overrides + default por posición)
+	AggressionSystem.init_player(player)
 
 
 # Devuelve un overall numérico aleatorio dentro del rango del tier.

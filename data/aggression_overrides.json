@@ -1,0 +1,812 @@
+{
+  "_meta": {
+    "source": "api.unidadeditorial.es (Marca)",
+    "season": "2025-26",
+    "sources": [
+      "Primera (LALIGA EA Sports)",
+      "Segunda (LALIGA Hypermotion)"
+    ]
+  },
+  "players": {
+    "catena": {
+      "name": "Catena",
+      "team": "Osasuna",
+      "yellow_cards": 10,
+      "red_cards": 1,
+      "games": 31,
+      "aggression": 95
+    },
+    "djene": {
+      "name": "Djené",
+      "team": "Getafe",
+      "yellow_cards": 10,
+      "red_cards": 1,
+      "games": 31,
+      "aggression": 95
+    },
+    "isi": {
+      "name": "Isi",
+      "team": "Rayo",
+      "yellow_cards": 10,
+      "red_cards": 1,
+      "games": 31,
+      "aggression": 95
+    },
+    "agoume": {
+      "name": "Agoumé",
+      "team": "Sevilla",
+      "yellow_cards": 11,
+      "red_cards": 0,
+      "games": 30,
+      "aggression": 89
+    },
+    "carmona": {
+      "name": "Carmona",
+      "team": "Sevilla",
+      "yellow_cards": 11,
+      "red_cards": 0,
+      "games": 31,
+      "aggression": 87
+    },
+    "duarte": {
+      "name": "Duarte",
+      "team": "Getafe",
+      "yellow_cards": 11,
+      "red_cards": 0,
+      "games": 30,
+      "aggression": 89
+    },
+    "pathe ciss": {
+      "name": "Pathé Ciss",
+      "team": "Rayo",
+      "yellow_cards": 8,
+      "red_cards": 2,
+      "games": 25,
+      "aggression": 95
+    },
+    "abqar": {
+      "name": "Abqar",
+      "team": "Getafe",
+      "yellow_cards": 9,
+      "red_cards": 1,
+      "games": 20,
+      "aggression": 95
+    },
+    "pol lozano": {
+      "name": "Pol Lozano",
+      "team": "Espanyol",
+      "yellow_cards": 9,
+      "red_cards": 1,
+      "games": 30,
+      "aggression": 94
+    },
+    "aramburu": {
+      "name": "Aramburu",
+      "team": "R. Sociedad",
+      "yellow_cards": 10,
+      "red_cards": 0,
+      "games": 32,
+      "aggression": 80
+    },
+    "maffeo": {
+      "name": "Maffeo",
+      "team": "Mallorca",
+      "yellow_cards": 10,
+      "red_cards": 0,
+      "games": 28,
+      "aggression": 88
+    },
+    "mario martin": {
+      "name": "Mario Martín",
+      "team": "Getafe",
+      "yellow_cards": 10,
+      "red_cards": 0,
+      "games": 31,
+      "aggression": 81
+    },
+    "nobel mendy": {
+      "name": "Nobel Mendy",
+      "team": "Rayo",
+      "yellow_cards": 7,
+      "red_cards": 2,
+      "games": 21,
+      "aggression": 95
+    },
+    "mourino": {
+      "name": "Mouriño",
+      "team": "Villarreal",
+      "yellow_cards": 8,
+      "red_cards": 1,
+      "games": 25,
+      "aggression": 95
+    },
+    "vivian": {
+      "name": "Vivian",
+      "team": "Athletic",
+      "yellow_cards": 8,
+      "red_cards": 1,
+      "games": 28,
+      "aggression": 92
+    },
+    "edu exposito": {
+      "name": "Edu Expósito",
+      "team": "Espanyol",
+      "yellow_cards": 9,
+      "red_cards": 0,
+      "games": 32,
+      "aggression": 74
+    },
+    "galarreta": {
+      "name": "Galarreta",
+      "team": "Athletic",
+      "yellow_cards": 9,
+      "red_cards": 0,
+      "games": 31,
+      "aggression": 76
+    },
+    "moncayola": {
+      "name": "Moncayola",
+      "team": "Osasuna",
+      "yellow_cards": 9,
+      "red_cards": 0,
+      "games": 32,
+      "aggression": 74
+    },
+    "ratiu": {
+      "name": "Ratiu",
+      "team": "Rayo",
+      "yellow_cards": 9,
+      "red_cards": 0,
+      "games": 31,
+      "aggression": 76
+    },
+    "samu costa": {
+      "name": "Samú Costa",
+      "team": "Mallorca",
+      "yellow_cards": 9,
+      "red_cards": 0,
+      "games": 31,
+      "aggression": 76
+    },
+    "huijsen": {
+      "name": "Huijsen",
+      "team": "R. Madrid",
+      "yellow_cards": 7,
+      "red_cards": 1,
+      "games": 26,
+      "aggression": 91
+    },
+    "parada": {
+      "name": "Parada",
+      "team": "Alavés",
+      "yellow_cards": 7,
+      "red_cards": 1,
+      "games": 26,
+      "aggression": 91
+    },
+    "reis": {
+      "name": "Reis",
+      "team": "Girona",
+      "yellow_cards": 7,
+      "red_cards": 1,
+      "games": 32,
+      "aggression": 79
+    },
+    "blanco": {
+      "name": "Blanco",
+      "team": "Alavés",
+      "yellow_cards": 8,
+      "red_cards": 0,
+      "games": 32,
+      "aggression": 69
+    },
+    "buchanan": {
+      "name": "Buchanan",
+      "team": "Villarreal",
+      "yellow_cards": 8,
+      "red_cards": 0,
+      "games": 31,
+      "aggression": 70
+    },
+    "el hilali": {
+      "name": "El Hilali",
+      "team": "Espanyol",
+      "yellow_cards": 8,
+      "red_cards": 0,
+      "games": 32,
+      "aggression": 69
+    },
+    "febas": {
+      "name": "Febas",
+      "team": "Elche",
+      "yellow_cards": 8,
+      "red_cards": 0,
+      "games": 33,
+      "aggression": 67
+    },
+    "gudelj": {
+      "name": "Gudelj",
+      "team": "Sevilla",
+      "yellow_cards": 8,
+      "red_cards": 0,
+      "games": 30,
+      "aggression": 72
+    },
+    "gueye": {
+      "name": "Gueye",
+      "team": "Villarreal",
+      "yellow_cards": 8,
+      "red_cards": 0,
+      "games": 27,
+      "aggression": 77
+    },
+    "m. sanchez": {
+      "name": "M. Sánchez",
+      "team": "Levante",
+      "yellow_cards": 8,
+      "red_cards": 0,
+      "games": 29,
+      "aggression": 73
+    },
+    "pedraza": {
+      "name": "Pedraza",
+      "team": "Villarreal",
+      "yellow_cards": 8,
+      "red_cards": 0,
+      "games": 25,
+      "aggression": 81
+    },
+    "peque": {
+      "name": "Peque",
+      "team": "Sevilla",
+      "yellow_cards": 8,
+      "red_cards": 0,
+      "games": 25,
+      "aggression": 81
+    },
+    "tchouameni": {
+      "name": "Tchouameni",
+      "team": "R. Madrid",
+      "yellow_cards": 8,
+      "red_cards": 0,
+      "games": 30,
+      "aggression": 72
+    },
+    "vinicius": {
+      "name": "Vinícius",
+      "team": "R. Madrid",
+      "yellow_cards": 8,
+      "red_cards": 0,
+      "games": 33,
+      "aggression": 67
+    },
+    "zubeldia": {
+      "name": "Zubeldia",
+      "team": "R. Sociedad",
+      "yellow_cards": 8,
+      "red_cards": 0,
+      "games": 22,
+      "aggression": 89
+    },
+    "affengruber": {
+      "name": "Affengruber",
+      "team": "Elche",
+      "yellow_cards": 6,
+      "red_cards": 1,
+      "games": 32,
+      "aggression": 74
+    },
+    "chust": {
+      "name": "Chust",
+      "team": "Elche",
+      "yellow_cards": 6,
+      "red_cards": 1,
+      "games": 27,
+      "aggression": 82
+    },
+    "david carmo": {
+      "name": "David Carmo",
+      "team": "Oviedo",
+      "yellow_cards": 6,
+      "red_cards": 1,
+      "games": 22,
+      "aggression": 94
+    },
+    "gaya": {
+      "name": "Gayá",
+      "team": "Valencia",
+      "yellow_cards": 6,
+      "red_cards": 1,
+      "games": 30,
+      "aggression": 77
+    },
+    "nyom": {
+      "name": "Nyom",
+      "team": "Getafe",
+      "yellow_cards": 6,
+      "red_cards": 1,
+      "games": 12,
+      "aggression": 95
+    },
+    "pere milla": {
+      "name": "Pere Milla",
+      "team": "Espanyol",
+      "yellow_cards": 6,
+      "red_cards": 1,
+      "games": 30,
+      "aggression": 77
+    },
+    "borja iglesias": {
+      "name": "Borja Iglesias",
+      "team": "Celta",
+      "yellow_cards": 7,
+      "red_cards": 0,
+      "games": 31,
+      "aggression": 65
+    },
+    "matias moreno": {
+      "name": "Matias Moreno",
+      "team": "Levante",
+      "yellow_cards": 7,
+      "red_cards": 0,
+      "games": 24,
+      "aggression": 76
+    },
+    "natan": {
+      "name": "Natan",
+      "team": "Betis",
+      "yellow_cards": 7,
+      "red_cards": 0,
+      "games": 30,
+      "aggression": 66
+    },
+    "ounahi": {
+      "name": "Ounahi",
+      "team": "Girona",
+      "yellow_cards": 7,
+      "red_cards": 0,
+      "games": 20,
+      "aggression": 86
+    },
+    "suazo": {
+      "name": "Suazo",
+      "team": "Sevilla",
+      "yellow_cards": 7,
+      "red_cards": 0,
+      "games": 25,
+      "aggression": 74
+    },
+    "toljan": {
+      "name": "Toljan",
+      "team": "Levante",
+      "yellow_cards": 7,
+      "red_cards": 0,
+      "games": 33,
+      "aggression": 62
+    },
+    "tarrega": {
+      "name": "Tárrega",
+      "team": "Valencia",
+      "yellow_cards": 7,
+      "red_cards": 0,
+      "games": 28,
+      "aggression": 69
+    },
+    "federico vinas": {
+      "name": "Federico Viñas",
+      "team": "Oviedo",
+      "yellow_cards": 3,
+      "red_cards": 3,
+      "games": 30,
+      "aggression": 82
+    },
+    "antony": {
+      "name": "Antony",
+      "team": "Betis",
+      "yellow_cards": 5,
+      "red_cards": 1,
+      "games": 28,
+      "aggression": 74
+    },
+    "recio": {
+      "name": "Recio",
+      "team": "Cádiz",
+      "yellow_cards": 15,
+      "red_cards": 0,
+      "games": 36,
+      "aggression": 95
+    },
+    "climent": {
+      "name": "Climent",
+      "team": "Cádiz",
+      "yellow_cards": 13,
+      "red_cards": 1,
+      "games": 28,
+      "aggression": 95
+    },
+    "mikel": {
+      "name": "Mikel",
+      "team": "Real Sociedad B",
+      "yellow_cards": 13,
+      "red_cards": 1,
+      "games": 31,
+      "aggression": 95
+    },
+    "puerta": {
+      "name": "Puerta",
+      "team": "Racing",
+      "yellow_cards": 12,
+      "red_cards": 1,
+      "games": 30,
+      "aggression": 95
+    },
+    "insua": {
+      "name": "Ínsua",
+      "team": "Zaragoza",
+      "yellow_cards": 12,
+      "red_cards": 1,
+      "games": 30,
+      "aggression": 95
+    },
+    "bauza": {
+      "name": "Bauzá",
+      "team": "Mirandés",
+      "yellow_cards": 13,
+      "red_cards": 0,
+      "games": 34,
+      "aggression": 92
+    },
+    "corpas": {
+      "name": "Corpas",
+      "team": "Eibar",
+      "yellow_cards": 13,
+      "red_cards": 0,
+      "games": 36,
+      "aggression": 88
+    },
+    "alberto": {
+      "name": "Alberto",
+      "team": "Castellón",
+      "yellow_cards": 10,
+      "red_cards": 2,
+      "games": 32,
+      "aggression": 95
+    },
+    "barzic": {
+      "name": "Barzic",
+      "team": "Cultural",
+      "yellow_cards": 11,
+      "red_cards": 1,
+      "games": 31,
+      "aggression": 95
+    },
+    "gorosabel": {
+      "name": "Gorosabel",
+      "team": "Real Sociedad B",
+      "yellow_cards": 11,
+      "red_cards": 1,
+      "games": 31,
+      "aggression": 95
+    },
+    "gutierrez": {
+      "name": "Gutiérrez",
+      "team": "Mirandés",
+      "yellow_cards": 11,
+      "red_cards": 1,
+      "games": 35,
+      "aggression": 95
+    },
+    "mantilla": {
+      "name": "Mantilla",
+      "team": "Racing",
+      "yellow_cards": 11,
+      "red_cards": 1,
+      "games": 25,
+      "aggression": 95
+    },
+    "atienza": {
+      "name": "Atienza",
+      "team": "Burgos CF",
+      "yellow_cards": 12,
+      "red_cards": 0,
+      "games": 36,
+      "aggression": 83
+    },
+    "carbonell": {
+      "name": "Carbonell",
+      "team": "Real Sociedad B",
+      "yellow_cards": 12,
+      "red_cards": 0,
+      "games": 32,
+      "aggression": 91
+    },
+    "carrera": {
+      "name": "Carrera",
+      "team": "Real Sociedad B",
+      "yellow_cards": 12,
+      "red_cards": 0,
+      "games": 35,
+      "aggression": 85
+    },
+    "florian": {
+      "name": "Florian",
+      "team": "Burgos CF",
+      "yellow_cards": 12,
+      "red_cards": 0,
+      "games": 36,
+      "aggression": 83
+    },
+    "lopy": {
+      "name": "Lopy",
+      "team": "Almería",
+      "yellow_cards": 9,
+      "red_cards": 2,
+      "games": 24,
+      "aggression": 95
+    },
+    "corredera": {
+      "name": "Corredera",
+      "team": "Sporting",
+      "yellow_cards": 10,
+      "red_cards": 1,
+      "games": 35,
+      "aggression": 90
+    },
+    "ivan alejo": {
+      "name": "Iván Alejo",
+      "team": "Valladolid",
+      "yellow_cards": 10,
+      "red_cards": 1,
+      "games": 32,
+      "aggression": 95
+    },
+    "jon balda": {
+      "name": "Jon Balda",
+      "team": "Real Sociedad B",
+      "yellow_cards": 10,
+      "red_cards": 1,
+      "games": 33,
+      "aggression": 94
+    },
+    "marvel": {
+      "name": "Marvel",
+      "team": "Leganés",
+      "yellow_cards": 10,
+      "red_cards": 1,
+      "games": 32,
+      "aggression": 95
+    },
+    "diawara": {
+      "name": "Diawara",
+      "team": "Leganés",
+      "yellow_cards": 11,
+      "red_cards": 0,
+      "games": 36,
+      "aggression": 78
+    },
+    "s. guardiola": {
+      "name": "S. Guardiola",
+      "team": "Córdoba",
+      "yellow_cards": 11,
+      "red_cards": 0,
+      "games": 33,
+      "aggression": 83
+    },
+    "a. munoz": {
+      "name": "Á. Muñoz",
+      "team": "Almería",
+      "yellow_cards": 11,
+      "red_cards": 0,
+      "games": 32,
+      "aggression": 85
+    },
+    "gael": {
+      "name": "Gael",
+      "team": "FC Andorra",
+      "yellow_cards": 9,
+      "red_cards": 1,
+      "games": 35,
+      "aggression": 85
+    },
+    "juric": {
+      "name": "Juric",
+      "team": "Valladolid",
+      "yellow_cards": 9,
+      "red_cards": 1,
+      "games": 33,
+      "aggression": 88
+    },
+    "marcos": {
+      "name": "Marcos",
+      "team": "AD Ceuta",
+      "yellow_cards": 9,
+      "red_cards": 1,
+      "games": 32,
+      "aggression": 90
+    },
+    "murillo": {
+      "name": "Murillo",
+      "team": "Málaga",
+      "yellow_cards": 9,
+      "red_cards": 1,
+      "games": 33,
+      "aggression": 88
+    },
+    "carlos fernandez": {
+      "name": "Carlos Fernández",
+      "team": "Mirandés",
+      "yellow_cards": 10,
+      "red_cards": 0,
+      "games": 32,
+      "aggression": 80
+    },
+    "marvin": {
+      "name": "Marvin",
+      "team": "Las Palmas",
+      "yellow_cards": 10,
+      "red_cards": 0,
+      "games": 27,
+      "aggression": 90
+    },
+    "ruben diez": {
+      "name": "Rubén Díez",
+      "team": "AD Ceuta",
+      "yellow_cards": 10,
+      "red_cards": 0,
+      "games": 25,
+      "aggression": 95
+    },
+    "th. ojeda": {
+      "name": "Th. Ojeda",
+      "team": "Cultural",
+      "yellow_cards": 10,
+      "red_cards": 0,
+      "games": 32,
+      "aggression": 80
+    },
+    "arbilla": {
+      "name": "Arbilla",
+      "team": "Eibar",
+      "yellow_cards": 7,
+      "red_cards": 2,
+      "games": 30,
+      "aggression": 94
+    },
+    "albarran": {
+      "name": "Albarrán",
+      "team": "Córdoba",
+      "yellow_cards": 8,
+      "red_cards": 1,
+      "games": 29,
+      "aggression": 90
+    },
+    "andrada": {
+      "name": "Andrada",
+      "team": "Zaragoza",
+      "yellow_cards": 8,
+      "red_cards": 1,
+      "games": 27,
+      "aggression": 95
+    },
+    "chirino": {
+      "name": "Chirino",
+      "team": "Almería",
+      "yellow_cards": 8,
+      "red_cards": 1,
+      "games": 29,
+      "aggression": 90
+    },
+    "doue": {
+      "name": "Doué",
+      "team": "Castellón",
+      "yellow_cards": 8,
+      "red_cards": 1,
+      "games": 29,
+      "aggression": 90
+    },
+    "j. alonso": {
+      "name": "J. Alonso",
+      "team": "Huesca",
+      "yellow_cards": 8,
+      "red_cards": 1,
+      "games": 29,
+      "aggression": 90
+    },
+    "jorge pulido": {
+      "name": "Jorge Pulido",
+      "team": "Huesca",
+      "yellow_cards": 8,
+      "red_cards": 1,
+      "games": 33,
+      "aggression": 83
+    },
+    "salinas": {
+      "name": "Salinas",
+      "team": "Racing",
+      "yellow_cards": 8,
+      "red_cards": 1,
+      "games": 29,
+      "aggression": 90
+    },
+    "alcaraz": {
+      "name": "Alcaraz",
+      "team": "Granada",
+      "yellow_cards": 9,
+      "red_cards": 0,
+      "games": 30,
+      "aggression": 78
+    },
+    "carracedo": {
+      "name": "Carracedo",
+      "team": "Córdoba",
+      "yellow_cards": 9,
+      "red_cards": 0,
+      "games": 36,
+      "aggression": 69
+    },
+    "e. clemente": {
+      "name": "E. Clemente",
+      "team": "Las Palmas",
+      "yellow_cards": 9,
+      "red_cards": 0,
+      "games": 34,
+      "aggression": 71
+    },
+    "olaetxea": {
+      "name": "Olaetxea",
+      "team": "Eibar",
+      "yellow_cards": 9,
+      "red_cards": 0,
+      "games": 27,
+      "aggression": 83
+    },
+    "quagliata": {
+      "name": "Quagliata",
+      "team": "Deportivo",
+      "yellow_cards": 9,
+      "red_cards": 0,
+      "games": 34,
+      "aggression": 71
+    },
+    "sergio gonzalez": {
+      "name": "Sergio González",
+      "team": "Burgos CF",
+      "yellow_cards": 9,
+      "red_cards": 0,
+      "games": 27,
+      "aggression": 83
+    },
+    "oscar": {
+      "name": "Óscar",
+      "team": "Granada",
+      "yellow_cards": 9,
+      "red_cards": 0,
+      "games": 35,
+      "aggression": 70
+    },
+    "mellot": {
+      "name": "Mellot",
+      "team": "Castellón",
+      "yellow_cards": 5,
+      "red_cards": 3,
+      "games": 34,
+      "aggression": 87
+    },
+    "iker cordoba": {
+      "name": "Iker Córdoba",
+      "team": "Mirandés",
+      "yellow_cards": 6,
+      "red_cards": 2,
+      "games": 22,
+      "aggression": 95
+    },
+    "barcia": {
+      "name": "Barcia",
+      "team": "Las Palmas",
+      "yellow_cards": 7,
+      "red_cards": 1,
+      "games": 34,
+      "aggression": 76
+    }
+  }
+}

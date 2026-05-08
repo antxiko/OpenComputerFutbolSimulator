@@ -30,6 +30,7 @@ static func process_match(result: MatchResult, all_teams: Array) -> Array:
 				p.suspended_matches += 1
 				newly_suspended.append(p)
 		elif ev.type == MatchEvent.T_RED:
+			p.red_cards_season += 1
 			p.suspended_matches += 1
 			newly_suspended.append(p)
 	return newly_suspended
@@ -43,12 +44,14 @@ static func decrement_for_team(team: Team) -> void:
 			p.suspended_matches -= 1
 
 
-# Reset de amarillas (NO de sanciones pendientes, esas se arrastran)
-# al inicio de una nueva temporada.
+# Reset de tarjetas (amarillas y rojas) al inicio de una nueva temporada.
+# Las suspensiones pendientes NO se resetean (un sancionado a final de junio
+# cumple en la jornada que dispute en la nueva temporada).
 static func reset_yellow_cards(all_teams: Array) -> void:
 	for t: Team in all_teams:
 		for p: Player in t.players:
 			p.yellow_cards_season = 0
+			p.red_cards_season = 0
 
 
 static func is_suspended(p: Player) -> bool:

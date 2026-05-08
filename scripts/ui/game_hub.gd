@@ -637,7 +637,9 @@ func _on_reset_season() -> void:
 	Aging.age_all(all_teams, year, SEED_BASE * 100)
 	for t: Team in all_teams:
 		Cantera.fill_squad_if_needed(t, year, SEED_BASE * 50)
-	# Reset de amarillas para la nueva temporada
+	# Update aggression según tarjetas de la temporada que acaba
+	AggressionSystem.update_after_season(all_teams)
+	# Reset de amarillas/rojas para la nueva temporada (mantiene sanciones)
 	CardSystem.reset_yellow_cards(all_teams)
 	# Mercado de fichajes
 	TransferMarket.run(all_teams, year, SEED_BASE * 7)
