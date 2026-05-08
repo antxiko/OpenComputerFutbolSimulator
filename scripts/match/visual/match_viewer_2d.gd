@@ -51,8 +51,15 @@ var away_lineup: Lineup
 var event_idx: int = 0
 var ball_pos: Vector2 = Vector2(0.50, 0.50)
 var ball_target: Vector2 = Vector2(0.50, 0.50)
-var ball_speed_factor: float = 4.0   # mayor = balón más rápido al perseguir target
+# El balón usa interpolación basada en tiempo: recorre la distancia hacia el
+# target en `BALL_TRANSIT_TIME` segundos para movimientos normales y en
+# `SHOT_TRANSIT_TIME` segundos para tiros (más rápido pero VISIBLE).
+const BALL_TRANSIT_TIME: float = 0.55
+const SHOT_TRANSIT_TIME: float = 0.30
 var ball_trail: Array = []           # Vector2[] últimas posiciones para dibujar estela
+var ball_anim_total: float = BALL_TRANSIT_TIME  # tiempo total para cruzar la distancia actual
+var ball_anim_remaining: float = 0.0
+var ball_anim_origin: Vector2 = Vector2(0.50, 0.50)
 var current_minute: int = 0
 var current_second: int = 0
 var score_home: int = 0
@@ -280,34 +287,46 @@ func _process(delta: float) -> void:
 
 
 func _update_ball_smooth(delta: float) -> void:
-	# Interpolar posición real del balón hacia el target con velocidad limitada.
-	var to_target: Vector2 = ball_target - ball_pos
-	var dist: float = to_target.length()
-	if dist < 0.001:
+	# Interpolación basada en tiempo: el balón llega al target en
+	# ball_anim_total segundos (sea cual sea la distancia). Esto hace que
+	# tiros cortos no sean teletransporte y movimientos largos no eternos.
+	if ball_anim_remaining <= 0.0:
 		return
-	# Velocidad mayor durante animación de tiro
-	var speed: float = ball_speed_factor * delta
+	ball_anim_remaining = max(0.0, ball_anim_remaining - delta)
+	var t_elapsed: float = ball_anim_total - ball_anim_remaining
+	var t_norm: float = clamp(t_elapsed / max(0.001, ball_anim_total), 0.0, 1.0)
+	# Curva de easing: smooth-in-out para movimientos normales, ease-out para tiros (sale rápido y se frena al final)
+	var eased: float
 	if shot_animation_active:
-		speed *= 3.5
-	if dist <= speed:
-		ball_pos = ball_target
+		# ease-out cubic: arrancada explosiva, frenada al impactar
+		eased = 1.0 - pow(1.0 - t_norm, 3)
 	else:
-		ball_pos += to_target.normalized() * speed
+		# smoothstep clásico
+		eased = t_norm * t_norm * (3.0 - 2.0 * t_norm)
+	ball_pos = ball_anim_origin.lerp(ball_target, eased)
 	# Trail
 	ball_trail.append(ball_pos)
 	while ball_trail.size() > 8:
 		ball_trail.pop_front()
 
 
+# Llamada cuando ball_target cambia. Resetea animación con duración apropiada.
+func _kick_off_ball_animation() -> void:
+	ball_anim_origin = ball_pos
+	ball_anim_total = SHOT_TRANSIT_TIME if shot_animation_active else BALL_TRANSIT_TIME
+	ball_anim_remaining = ball_anim_total
+
+
 func _update_players_smooth(delta: float) -> void:
 	# Cada jugador tiene un offset target calculado según el contexto del juego.
-	# Después se interpola el offset actual hacia el target con velocidad lenta.
+	# Después se interpola el offset actual hacia el target con velocidad rápida
+	# para que el movimiento sea visible.
 	if home_lineup == null or away_lineup == null:
 		return
 	_compute_player_targets(home_lineup, home_player_targets, false)
 	_compute_player_targets(away_lineup, away_player_targets, true)
-	# Interpolar
-	var alpha: float = clamp(delta * 1.8, 0.0, 1.0)
+	# alpha alto = respuesta rápida; los jugadores llegan al target en ~0.3-0.4s
+	var alpha: float = clamp(delta * 4.0, 0.0, 1.0)
 	for i in home_player_offsets.size():
 		home_player_offsets[i] = home_player_offsets[i].lerp(home_player_targets[i], alpha)
 	for i in away_player_offsets.size():
@@ -319,6 +338,9 @@ func _compute_player_targets(lineup: Lineup, targets: Array, mirror: bool) -> vo
 	var has_possession: bool = (team_id == match_result.home_team_id and possession_team == "home") \
 			or (team_id == match_result.away_team_id and possession_team == "away")
 
+	# Tiempo relativo para "breathing" (oscilación natural de jugadores)
+	var t_now: float = float(Time.get_ticks_msec()) / 1000.0
+
 	for i in lineup.starting_eleven.size():
 		var slot: String = lineup.slot_assignments[i] if i < lineup.slot_assignments.size() else "CM"
 		var base_pos: Vector2 = SLOT_POSITIONS.get(slot, Vector2(0.45, 0.5))
@@ -326,54 +348,78 @@ func _compute_player_targets(lineup: Lineup, targets: Array, mirror: bool) -> vo
 			base_pos.x = 1.0 - base_pos.x
 
 		# Distancia del jugador al balón en coords del campo
-		var player_at: Vector2 = base_pos
-		var to_ball: Vector2 = ball_pos - player_at
+		var to_ball: Vector2 = ball_pos - base_pos
 		var dist: float = to_ball.length()
 
-		# Offset target inicial: cero (mantener formación)
+		# Offset target inicial: cero
 		var off: Vector2 = Vector2.ZERO
 
-		# 1) Movimiento global del bloque según zona del balón
-		# El equipo en posesión adelanta el bloque hacia el balón; el otro retrocede ligeramente.
+		# 1) Movimiento global del bloque hacia el balón / repliegue.
+		# Bloque entero se desplaza según la zona X actual del balón (-0.5 a +0.5).
+		# El equipo en posesión empuja MÁS hacia adelante; el otro repliega hacia atrás.
+		var ball_x_signed: float = ball_pos.x - 0.5  # negativo = balón en mitad propia, positivo = mitad rival
+		# Para el equipo away (mirror), invertimos
+		if mirror:
+			ball_x_signed = -ball_x_signed
 		var block_shift: float = 0.0
 		if has_possession:
-			# Acercarse a la zona del balón. Más para atacantes (ya están adelante), menos para defensas.
-			if slot in ["ST", "LW", "RW", "CAM"]:
-				block_shift = 0.06
+			# Empujamos según rol y dirección del balón
+			if slot in ["ST", "LW", "RW", "CF"]:
+				block_shift = 0.18 + max(0.0, ball_x_signed) * 0.10  # atacantes adelantadísimos
+			elif slot == "CAM":
+				block_shift = 0.14
 			elif slot in ["CM", "CDM", "LM", "RM"]:
-				block_shift = 0.04
-			elif slot in ["LB", "RB"]:
-				block_shift = 0.05  # laterales se incorporan
-			elif slot in ["CB"]:
-				block_shift = 0.02
+				block_shift = 0.10
+			elif slot in ["LB", "RB", "LWB", "RWB"]:
+				block_shift = 0.13  # laterales se incorporan al ataque
+			elif slot == "CB":
+				block_shift = 0.06  # CBs adelantan línea
 		else:
-			# Sin posesión: presionar pero la línea defensiva se replega un poco
-			if slot in ["ST", "LW", "RW", "CAM"]:
-				block_shift = 0.02
+			# Sin posesión: presionar adelante o replegar
+			if slot in ["ST", "LW", "RW"]:
+				block_shift = 0.04  # presión en la salida pero no demasiado
+			elif slot == "CAM":
+				block_shift = 0.06
 			elif slot in ["CM", "CDM"]:
-				block_shift = 0.03
-			elif slot in ["LB", "RB", "CB"]:
-				block_shift = -0.03
+				block_shift = 0.05
+			elif slot in ["LB", "RB"]:
+				block_shift = -0.04  # laterales replegados
+			elif slot == "CB":
+				block_shift = -0.06
 
 		# Aplicar block_shift en dirección hacia portería rival
-		var goal_x: float = 1.0 if not mirror else 0.0
-		var attack_dir: float = 1.0 if goal_x > 0.5 else -1.0
+		var attack_dir: float = -1.0 if mirror else 1.0
 		off.x += block_shift * attack_dir
 
-		# 2) Atracción al balón si está cerca (para los más cercanos)
-		# Solo el jugador del equipo en posesión más cercano + 1-2 rivales.
-		if dist < 0.30 and slot != "GK":
-			var pull: float = (0.30 - dist) * 0.4
-			# Limitar el pull para que no se peguen al balón
-			off += to_ball.normalized() * pull * 0.3
+		# 2) Movimiento lateral del bloque siguiendo Y del balón (compactación)
+		# Los jugadores del medio + defensa se desplazan ligeramente hacia el lado del balón.
+		if slot != "GK":
+			var ball_y_signed: float = ball_pos.y - 0.5
+			off.y += ball_y_signed * 0.12
 
-		# 3) GK: ligero ajuste lateral siguiendo la altura del balón
+		# 3) Atracción AL balón para los jugadores cercanos (excluye GK).
+		# Mucho más fuerte que antes: si estás a < 0.25 te acercas activamente.
+		if dist < 0.35 and slot != "GK":
+			var pull_strength: float = (0.35 - dist) * 1.3   # más fuerte cuanto más cerca
+			off += to_ball.normalized() * pull_strength * 0.18
+
+		# 4) GK: sigue la altura del balón con más amplitud y se adelanta si el balón está lejos
 		if slot == "GK":
-			off.y = (ball_pos.y - 0.5) * 0.15
+			off.y = (ball_pos.y - 0.5) * 0.30
+			# si el balón está en la mitad rival, el GK se adelanta un poco
+			var half_x: float = 0.5 if not mirror else 0.5
+			var ball_in_my_half: float = (0.5 - ball_pos.x) if not mirror else (ball_pos.x - 0.5)
+			if ball_in_my_half < 0:  # balón en campo rival
+				off.x += 0.04 * attack_dir
 
-		# 4) Limitar offset total
-		off.x = clamp(off.x, -0.10, 0.10)
-		off.y = clamp(off.y, -0.08, 0.08)
+		# 5) Breathing: oscilación constante para que se vea que están vivos
+		var phase: float = t_now * 1.5 + float(i) * 0.7 + (3.14 if mirror else 0.0)
+		off.x += sin(phase) * 0.012
+		off.y += cos(phase * 1.3) * 0.012
+
+		# 6) Limitar offset total (rangos amplios para movimiento visible)
+		off.x = clamp(off.x, -0.22, 0.22)
+		off.y = clamp(off.y, -0.18, 0.18)
 
 		if i < targets.size():
 			targets[i] = off
@@ -445,6 +491,7 @@ func _set_ball_for_event(ev: MatchEvent) -> void:
 		shot_animation_remaining = play_delay_ms * 0.85
 		var goal_y: float = 0.5 + (randf() - 0.5) * 0.18
 		ball_target = Vector2(goal_x, goal_y)
+		_kick_off_ball_animation()
 		return
 	if ev.type == MatchEvent.T_SHOT_OFF:
 		# Disparo fuera: balón pasa por encima/al lado de la portería
@@ -453,6 +500,7 @@ func _set_ball_for_event(ev: MatchEvent) -> void:
 		var off_y: float = 0.5 + (randf() - 0.5) * 0.50
 		var off_x: float = goal_x + (0.04 if attacking_home else -0.04)
 		ball_target = Vector2(off_x, clamp(off_y, 0.05, 0.95))
+		_kick_off_ball_animation()
 		return
 	if ev.type == MatchEvent.T_SHOT_BLOCKED:
 		# Bloqueado: balón rebota en zona de remate
@@ -461,27 +509,35 @@ func _set_ball_for_event(ev: MatchEvent) -> void:
 		var bx: float = 0.78 if attacking_home else 0.22
 		var by: float = 0.5 + (randf() - 0.5) * 0.25
 		ball_target = Vector2(bx, by)
+		_kick_off_ball_animation()
 		return
 	if ev.type == MatchEvent.T_CORNER:
 		# Saque de esquina: en la esquina del campo atacante
 		var cx: float = 0.99 if attacking_home else 0.01
 		var cy: float = 0.05 if randf() < 0.5 else 0.95
 		ball_target = Vector2(cx, cy)
+		_kick_off_ball_animation()
 		return
 	if ev.type == MatchEvent.T_KICKOFF or ev.type == MatchEvent.T_HALFTIME:
 		ball_target = Vector2(0.50, 0.50)
+		_kick_off_ball_animation()
 		return
 	# Resto de eventos (foul, yellow, red, etc): posición por zona estándar
 	_update_ball_position()
 
 
 func _update_ball_position() -> void:
-	# Target según zona y POV del equipo en posesión (movimiento "normal" del balón)
+	# Target según zona y POV del equipo en posesión (movimiento "normal" del balón).
+	# Añadimos algo de jitter en y proporcional al evento para que el balón se
+	# mueva por toda la zona, no en línea recta.
 	var x: float = ZONE_X_HOME[current_zone]
 	if possession_team == "away":
 		x = 1.0 - x
-	var y: float = 0.5 + sin(float(event_idx) * 0.7) * 0.2
-	ball_target = Vector2(x, y)
+	# Pequeño jitter en x dentro de la zona (distintos pases en la misma zona)
+	x += (randf() - 0.5) * 0.10
+	var y: float = 0.30 + randf() * 0.40   # entre 0.30 y 0.70
+	ball_target = Vector2(clamp(x, 0.05, 0.95), y)
+	_kick_off_ball_animation()
 
 
 # ============================================================================
