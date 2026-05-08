@@ -1674,16 +1674,34 @@ func _render_table_view() -> void:
 
 func _add_table_row(grid: GridContainer, pos: int, row: LeagueTable.TeamRow, n_teams: int) -> void:
 	var color: Color = Color(1, 1, 1)
-	if pos <= 4:
+	var icon: String = ""
+	# Solo Primera tiene plazas europeas
+	var is_primera: bool = (selected_division == "primera")
+	if is_primera and pos <= 4:
 		color = Color(0.6, 1.0, 0.7)
-	elif pos <= 6:
+		icon = "🏆 "
+	elif is_primera and pos <= 6:
 		color = Color(0.6, 0.8, 1.0)
+		icon = "⭐ "
+	elif is_primera and pos == 7:
+		color = Color(0.6, 0.8, 1.0)
+		icon = "🥉 "
+	elif pos <= 2 and not is_primera:
+		# Segunda: top 2 ascienden directos
+		color = Color(0.6, 1.0, 0.7)
+		icon = "⬆ "
+	elif pos <= 6 and not is_primera:
+		# Segunda: 3-6 zona playoff de ascenso
+		color = Color(0.7, 0.85, 1.0)
+		icon = "↑ "
 	elif pos > n_teams - 3:
 		color = Color(1.0, 0.65, 0.65)
+		icon = "⬇ "
 
 	# Ajustamos el ancho del botón de equipo para que el resto de columnas quepan
 	var team_button := Button.new()
-	team_button.text = row.team_name
+	team_button.text = "%s%s" % [icon, row.team_name]
+	team_button.tooltip_text = _table_row_tooltip(pos, n_teams, is_primera)
 	team_button.flat = true
 	team_button.add_theme_color_override("font_color", color)
 	team_button.add_theme_font_size_override("font_size", 12)
@@ -1717,6 +1735,27 @@ func _add_table_row(grid: GridContainer, pos: int, row: LeagueTable.TeamRow, n_t
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		l.custom_minimum_size = Vector2(32, 0)
 		grid.add_child(l)
+
+
+func _table_row_tooltip(pos: int, n_teams: int, is_primera: bool) -> String:
+	if is_primera:
+		if pos <= 4:
+			return "Clasificado a Champions League"
+		if pos <= 6:
+			return "Clasificado a Europa League (v2)"
+		if pos == 7:
+			return "Clasificado a Conference League (v2)"
+		if pos > n_teams - 3:
+			return "Zona de descenso a Segunda"
+		return ""
+	else:
+		if pos <= 2:
+			return "Asciende directo a Primera"
+		if pos <= 6:
+			return "Zona de playoff de ascenso"
+		if pos > n_teams - 3:
+			return "Zona de descenso a Tercera"
+		return ""
 
 
 func _on_team_clicked(team_id: String) -> void:

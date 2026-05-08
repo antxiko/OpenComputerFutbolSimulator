@@ -124,7 +124,7 @@ static func _attempt_signing(
 		var fee: int = candidate_data["fee"]
 
 		# 3) Probabilidad de venta
-		var accept_prob: float = _seller_acceptance_prob(candidate, seller, fee, season_year)
+		var accept_prob: float = _seller_acceptance_prob(candidate, seller, fee, season_year, buyer)
 		if rng.randf() > accept_prob:
 			continue
 
@@ -277,9 +277,17 @@ static func _find_best_candidate(
 # ============================================================================
 # Aceptación del vendedor
 # ============================================================================
-static func _seller_acceptance_prob(player: Player, seller: Team, fee: int, season_year: int) -> float:
+static func _seller_acceptance_prob(player: Player, seller: Team, fee: int, season_year: int, buyer: Team = null) -> float:
 	# Base: 50%
 	var p: float = 0.50
+
+	# Atractivo del comprador: si la reputación del comprador es claramente
+	# mayor que la del vendedor, el jugador "quiere irse" → la prob sube. Si
+	# es menor, baja (ningún jugador top quiere bajar a un equipo peor).
+	if buyer != null:
+		var rep_diff: int = buyer.reputation - seller.reputation
+		# +0.20 si rep_diff = +20 (gran upgrade), -0.15 si rep_diff = -15
+		p += clampf(float(rep_diff) * 0.012, -0.20, 0.30)
 
 	# Lealtad: jugador recién incorporado (últimos 2 años) muy difícil de vender
 	var seasons_at_club: int = season_year - player.joined_year
