@@ -526,8 +526,6 @@
       },
       "nationality": "ES",
       "positions": [
-        "CM",
-        "CDM",
         "CAM"
       ],
       "preferred_foot": "R",
@@ -684,9 +682,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "ST",
-        "LW",
-        "RW"
+        "ST"
       ],
       "preferred_foot": "R",
       "tier": "C",

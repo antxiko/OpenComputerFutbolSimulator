@@ -318,9 +318,7 @@
       },
       "nationality": "GQ",
       "positions": [
-        "ST",
-        "LW",
-        "RW"
+        "ST"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -346,8 +344,6 @@
       },
       "nationality": "ES",
       "positions": [
-        "CB",
-        "LB",
         "RB"
       ],
       "preferred_foot": "R",
@@ -556,8 +552,6 @@
       },
       "nationality": "ES",
       "positions": [
-        "CM",
-        "CDM",
         "CAM"
       ],
       "preferred_foot": "R",
@@ -584,9 +578,7 @@
       },
       "nationality": "CM",
       "positions": [
-        "CM",
-        "CDM",
-        "CAM"
+        "CDM"
       ],
       "preferred_foot": "R",
       "tier": "Y",
@@ -768,9 +760,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "ST",
-        "LW",
-        "RW"
+        "LW"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -796,9 +786,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "ST",
-        "LW",
-        "RW"
+        "LW"
       ],
       "preferred_foot": "R",
       "tier": "C",

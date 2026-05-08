@@ -74,8 +74,12 @@ var user_lineup_template: Dictionary = {}
 var user_career_history: Array = []
 # Flag para saber si el mercado de invierno ya se ha ejecutado esta temporada.
 var winter_market_done: bool = false
-# Última edición de Champions League simulada (no se persiste en save).
+# Última edición de competiciones europeas (no se persisten en save).
 var champions_state: ChampionsBracket = null
+var europa_state: ChampionsBracket = null
+var conference_state: ChampionsBracket = null
+# Pestaña activa dentro del visor de competiciones europeas.
+var selected_european_comp: String = ""
 
 # UI refs (populadas en _build_ui)
 var year_label: Label
@@ -511,6 +515,156 @@ func _show_winter_market_modal(market_result: TransferMarket.MarketResult) -> vo
 	popup.popup_centered()
 
 
+# Modal de resumen del mercado de verano (incluye renovaciones, free agents,
+# traspasos y libres que se retiraron).
+func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
+	var popup := AcceptDialog.new()
+	popup.title = "☀ Mercado de verano %d" % year
+	popup.size = Vector2(700, 540)
+	popup.ok_button_text = "Continuar"
+	add_child(popup)
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.custom_minimum_size = Vector2(680, 480)
+	popup.add_child(scroll)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(box)
+
+	# Header con cifras globales
+	var stats_label := Label.new()
+	stats_label.text = "📊 %d traspasos · %d fichajes libres · %d renovaciones · %d sin equipo (retirados/fuera)" % [
+		market.transfers.size(),
+		market.free_agent_signings.size(),
+		market.renewals.size(),
+		market.released.size() - market.free_agent_signings.size(),
+	]
+	stats_label.add_theme_font_size_override("font_size", 12)
+	stats_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	box.add_child(stats_label)
+
+	box.add_child(HSeparator.new())
+
+	# === Tu club ===
+	var user_signings: Array = []
+	var user_departures: Array = []
+	var user_free_signings: Array = []
+	var user_released: Array = []
+	for tr: TransferMarket.Transfer in market.transfers:
+		if tr.to_team_id == user_team_id: user_signings.append(tr)
+		elif tr.from_team_id == user_team_id: user_departures.append(tr)
+	for fa: Dictionary in market.free_agent_signings:
+		if String(fa.get("signing_team_id", "")) == user_team_id:
+			user_free_signings.append(fa)
+
+	if user_signings.size() > 0 or user_departures.size() > 0 or user_free_signings.size() > 0:
+		var your_label := Label.new()
+		your_label.text = "🏟 Tu club:"
+		your_label.add_theme_font_size_override("font_size", 14)
+		your_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+		box.add_child(your_label)
+		for tr: TransferMarket.Transfer in user_signings:
+			var l := Label.new()
+			l.text = "  ✅ Ficha: %s (%s, %s €)" % [tr.player_name, tr.from_team_name, TransferMarket._fmt_eur(tr.fee_eur)]
+			l.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+			box.add_child(l)
+		for fa: Dictionary in user_free_signings:
+			var l := Label.new()
+			l.text = "  🆓 Libre: %s (%s, ovr %d, %s €/año)" % [
+				String(fa["player_name"]), String(fa["prev_team_name"]),
+				int(fa["overall"]), TransferMarket._fmt_eur(int(fa["salary"])),
+			]
+			l.add_theme_color_override("font_color", Color(0.85, 1.0, 0.5))
+			box.add_child(l)
+		for tr: TransferMarket.Transfer in user_departures:
+			var l := Label.new()
+			l.text = "  ❌ Vende: %s (a %s, %s €)" % [tr.player_name, tr.to_team_name, TransferMarket._fmt_eur(tr.fee_eur)]
+			l.add_theme_color_override("font_color", Color(1.0, 0.7, 0.7))
+			box.add_child(l)
+		box.add_child(HSeparator.new())
+
+	# === Top fichajes (resto liga) ===
+	var sorted_t: Array = market.transfers.duplicate()
+	sorted_t.sort_custom(func(a: TransferMarket.Transfer, b: TransferMarket.Transfer) -> bool:
+		return a.fee_eur > b.fee_eur)
+	var top_label := Label.new()
+	top_label.text = "💰 Top traspasos:"
+	top_label.add_theme_font_size_override("font_size", 13)
+	top_label.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	box.add_child(top_label)
+	var shown: int = 0
+	for tr: TransferMarket.Transfer in sorted_t:
+		if shown >= 8: break
+		if tr.to_team_id == user_team_id or tr.from_team_id == user_team_id:
+			continue
+		var l := Label.new()
+		l.text = "  %s · %s → %s · %s €" % [tr.player_name, tr.from_team_name, tr.to_team_name, TransferMarket._fmt_eur(tr.fee_eur)]
+		l.add_theme_font_size_override("font_size", 11)
+		box.add_child(l)
+		shown += 1
+
+	# === Top free agent signings ===
+	var sorted_fa: Array = market.free_agent_signings.duplicate()
+	sorted_fa.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return int(a["overall"]) > int(b["overall"]))
+	if sorted_fa.size() > 0:
+		var fa_label := Label.new()
+		fa_label.text = "🆓 Top fichajes libres:"
+		fa_label.add_theme_font_size_override("font_size", 13)
+		fa_label.add_theme_color_override("font_color", Color(0.85, 1.0, 0.5))
+		box.add_child(fa_label)
+		shown = 0
+		for fa: Dictionary in sorted_fa:
+			if shown >= 6: break
+			if String(fa.get("signing_team_id", "")) == user_team_id:
+				continue
+			var l := Label.new()
+			l.text = "  %s (ovr %d) %s → %s" % [
+				String(fa["player_name"]), int(fa["overall"]),
+				String(fa["prev_team_name"]), String(fa["signing_team_name"]),
+			]
+			l.add_theme_font_size_override("font_size", 11)
+			box.add_child(l)
+			shown += 1
+
+	# === Notable releases (jugadores top que se quedaron sin equipo) ===
+	var sorted_rel: Array = market.released.duplicate()
+	sorted_rel.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return int(a.get("ovr", 0)) > int(b.get("ovr", 0)))
+	# Filtrar los que SÍ ficharon (excluirlos de "sin equipo")
+	var fa_signed_names: Dictionary = {}
+	for fa in market.free_agent_signings:
+		fa_signed_names[String(fa["player_name"])] = true
+	var unsigned: Array = []
+	for r: Dictionary in sorted_rel:
+		if not fa_signed_names.has(String(r["player_name"])):
+			unsigned.append(r)
+	if unsigned.size() > 0:
+		var rel_label := Label.new()
+		rel_label.text = "⚠ Sin equipo (retirados o fuera de la liga):"
+		rel_label.add_theme_font_size_override("font_size", 13)
+		rel_label.add_theme_color_override("font_color", Color(1.0, 0.7, 0.7))
+		box.add_child(rel_label)
+		shown = 0
+		for r: Dictionary in unsigned:
+			if shown >= 5: break
+			if int(r.get("ovr", 0)) < 70: continue  # solo los notables
+			var l := Label.new()
+			l.text = "  %s (ovr %d, %d años, ex-%s)" % [
+				String(r["player_name"]), int(r["ovr"]),
+				int(r.get("age", 0)), String(r["team_name"]),
+			]
+			l.add_theme_font_size_override("font_size", 11)
+			box.add_child(l)
+			shown += 1
+
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
+
+
 func _init_division(state: DivisionState, seed_offset: int) -> void:
 	var ids: Array = state.teams.map(func(t: Team) -> String: return t.id)
 	state.calendar = CalendarGenerator.generate(ids, SEED_BASE + seed_offset)
@@ -878,30 +1032,49 @@ func _on_reset_season() -> void:
 	AggressionSystem.update_after_season(all_teams)
 	# Reset de amarillas/rojas para la nueva temporada (mantiene sanciones)
 	CardSystem.reset_yellow_cards(all_teams)
-	# Mercado de fichajes
-	TransferMarket.run(all_teams, year, SEED_BASE * 7)
-	# Champions League: top 4 españoles del año que acaba (basado en p_table snapshot
-	# previo) vs 12 europeos generados procedurally.
+	# Mercado de fichajes (verano)
+	var summer_result: TransferMarket.MarketResult = TransferMarket.run(all_teams, year, SEED_BASE * 7)
+	# Modal de resumen (solo si hubo movimientos relevantes)
+	if user_team_id != "" and (summer_result.transfers.size() > 0 or summer_result.free_agent_signings.size() > 0):
+		_show_summer_market_modal(summer_result)
+	# Competiciones europeas:
+	#   Champions: top 1-4 (4 españoles + 12 europeos = 16, 4 grupos x 4 + KO).
+	#   Europa: top 5-8 + 4 más + 8 europeos pool medio = 16, KO directo.
+	#   Conference: top 9-16 + 8 europeos pool bajo = 16, KO directo.
 	if primera_state.league_table != null:
-		var top4_rows: Array = primera_state.league_table.sorted_rows().slice(0, 4)
-		var top4_teams: Array = []
-		for r: LeagueTable.TeamRow in top4_rows:
-			var t: Team = _find_team_by_id(r.team_id)
-			if t != null:
-				top4_teams.append(t)
-		if top4_teams.size() == 4:
-			var euros: Array = EuropeanTeams.generate_all(year, SEED_BASE + year * 13)
-			champions_state = ChampionsSimulator.run(top4_teams, euros, year, SEED_BASE * 17 + year)
-			if champions_state != null and champions_state.champion_name != "":
-				var qualified_user: bool = false
-				for tt: Team in top4_teams:
-					if tt.id == user_team_id:
-						qualified_user = true
-						break
-				if qualified_user:
-					_show_champions_modal(champions_state)
-				else:
-					status_label.text = "🏆 Champions %d: %s campeón (final vs %s)" % [year, champions_state.champion_name, champions_state.runner_up_name]
+		var liga_sorted: Array = primera_state.league_table.sorted_rows()
+		var spanish_by_pos: Array = []
+		for r: LeagueTable.TeamRow in liga_sorted:
+			var tt: Team = _find_team_by_id(r.team_id)
+			if tt != null:
+				spanish_by_pos.append(tt)
+		# Champions: 1-4
+		var top4: Array = spanish_by_pos.slice(0, 4)
+		if top4.size() == 4:
+			var euros_ch: Array = EuropeanTeams.generate_all(year, SEED_BASE + year * 13)
+			champions_state = ChampionsSimulator.run(top4, euros_ch, year, SEED_BASE * 17 + year)
+		# Europa: 5-12 (8 equipos)
+		var europa_qual: Array = spanish_by_pos.slice(4, 12)
+		if europa_qual.size() == 8:
+			var euros_el: Array = EuropeanTeams.generate_europa(year, SEED_BASE + year * 23)
+			europa_state = EuropeSecondarySimulator.run(europa_qual, euros_el, "Europa League", year, SEED_BASE * 19 + year)
+		# Conference: 13-20 (los 8 últimos de Primera + 8 europeos del pool conference)
+		# Estos son simbólicos — clubes "menores" pueden ganar Conference.
+		var conf_qual: Array = spanish_by_pos.slice(12, 20)
+		if conf_qual.size() == 8:
+			var euros_cf: Array = EuropeanTeams.generate_conference(year, SEED_BASE + year * 29)
+			conference_state = EuropeSecondarySimulator.run(conf_qual, euros_cf, "Conference League", year, SEED_BASE * 23 + year)
+
+		# Modal Champions si el usuario está en top 4
+		if champions_state != null and champions_state.champion_name != "":
+			var user_in_ch: bool = false
+			for tt: Team in top4:
+				if tt.id == user_team_id:
+					user_in_ch = true; break
+			if user_in_ch:
+				_show_champions_modal(champions_state)
+			else:
+				status_label.text = "🏆 Champions %d: %s campeón" % [year, champions_state.champion_name]
 	# Supercopa de España (con clasificados de la temporada que acaba de terminar)
 	if sc_qualifiers.size() >= 4:
 		var fallback: Team = null
@@ -1248,9 +1421,9 @@ func _compute_user_cup_progress(bracket: CupBracket) -> String:
 # Vista: Champions League
 # =========================================================================== #
 func _render_champions_view() -> void:
-	if champions_state == null:
+	if champions_state == null and europa_state == null and conference_state == null:
 		var l := Label.new()
-		l.text = "Aún no hay edición de Champions League activa.\nFinaliza una temporada (botón \"🔁 Nueva temp.\") para que se simule la siguiente edición."
+		l.text = "Aún no hay competiciones europeas activas.\nFinaliza una temporada (botón \"🔁 Nueva temp.\") para que se simule la edición siguiente."
 		l.add_theme_font_size_override("font_size", 14)
 		l.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -1262,70 +1435,99 @@ func _render_champions_view() -> void:
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content_area.add_child(scroll)
 	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 12)
+	vbox.add_theme_constant_override("separation", 16)
 	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(vbox)
 
+	# Selector de competición (botones simples)
+	var tabs := HBoxContainer.new()
+	tabs.add_theme_constant_override("separation", 8)
+	vbox.add_child(tabs)
+	for opt in [["🏆 Champions", champions_state], ["⭐ Europa", europa_state], ["🥉 Conference", conference_state]]:
+		var label_text: String = String(opt[0])
+		var bracket = opt[1]
+		var btn := Button.new()
+		btn.text = label_text + ("  (%s)" % bracket.champion_name if (bracket != null and bracket.champion_name != "") else "")
+		btn.flat = true
+		btn.disabled = (bracket == null)
+		btn.pressed.connect(func() -> void:
+			selected_european_comp = label_text
+			_refresh_ui()
+		)
+		tabs.add_child(btn)
+
+	vbox.add_child(HSeparator.new())
+
+	# Bracket activo: el seleccionado, o el primero disponible (Champions por defecto)
+	var active_bracket: ChampionsBracket = champions_state
+	if selected_european_comp.contains("Europa"): active_bracket = europa_state
+	elif selected_european_comp.contains("Conference"): active_bracket = conference_state
+	# Fallback si la seleccionada no existe
+	if active_bracket == null:
+		active_bracket = champions_state if champions_state != null else (europa_state if europa_state != null else conference_state)
+
+	if active_bracket == null:
+		return
+
+	_render_european_bracket(vbox, active_bracket, selected_european_comp if selected_european_comp != "" else "🏆 Champions")
+
+
+func _render_european_bracket(vbox: VBoxContainer, bracket: ChampionsBracket, comp_name: String) -> void:
 	# Título + campeón
 	var title := Label.new()
-	title.text = "🏆 Champions League %d-%d" % [champions_state.season_year, champions_state.season_year + 1]
+	title.text = "%s · %d-%d" % [comp_name, bracket.season_year, bracket.season_year + 1]
 	title.add_theme_font_size_override("font_size", 18)
 	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 	vbox.add_child(title)
 
-	if champions_state.champion_name != "":
+	if bracket.champion_name != "":
 		var champ := Label.new()
-		champ.text = "Campeón: %s   ·   Subcampeón: %s" % [
-			champions_state.champion_name, champions_state.runner_up_name]
+		champ.text = "Campeón: %s   ·   Subcampeón: %s" % [bracket.champion_name, bracket.runner_up_name]
 		champ.add_theme_color_override("font_color", Color(0.8, 1.0, 0.6))
 		vbox.add_child(champ)
 
-	# Fase de grupos
-	var groups_label := Label.new()
-	groups_label.text = "── Fase de grupos ──"
-	groups_label.add_theme_font_size_override("font_size", 14)
-	groups_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
-	vbox.add_child(groups_label)
+	# Fase de grupos (solo en Champions)
+	if not bracket.groups.is_empty():
+		var groups_label := Label.new()
+		groups_label.text = "── Fase de grupos ──"
+		groups_label.add_theme_font_size_override("font_size", 14)
+		groups_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+		vbox.add_child(groups_label)
 
-	var groups_grid := GridContainer.new()
-	groups_grid.columns = 2
-	groups_grid.add_theme_constant_override("h_separation", 24)
-	groups_grid.add_theme_constant_override("v_separation", 12)
-	vbox.add_child(groups_grid)
+		var groups_grid := GridContainer.new()
+		groups_grid.columns = 2
+		groups_grid.add_theme_constant_override("h_separation", 24)
+		groups_grid.add_theme_constant_override("v_separation", 12)
+		vbox.add_child(groups_grid)
 
-	for g: ChampionsBracket.Group in champions_state.groups:
-		var gbox := VBoxContainer.new()
-		var gh := Label.new()
-		gh.text = "Grupo %s" % g.letter
-		gh.add_theme_font_size_override("font_size", 13)
-		gh.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
-		gbox.add_child(gh)
-		var grid := GridContainer.new()
-		grid.columns = 6
-		grid.add_theme_constant_override("h_separation", 8)
-		# header
-		for h_text in ["Pos", "Equipo", "PJ", "Pts", "GF", "GC"]:
-			var hl := Label.new()
-			hl.text = h_text
-			hl.add_theme_font_size_override("font_size", 11)
-			hl.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
-			grid.add_child(hl)
-		var standings: Array = g.sorted_standings()
-		for i in standings.size():
-			var st: ChampionsBracket.GroupStanding = standings[i]
-			var color: Color = Color(1, 1, 1)
-			if i < 2:
-				color = Color(0.7, 1.0, 0.7)  # clasificados
-			else:
-				color = Color(0.85, 0.85, 0.85)
-			grid.add_child(_make_label("%d" % (i + 1), 11, color))
-			grid.add_child(_make_label(st.team_name, 11, color))
-			grid.add_child(_make_label("%d" % st.played, 11, color))
-			grid.add_child(_make_label("%d" % st.points(), 11, color))
-			grid.add_child(_make_label("%d" % st.goals_for, 11, color))
-			grid.add_child(_make_label("%d" % st.goals_against, 11, color))
-		gbox.add_child(grid)
-		groups_grid.add_child(gbox)
+		for g: ChampionsBracket.Group in bracket.groups:
+			var gbox := VBoxContainer.new()
+			var gh := Label.new()
+			gh.text = "Grupo %s" % g.letter
+			gh.add_theme_font_size_override("font_size", 13)
+			gh.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+			gbox.add_child(gh)
+			var grid := GridContainer.new()
+			grid.columns = 6
+			grid.add_theme_constant_override("h_separation", 8)
+			for h_text in ["Pos", "Equipo", "PJ", "Pts", "GF", "GC"]:
+				var hl := Label.new()
+				hl.text = h_text
+				hl.add_theme_font_size_override("font_size", 11)
+				hl.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+				grid.add_child(hl)
+			var standings: Array = g.sorted_standings()
+			for i in standings.size():
+				var st: ChampionsBracket.GroupStanding = standings[i]
+				var color: Color = Color(0.7, 1.0, 0.7) if i < 2 else Color(0.85, 0.85, 0.85)
+				grid.add_child(_make_label("%d" % (i + 1), 11, color))
+				grid.add_child(_make_label(st.team_name, 11, color))
+				grid.add_child(_make_label("%d" % st.played, 11, color))
+				grid.add_child(_make_label("%d" % st.points(), 11, color))
+				grid.add_child(_make_label("%d" % st.goals_for, 11, color))
+				grid.add_child(_make_label("%d" % st.goals_against, 11, color))
+			gbox.add_child(grid)
+			groups_grid.add_child(gbox)
 
 	# Eliminatorias
 	var ko_label := Label.new()
@@ -1334,7 +1536,7 @@ func _render_champions_view() -> void:
 	ko_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
 	vbox.add_child(ko_label)
 
-	for r: ChampionsBracket.KORound in champions_state.ko_rounds:
+	for r: ChampionsBracket.KORound in bracket.ko_rounds:
 		var rh := Label.new()
 		rh.text = r.name
 		rh.add_theme_font_size_override("font_size", 13)

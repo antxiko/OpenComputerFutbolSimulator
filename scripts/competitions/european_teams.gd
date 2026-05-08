@@ -26,6 +26,32 @@ const EUROPEAN_CLUBS := [
 	{ "id": "eu_juventus",   "name": "Juventus FC",        "short": "JUV", "city": "Turín",     "country": "IT", "reputation": 84, "primary": "#000000", "secondary": "#FFFFFF" },
 ]
 
+
+# Pool secundario (para Europa League): nivel medio europeo.
+const EUROPA_CLUBS := [
+	{ "id": "el_atalanta",   "name": "Atalanta BC",        "short": "ATA", "city": "Bérgamo",   "country": "IT", "reputation": 76, "primary": "#1C3F94", "secondary": "#000000" },
+	{ "id": "el_roma",       "name": "AS Roma",            "short": "ROM", "city": "Roma",      "country": "IT", "reputation": 78, "primary": "#8E1F2F", "secondary": "#F0BC42" },
+	{ "id": "el_leverkusen", "name": "Bayer Leverkusen",   "short": "B04", "city": "Leverkusen","country": "DE", "reputation": 80, "primary": "#E32219", "secondary": "#000000" },
+	{ "id": "el_leipzig",    "name": "RB Leipzig",         "short": "RBL", "city": "Leipzig",   "country": "DE", "reputation": 78, "primary": "#DD0741", "secondary": "#FFFFFF" },
+	{ "id": "el_tottenham",  "name": "Tottenham Hotspur",  "short": "TOT", "city": "Londres",   "country": "GB-ENG", "reputation": 80, "primary": "#132257", "secondary": "#FFFFFF" },
+	{ "id": "el_newcastle",  "name": "Newcastle United",   "short": "NEW", "city": "Newcastle", "country": "GB-ENG", "reputation": 76, "primary": "#000000", "secondary": "#FFFFFF" },
+	{ "id": "el_monaco",     "name": "AS Monaco",          "short": "ASM", "city": "Mónaco",    "country": "FR", "reputation": 74, "primary": "#CE2030", "secondary": "#FFFFFF" },
+	{ "id": "el_marseille",  "name": "Olympique Marseille","short": "OM",  "city": "Marsella",  "country": "FR", "reputation": 76, "primary": "#009DDC", "secondary": "#FFFFFF" },
+]
+
+
+# Pool terciario (para Conference League): nivel medio-bajo europeo.
+const CONFERENCE_CLUBS := [
+	{ "id": "cf_brighton",   "name": "Brighton & Hove Albion", "short": "BHA", "city": "Brighton", "country": "GB-ENG", "reputation": 70, "primary": "#0057B8", "secondary": "#FFCD00" },
+	{ "id": "cf_aston_villa","name": "Aston Villa FC",     "short": "AVL", "city": "Birmingham","country": "GB-ENG", "reputation": 74, "primary": "#7A003C", "secondary": "#95BFE5" },
+	{ "id": "cf_lille",      "name": "Lille OSC",          "short": "LOSC","city": "Lille",     "country": "FR", "reputation": 70, "primary": "#E01E13", "secondary": "#FFFFFF" },
+	{ "id": "cf_lazio",      "name": "SS Lazio",           "short": "LAZ", "city": "Roma",      "country": "IT", "reputation": 72, "primary": "#87CEEB", "secondary": "#FFFFFF" },
+	{ "id": "cf_salzburg",   "name": "Red Bull Salzburg",  "short": "RBS", "city": "Salzburg",  "country": "AT", "reputation": 68, "primary": "#E40521", "secondary": "#FFFFFF" },
+	{ "id": "cf_feyenoord",  "name": "Feyenoord Rotterdam","short": "FEY", "city": "Rotterdam", "country": "NL", "reputation": 70, "primary": "#E60026", "secondary": "#FFFFFF" },
+	{ "id": "cf_psv",        "name": "PSV Eindhoven",      "short": "PSV", "city": "Eindhoven", "country": "NL", "reputation": 72, "primary": "#ED1C24", "secondary": "#FFFFFF" },
+	{ "id": "cf_sporting",   "name": "Sporting CP",        "short": "SCP", "city": "Lisboa",    "country": "PT", "reputation": 74, "primary": "#008557", "secondary": "#FFFFFF" },
+]
+
 # Layout estándar 4-3-3 para todos los equipos europeos.
 const SQUAD_TEMPLATE := [
 	# 11 titulares + 11 suplentes (formación 4-3-3 con sustitutos)
@@ -57,9 +83,21 @@ const SQUAD_TEMPLATE := [
 # Genera los 12 equipos europeos. Cada uno con plantilla procedural según
 # su reputación, nombres del NamePool. Determinista por seed_base.
 static func generate_all(season_year: int, seed_base: int) -> Array:
+	return _generate_pool(EUROPEAN_CLUBS, season_year, seed_base)
+
+
+static func generate_europa(season_year: int, seed_base: int) -> Array:
+	return _generate_pool(EUROPA_CLUBS, season_year, seed_base + 31337)
+
+
+static func generate_conference(season_year: int, seed_base: int) -> Array:
+	return _generate_pool(CONFERENCE_CLUBS, season_year, seed_base + 91337)
+
+
+static func _generate_pool(clubs: Array, season_year: int, seed_base: int) -> Array:
 	var teams: Array = []
-	for i in EUROPEAN_CLUBS.size():
-		var club: Dictionary = EUROPEAN_CLUBS[i]
+	for i in clubs.size():
+		var club: Dictionary = clubs[i]
 		teams.append(_build_team(club, season_year, seed_base + i * 17))
 	return teams
 

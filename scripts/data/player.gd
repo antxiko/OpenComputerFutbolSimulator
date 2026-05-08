@@ -33,6 +33,11 @@ class_name Player extends Resource
 # heurística sobre apellidos vascos en data_loader; canteranos del Athletic
 # se marcan true automáticamente.
 @export var basque_eligible: bool = false
+# Cesión: si el jugador está cedido temporalmente, loan_origin_team_id contiene
+# el id del club propietario y loan_until_year el año en que vuelve. Default
+# vacío/0 = el jugador NO está cedido (es del club donde está).
+@export var loan_origin_team_id: String = ""
+@export var loan_until_year: int = 0
 
 # Historial estadístico por temporada — se rellena al final de cada temporada
 @export var history: Array = []
@@ -86,4 +91,6 @@ static func from_dict(d: Dictionary) -> Player:
 	else:
 		p.contract = ContractInfo.new()
 	p.basque_eligible = bool(d.get("basque_eligible", false))
+	p.loan_origin_team_id = String(d.get("loan_origin_team_id", ""))
+	p.loan_until_year = int(d.get("loan_until_year", 0))
 	return p

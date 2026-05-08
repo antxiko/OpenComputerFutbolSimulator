@@ -68,6 +68,9 @@ var possession_team: String = "home"  # home | away
 var current_zone: String = "mid"
 var playing: bool = false
 var play_delay_ms: float = 0.7   # segundos entre eventos (>= BALL_TRANSIT_TIME para que la animación complete)
+# Modo highlights: skip eventos triviales (turnover/keep/lose), solo anima
+# eventos clave (goles, tiros, paradas, tarjetas, córner, falta, kickoff/halftime/fulltime).
+var highlights_only: bool = false
 var time_acc: float = 0.0
 
 # Movimiento de jugadores: offsets dinámicos sobre la posición de formación.
@@ -210,6 +213,14 @@ func _build_ui() -> void:
 	speed_slider.value_changed.connect(func(v: float) -> void: play_delay_ms = v)
 	top.add_child(speed_slider)
 
+	# Toggle: modo highlights (skip eventos triviales)
+	var highlights_btn := CheckBox.new()
+	highlights_btn.text = "🎬 Solo highlights"
+	highlights_btn.tooltip_text = "Salta posesiones intermedias y muestra solo eventos clave (goles, tiros, tarjetas, córners)."
+	highlights_btn.button_pressed = false
+	highlights_btn.toggled.connect(func(p: bool) -> void: highlights_only = p)
+	top.add_child(highlights_btn)
+
 	vbox.add_child(HSeparator.new())
 
 	# Body: field (izquierda) + event log (derecha)
@@ -281,7 +292,9 @@ func _process(delta: float) -> void:
 	if not playing or match_result == null:
 		return
 	time_acc += delta
-	if time_acc < play_delay_ms:
+	# En modo highlights, reducir delay efectivo (más ágil entre highlights).
+	var effective_delay: float = play_delay_ms * (0.55 if highlights_only else 1.0)
+	if time_acc < effective_delay:
 		return
 	time_acc = 0.0
 	_advance_one_event()

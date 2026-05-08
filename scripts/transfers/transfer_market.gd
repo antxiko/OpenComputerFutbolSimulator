@@ -67,6 +67,11 @@ class MarketResult:
 	var renewals: Array = []
 	var released: Array = []
 	var free_agent_signings: Array = []
+	# Cesiones: prestamos temporales 1 año
+	#   loans_out: Array[{ player_name, origin_team_name, dest_team_name, until_year }]
+	#   loan_returns: Array[{ player_name, origin_team_name, prev_loan_team_name }]
+	var loans_out: Array = []
+	var loan_returns: Array = []
 
 
 static func run(teams: Array, season_year: int, seed_value: int, window: WindowConfig = null) -> MarketResult:
@@ -98,6 +103,11 @@ static func run(teams: Array, season_year: int, seed_value: int, window: WindowC
 			"income": 0,
 			"net": 0,
 		}
+
+	# Procesar cesiones que terminan: jugadores cuyo loan_until_year <= season_year
+	# vuelven a su club de origen.
+	if window.label == "verano":
+		_process_loan_returns(teams, season_year, result)
 
 	# Procesar contratos vencidos antes de las rondas (solo en verano).
 	# En invierno los contratos no se procesan — eso es exclusivo del verano.
@@ -141,6 +151,21 @@ static func run(teams: Array, season_year: int, seed_value: int, window: WindowC
 				result.transfers.append(transfer)
 				_apply_transfer(transfer, teams, budgets, counts_in, counts_out, result)
 				transferred_this_window[transfer.player_id] = true
+
+	# Cesiones: pasada extra al final solo en verano. Equipos grandes con
+	# canterabos excedentes los ceden a equipos pequeños para que tengan
+	# minutos.
+	if window.label == "verano":
+		var lenders: Array = teams.duplicate()
+		lenders.sort_custom(func(a: Team, b: Team) -> bool:
+			return a.reputation > b.reputation)
+		for lender: Team in lenders:
+			if lender.reputation < 75:
+				break  # solo equipos de cierta entidad ceden
+			# Cada equipo grande puede ceder hasta 2 canteranos
+			for k in 2:
+				if not _attempt_loan_offering(lender, teams, league_avg, season_year, result, rng):
+					break
 
 	# Free agents que no fichó nadie — se desvinculan del simulador
 	# (representa que se retiran o se van a otra liga). Quedan registrados
@@ -533,6 +558,107 @@ static func _player_overall_ranks_in_team(team: Team, slot: String) -> Array:
 	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return int(a["ovr"]) > int(b["ovr"]))
 	return rows.map(func(r: Dictionary) -> String: return String(r["id"]))
+
+
+# ============================================================================
+# Cesiones (loans)
+# ============================================================================
+# Devuelve los jugadores cedidos cuyo loan terminó al club de origen.
+static func _process_loan_returns(teams: Array, season_year: int, result: MarketResult) -> void:
+	var team_idx: Dictionary = {}
+	for t: Team in teams:
+		team_idx[t.id] = t
+	for t: Team in teams:
+		var to_remove: Array[Player] = []
+		for p: Player in t.players:
+			if p.loan_origin_team_id == "":
+				continue
+			if p.loan_until_year > season_year:
+				continue  # cesión sigue vigente
+			# La cesión terminó: vuelve al club de origen
+			var origin: Team = team_idx.get(p.loan_origin_team_id, null)
+			if origin == null:
+				# Si el club de origen ha desaparecido, el jugador se queda
+				p.loan_origin_team_id = ""
+				p.loan_until_year = 0
+				continue
+			to_remove.append(p)
+			origin.players.append(p)
+			result.loan_returns.append({
+				"player_name": p.name,
+				"origin_team_name": origin.short_name,
+				"prev_loan_team_name": t.short_name,
+			})
+			# Limpiar marca de cesión
+			p.loan_origin_team_id = ""
+			p.loan_until_year = 0
+		for p in to_remove:
+			t.players.erase(p)
+
+
+# Intenta ceder un canterano del comprador a un equipo más débil que necesite
+# cubrir slot.
+# Llamado durante las rondas como alternativa a fichaje pagado/free agent.
+# Returns true si hizo una cesión.
+static func _attempt_loan_offering(seller: Team, all_teams: Array, league_avg: Dictionary, season_year: int, result: MarketResult, rng: RandomNumberGenerator) -> bool:
+	# Solo equipos con plantilla amplia ceden (no quitarse cantera necesaria)
+	if seller.players.size() < 22:
+		return false
+	# Buscar canteranos cedibles (tier Y, < 22 años, no titulares)
+	var candidates: Array[Player] = []
+	for p: Player in seller.players:
+		if p.tier != "Y":
+			continue
+		if p.loan_origin_team_id != "":
+			continue  # ya cedido (no puede cederse otra vez)
+		var age: int = p.age_at(season_year, 7, 1)
+		if age >= 22:
+			continue
+		candidates.append(p)
+	if candidates.is_empty():
+		return false
+	candidates.shuffle()  # determinista por rng del shuffler interno
+	# Buscar destino: equipo de menor reputación con un slot débil
+	var dest_candidates: Array = all_teams.duplicate()
+	dest_candidates.sort_custom(func(a: Team, b: Team) -> bool:
+		return a.reputation < b.reputation)
+	for cantereano: Player in candidates:
+		var primary: String = cantereano.primary_position()
+		if primary == "":
+			continue
+		for dest: Team in dest_candidates:
+			if dest.id == seller.id:
+				continue
+			if dest.reputation >= seller.reputation:
+				continue  # solo cesiones a clubes inferiores
+			if dest.players.size() >= 26:
+				continue  # plantilla llena
+			# ¿El destino tiene este slot débil?
+			var weak_slots: Array = _weakest_slots(dest, league_avg, 5)
+			var slot_match: bool = false
+			for s: Dictionary in weak_slots:
+				if String(s["slot"]) == primary:
+					slot_match = true
+					break
+			if not slot_match:
+				continue
+			# 30% prob (no todas las opciones se concretan)
+			if rng.randf() > 0.30:
+				continue
+			# Hacer la cesión
+			seller.players.erase(cantereano)
+			cantereano.loan_origin_team_id = seller.id
+			cantereano.loan_until_year = season_year + 1
+			dest.players.append(cantereano)
+			result.loans_out.append({
+				"player_name": cantereano.name,
+				"origin_team_name": seller.short_name,
+				"dest_team_name": dest.short_name,
+				"until_year": season_year + 1,
+				"slot": primary,
+			})
+			return true
+	return false
 
 
 static func _find_team_by_id(teams: Array, team_id: String) -> Team:
