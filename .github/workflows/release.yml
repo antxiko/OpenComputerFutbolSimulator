@@ -1,0 +1,173 @@
+name: Release
+
+# Cuando se hace push de un tag tipo v0.1.0, builda los 3 binarios
+# y crea una release de GitHub con los assets adjuntos.
+# Trigger manual también disponible (workflow_dispatch).
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versión manual (ej: v0.1.0-test)'
+        required: true
+        default: 'v0.0.0-test'
+
+env:
+  GODOT_VERSION: 4.6.2
+  PROJECT_NAME: OpenComputerFutbolSimulator
+
+jobs:
+  export-windows:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.6.2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Godot
+        run: godot --version
+
+      - name: Build Windows
+        run: |
+          mkdir -p build/windows
+          godot --headless --import || true
+          godot --headless --export-release "Windows Desktop" build/windows/${PROJECT_NAME}.exe
+
+      - name: Package
+        run: |
+          cd build/windows
+          zip -r ../${PROJECT_NAME}-windows-x86_64.zip *
+          cd ../..
+          ls -la build/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: build/${{ env.PROJECT_NAME }}-windows-x86_64.zip
+
+  export-linux:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.6.2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Godot
+        run: godot --version
+
+      - name: Build Linux
+        run: |
+          mkdir -p build/linux
+          godot --headless --import || true
+          godot --headless --export-release "Linux/X11" build/linux/${PROJECT_NAME}.x86_64
+
+      - name: Package
+        run: |
+          cd build/linux
+          chmod +x ${PROJECT_NAME}.x86_64 || true
+          tar -czf ../${PROJECT_NAME}-linux-x86_64.tar.gz *
+          cd ../..
+          ls -la build/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: build/${{ env.PROJECT_NAME }}-linux-x86_64.tar.gz
+
+  export-mac:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.6.2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Godot
+        run: godot --version
+
+      - name: Build macOS
+        run: |
+          mkdir -p build/mac
+          godot --headless --import || true
+          godot --headless --export-release "macOS" build/mac/${PROJECT_NAME}.zip
+
+      - name: Rename
+        run: |
+          mv build/mac/${PROJECT_NAME}.zip build/${PROJECT_NAME}-macos-universal.zip
+          ls -la build/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac
+          path: build/${{ env.PROJECT_NAME }}-macos-universal.zip
+
+  release:
+    needs: [export-windows, export-linux, export-mac]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: List artifacts
+        run: |
+          ls -la artifacts/
+          find artifacts -type f
+
+      - name: Determine version tag
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          body: |
+            # OpenComputerFutbolSimulator ${{ steps.version.outputs.tag }}
+
+            Simulador híbrido de La Liga española en Godot 4.6.2.
+            Multi-temporada (2026-2046), 42 equipos (Primera + Segunda), Champions League, Copa del Rey, Supercopa.
+
+            ## Descargas
+
+            - **Windows**: `OpenComputerFutbolSimulator-windows-x86_64.zip`
+            - **Linux**: `OpenComputerFutbolSimulator-linux-x86_64.tar.gz`
+            - **macOS**: `OpenComputerFutbolSimulator-macos-universal.zip`
+
+            En macOS, al primer arranque puede aparecer un aviso de "desarrollador no identificado":
+            click derecho → Abrir → Confirmar.
+
+            ## Cómo jugar
+
+            1. Descomprime el zip/tar.gz para tu sistema operativo.
+            2. Ejecuta el binario.
+            3. "Nueva partida" → escoge tu club → dirige tu carrera.
+
+            Ver [README.md](https://github.com/antxiko/OpenComputerFutbolSimulator/blob/main/README.md)
+            y [MANUAL.md](https://github.com/antxiko/OpenComputerFutbolSimulator/blob/main/MANUAL.md) para más detalles.
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.tag, '-') }}
+          files: |
+            artifacts/windows/*.zip
+            artifacts/linux/*.tar.gz
+            artifacts/mac/*.zip

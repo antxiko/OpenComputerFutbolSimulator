@@ -16,24 +16,30 @@ El proyecto es **uso personal** — los nombres de equipos y jugadores se introd
 
 ## Estado del proyecto
 
-> **Iteración 4 — multi-temporada funcional, sin UI completa aún.**
+> **v0.1.0 — primer release jugable end-to-end.**
 
 | Bloque | Estado |
 |--------|--------|
 | Carga de datos JSON → Resources Godot | ✅ |
 | Atributos de jugador con sistema de tiers + curva de edad | ✅ |
-| Generador de esqueletos de equipos | ✅ |
-| Motor de partido por jugadas (3 zonas) | ✅ determinista |
+| Posiciones reales de jugadores (Transfermarkt 25-26) | ✅ 89% específicas |
+| Pool internacional de nombres para canteranos | ✅ 40% ES + 60% mundo |
+| Motor de partido por jugadas (3 zonas) | ✅ determinista, calibrado |
+| Sistema de tarjetas + sanciones + agresividad | ✅ |
 | Liga: calendario round-robin + tabla con tiebreakers | ✅ |
 | Mercado de fichajes (valor, retención, lealtad, cláusulas) | ✅ v1 |
 | Aging + retiros + cantera automática | ✅ |
-| Ascensos/descensos | ✅ |
-| Reputación dinámica | ✅ |
+| Ascensos/descensos + reputación dinámica | ✅ |
 | Multi-temporada (20 años) | ✅ ~10 min |
-| **UI inicial** (tabla de Primera + botones de simulación) | ⚙️ MVP |
-| Copa del Rey, Supercopa | ⏳ planeado |
-| Visor 2D de partido | ⏳ planeado |
-| Competiciones europeas | ⏳ v2 |
+| **UI completa** (hub con tabs Liga/Plantilla/Mercado/Carrera/Champions) | ✅ |
+| Save/Load **multi-slot** con nombres descriptivos | ✅ |
+| Visor 2D del partido (jugadores móviles, balón animado, tiros) | ✅ |
+| Copa del Rey + Supercopa Final 4 | ✅ |
+| 🏆 Champions League (12 europeos + 4 spanish, grupos + KO) | ✅ |
+| 📨 Ofertas de cambio de club entre temporadas (estilo FM) | ✅ |
+| 🟢 Pre-temporada con 3 amistosos | ✅ |
+| Europa League / Conference | ⏳ v2 |
+| Camera modes (control directo, highlights) | ⏳ v2 |
 
 Una temporada completa de Primera (380 partidos) tarda ~13 segundos en headless. Las 20 temporadas con Segunda incluida (842 partidos × 20) tardan ~10 minutos.
 
@@ -103,10 +109,33 @@ CareerSimulator.run(N_seasons):
 
 ## Cómo ejecutar
 
-### Requisitos
+### Releases pre-compiladas (recomendado)
 
-- **Godot 4.6.2** stable (Win64). Descarga: https://godotengine.org/download
-- (Opcional) Cualquier editor de texto para los JSON (`data/teams/`).
+Cada release del repo (etiquetas `v*`) trae binarios listos para ejecutar — no necesitas Godot.
+
+- **Windows**: descomprime `OpenComputerFutbolSimulator-windows-x86_64.zip` y ejecuta `OpenComputerFutbolSimulator.exe`.
+- **Linux**: `tar -xzf OpenComputerFutbolSimulator-linux-x86_64.tar.gz && ./OpenComputerFutbolSimulator.x86_64`.
+- **macOS**: descomprime `OpenComputerFutbolSimulator-macos-universal.zip` y ejecuta `OpenComputerFutbolSimulator.app`. Si macOS bloquea el binario por "desarrollador no identificado", click derecho → Abrir → Confirmar.
+
+Ver [releases](https://github.com/antxiko/OpenComputerFutbolSimulator/releases).
+
+### Cómo se generan las releases
+
+Push de un tag `vX.Y.Z` dispara el workflow `.github/workflows/release.yml` que:
+1. Lanza 3 jobs paralelos (Windows / Linux / Mac) en contenedor `barichello/godot-ci:4.6.2`.
+2. Cada job exporta usando los presets de `export_presets.cfg`.
+3. Empaqueta y crea release de GitHub con los 3 binarios adjuntos.
+
+```bash
+# Crear release v0.1.0
+git tag -a v0.1.0 -m "Release 0.1.0"
+git push origin v0.1.0
+# Esperar ~5-10 min para que el workflow termine.
+```
+
+### Modo dev (con Godot)
+
+Requisitos: **Godot 4.6.2** stable. Descarga: https://godotengine.org/download
 
 ### Modo UI (Iteración actual)
 

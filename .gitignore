@@ -2,7 +2,9 @@
 .godot/
 .import/
 export.cfg
-export_presets.cfg
+# export_presets.cfg se versiona porque define los builds de release.
+# Los binarios exportados localmente sí se ignoran:
+build/
 
 # Imported translations (automatically generated from CSV files)
 *.translation
