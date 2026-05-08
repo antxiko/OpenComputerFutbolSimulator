@@ -1737,6 +1737,51 @@ func _add_table_row(grid: GridContainer, pos: int, row: LeagueTable.TeamRow, n_t
 		grid.add_child(l)
 
 
+# =========================================================================== #
+# Helpers visuales para posiciones
+# =========================================================================== #
+# Categoria por slot: POR / DEF / MED / DEL
+static func _position_category(slot: String) -> String:
+	match slot:
+		"GK": return "POR"
+		"LB", "RB", "CB", "LWB", "RWB": return "DEF"
+		"CDM", "CM", "CAM", "LM", "RM": return "MED"
+		"LW", "RW", "ST", "CF": return "DEL"
+		_: return "—"
+
+
+# Devuelve un string compacto con icono + categoría + slot, ej: "🛡 DEF (CB)"
+func _position_label(p: Player) -> String:
+	if p.positions.is_empty():
+		return "—"
+	var primary: String = String(p.positions[0])
+	var cat: String = _position_category(primary)
+	var icon: String = ""
+	match cat:
+		"POR": icon = "🥅"
+		"DEF": icon = "🛡"
+		"MED": icon = "🎯"
+		"DEL": icon = "⚽"
+	# Si tiene varias posiciones, las añade entre paréntesis
+	if p.positions.size() == 1:
+		return "%s %s (%s)" % [icon, cat, primary]
+	var rest: Array = []
+	for i in range(p.positions.size()):
+		rest.append(String(p.positions[i]))
+	return "%s %s (%s)" % [icon, cat, ", ".join(rest)]
+
+
+# Color asociado a la categoría (consistente con UI clásica de FM)
+static func _position_color(slot: String) -> Color:
+	var cat: String = _position_category(slot)
+	match cat:
+		"POR": return Color(1.0, 0.85, 0.4)   # amarillo claro
+		"DEF": return Color(0.5, 0.85, 1.0)   # azul
+		"MED": return Color(0.7, 1.0, 0.7)    # verde
+		"DEL": return Color(1.0, 0.7, 0.7)    # rojo claro
+		_:     return Color(0.8, 0.8, 0.8)
+
+
 func _table_row_tooltip(pos: int, n_teams: int, is_primera: bool) -> String:
 	if is_primera:
 		if pos <= 4:
@@ -1976,7 +2021,7 @@ func _render_team_view() -> void:
 	for p: Player in sorted_players:
 		var ovr: int = PlayerFactory.compute_overall(p, "")
 		var age: int = p.age_at(year, 7, 1)
-		var pos_str: String = ", ".join(p.positions)
+		var pos_str: String = _position_label(p)
 		var until_year: int = p.contract.until_year if p.contract != null else 0
 		var injury_str: String = InjurySystem.injury_summary(p)
 		var status_str: String = "—"
@@ -2371,7 +2416,7 @@ func _render_market_view() -> void:
 		var age: int = p.age_at(year, 7, 1)
 		_market_add_label(buy_grid, p.name, _player_color(p))
 		_market_add_label(buy_grid, t.short_name, _player_color(p))
-		_market_add_label(buy_grid, ", ".join(p.positions).left(15), _player_color(p))
+		_market_add_label(buy_grid, _position_label(p), _position_color(p.positions[0] if p.positions.size() > 0 else ""))
 		_market_add_label(buy_grid, str(age), _player_color(p))
 		_market_add_label(buy_grid, str(ovr), _player_color(p))
 		var btn := Button.new()
@@ -2407,7 +2452,7 @@ func _render_market_view() -> void:
 		var age: int = p.age_at(year, 7, 1)
 		var value: int = MarketValue.compute(p, year, "")
 		_market_add_label(sell_grid, p.name, _player_color(p))
-		_market_add_label(sell_grid, ", ".join(p.positions).left(15), _player_color(p))
+		_market_add_label(sell_grid, _position_label(p), _position_color(p.positions[0] if p.positions.size() > 0 else ""))
 		_market_add_label(sell_grid, str(age), _player_color(p))
 		_market_add_label(sell_grid, p.tier, _player_color(p))
 		_market_add_label(sell_grid, str(ovr), _player_color(p))
@@ -2556,7 +2601,7 @@ func _on_change_slot_player(slot_idx: int, slot: String, team: Team) -> void:
 	for i in mini(40, candidates.size()):
 		var p: Player = candidates[i]["player"]
 		var fit: float = candidates[i]["fit"]
-		option.add_item("%s (%s, ovr %d)" % [p.name, ", ".join(p.positions), int(fit)], i)
+		option.add_item("%s — %s — ovr %d" % [p.name, _position_label(p), int(fit)], i)
 	vbox.add_child(option)
 	popup.confirmed.connect(func() -> void:
 		var sel: int = option.selected
