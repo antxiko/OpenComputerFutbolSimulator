@@ -50,6 +50,9 @@ var home_lineup: Lineup
 var away_lineup: Lineup
 var event_idx: int = 0
 var ball_pos: Vector2 = Vector2(0.50, 0.50)
+var ball_target: Vector2 = Vector2(0.50, 0.50)
+var ball_speed_factor: float = 4.0   # mayor = balón más rápido al perseguir target
+var ball_trail: Array = []           # Vector2[] últimas posiciones para dibujar estela
 var current_minute: int = 0
 var current_second: int = 0
 var score_home: int = 0
@@ -59,6 +62,18 @@ var current_zone: String = "mid"
 var playing: bool = false
 var play_delay_ms: float = 0.4   # segundos entre eventos
 var time_acc: float = 0.0
+
+# Movimiento de jugadores: offsets dinámicos sobre la posición de formación.
+# Calculados cada frame en función de zona/posesión/cercanía al balón.
+var home_player_offsets: Array = []   # Vector2[] (current)
+var away_player_offsets: Array = []
+var home_player_targets: Array = []   # Vector2[] (target — hacia donde se interpola)
+var away_player_targets: Array = []
+
+# Animación especial de tiro/parada
+var shot_animation_active: bool = false
+var shot_animation_remaining: float = 0.0   # cuenta atrás durante la animación
+var last_event_type: String = ""
 
 # UI refs
 var play_button: Button
@@ -102,6 +117,24 @@ func setup(result: MatchResult, hl: Lineup, al: Lineup, back_callback: Callable 
 	possession_team = "home"
 	current_zone = "mid"
 	ball_pos = Vector2(0.50, 0.50)
+	ball_target = ball_pos
+	ball_trail.clear()
+	last_event_type = ""
+	shot_animation_active = false
+	shot_animation_remaining = 0.0
+	# Inicializar offsets de jugadores a cero
+	home_player_offsets = []
+	home_player_targets = []
+	away_player_offsets = []
+	away_player_targets = []
+	if home_lineup != null:
+		for i in home_lineup.starting_eleven.size():
+			home_player_offsets.append(Vector2.ZERO)
+			home_player_targets.append(Vector2.ZERO)
+	if away_lineup != null:
+		for i in away_lineup.starting_eleven.size():
+			away_player_offsets.append(Vector2.ZERO)
+			away_player_targets.append(Vector2.ZERO)
 	_clear_event_log()
 	_update_score()
 	_update_clock()
@@ -226,7 +259,17 @@ func _on_pause() -> void:
 func _process(delta: float) -> void:
 	if goal_flash_timer > 0.0:
 		goal_flash_timer -= delta
+	if shot_animation_remaining > 0.0:
+		shot_animation_remaining -= delta
+		if shot_animation_remaining <= 0.0:
+			shot_animation_active = false
+
+	# Animación continua: balón y jugadores se interpolan suavemente cada frame
+	if match_result != null:
+		_update_ball_smooth(delta)
+		_update_players_smooth(delta)
 		_get_field_panel().queue_redraw()
+
 	if not playing or match_result == null:
 		return
 	time_acc += delta
@@ -236,11 +279,112 @@ func _process(delta: float) -> void:
 	_advance_one_event()
 
 
+func _update_ball_smooth(delta: float) -> void:
+	# Interpolar posición real del balón hacia el target con velocidad limitada.
+	var to_target: Vector2 = ball_target - ball_pos
+	var dist: float = to_target.length()
+	if dist < 0.001:
+		return
+	# Velocidad mayor durante animación de tiro
+	var speed: float = ball_speed_factor * delta
+	if shot_animation_active:
+		speed *= 3.5
+	if dist <= speed:
+		ball_pos = ball_target
+	else:
+		ball_pos += to_target.normalized() * speed
+	# Trail
+	ball_trail.append(ball_pos)
+	while ball_trail.size() > 8:
+		ball_trail.pop_front()
+
+
+func _update_players_smooth(delta: float) -> void:
+	# Cada jugador tiene un offset target calculado según el contexto del juego.
+	# Después se interpola el offset actual hacia el target con velocidad lenta.
+	if home_lineup == null or away_lineup == null:
+		return
+	_compute_player_targets(home_lineup, home_player_targets, false)
+	_compute_player_targets(away_lineup, away_player_targets, true)
+	# Interpolar
+	var alpha: float = clamp(delta * 1.8, 0.0, 1.0)
+	for i in home_player_offsets.size():
+		home_player_offsets[i] = home_player_offsets[i].lerp(home_player_targets[i], alpha)
+	for i in away_player_offsets.size():
+		away_player_offsets[i] = away_player_offsets[i].lerp(away_player_targets[i], alpha)
+
+
+func _compute_player_targets(lineup: Lineup, targets: Array, mirror: bool) -> void:
+	var team_id: String = lineup.team.id if lineup.team else ""
+	var has_possession: bool = (team_id == match_result.home_team_id and possession_team == "home") \
+			or (team_id == match_result.away_team_id and possession_team == "away")
+
+	for i in lineup.starting_eleven.size():
+		var slot: String = lineup.slot_assignments[i] if i < lineup.slot_assignments.size() else "CM"
+		var base_pos: Vector2 = SLOT_POSITIONS.get(slot, Vector2(0.45, 0.5))
+		if mirror:
+			base_pos.x = 1.0 - base_pos.x
+
+		# Distancia del jugador al balón en coords del campo
+		var player_at: Vector2 = base_pos
+		var to_ball: Vector2 = ball_pos - player_at
+		var dist: float = to_ball.length()
+
+		# Offset target inicial: cero (mantener formación)
+		var off: Vector2 = Vector2.ZERO
+
+		# 1) Movimiento global del bloque según zona del balón
+		# El equipo en posesión adelanta el bloque hacia el balón; el otro retrocede ligeramente.
+		var block_shift: float = 0.0
+		if has_possession:
+			# Acercarse a la zona del balón. Más para atacantes (ya están adelante), menos para defensas.
+			if slot in ["ST", "LW", "RW", "CAM"]:
+				block_shift = 0.06
+			elif slot in ["CM", "CDM", "LM", "RM"]:
+				block_shift = 0.04
+			elif slot in ["LB", "RB"]:
+				block_shift = 0.05  # laterales se incorporan
+			elif slot in ["CB"]:
+				block_shift = 0.02
+		else:
+			# Sin posesión: presionar pero la línea defensiva se replega un poco
+			if slot in ["ST", "LW", "RW", "CAM"]:
+				block_shift = 0.02
+			elif slot in ["CM", "CDM"]:
+				block_shift = 0.03
+			elif slot in ["LB", "RB", "CB"]:
+				block_shift = -0.03
+
+		# Aplicar block_shift en dirección hacia portería rival
+		var goal_x: float = 1.0 if not mirror else 0.0
+		var attack_dir: float = 1.0 if goal_x > 0.5 else -1.0
+		off.x += block_shift * attack_dir
+
+		# 2) Atracción al balón si está cerca (para los más cercanos)
+		# Solo el jugador del equipo en posesión más cercano + 1-2 rivales.
+		if dist < 0.30 and slot != "GK":
+			var pull: float = (0.30 - dist) * 0.4
+			# Limitar el pull para que no se peguen al balón
+			off += to_ball.normalized() * pull * 0.3
+
+		# 3) GK: ligero ajuste lateral siguiendo la altura del balón
+		if slot == "GK":
+			off.y = (ball_pos.y - 0.5) * 0.15
+
+		# 4) Limitar offset total
+		off.x = clamp(off.x, -0.10, 0.10)
+		off.y = clamp(off.y, -0.08, 0.08)
+
+		if i < targets.size():
+			targets[i] = off
+		else:
+			targets.append(off)
+
+
 func _advance_one_event() -> void:
 	while event_idx < match_result.events.size():
 		var ev: MatchEvent = match_result.events[event_idx]
 		event_idx += 1
-		# Saltar tipos no interesantes para el log (turnover, etc.)
 		current_minute = ev.minute
 		current_second = ev.second_in_minute
 		_update_clock()
@@ -249,6 +393,7 @@ func _advance_one_event() -> void:
 			possession_team = "home" if ev.team_id == match_result.home_team_id else "away"
 		if ev.zone in ["def", "mid", "atk"]:
 			current_zone = ev.zone
+		last_event_type = ev.type
 		# Actualizar marcador en goles
 		if ev.type == MatchEvent.T_GOAL:
 			if ev.team_id == match_result.home_team_id:
@@ -258,8 +403,7 @@ func _advance_one_event() -> void:
 			_update_score()
 			goal_flash_timer = 0.6
 			_log_event(ev, Color(0.4, 1.0, 0.5))
-			_update_ball_position()
-			_get_field_panel().queue_redraw()
+			_set_ball_for_event(ev)
 			return
 		if ev.type in [MatchEvent.T_SHOT_ON, MatchEvent.T_SHOT_OFF, MatchEvent.T_SHOT_BLOCKED,
 				MatchEvent.T_SAVE, MatchEvent.T_YELLOW, MatchEvent.T_RED, MatchEvent.T_SUBSTITUTION,
@@ -275,8 +419,7 @@ func _advance_one_event() -> void:
 			elif ev.type == MatchEvent.T_SAVE:
 				color = Color(0.8, 0.8, 1.0)
 			_log_event(ev, color)
-			_update_ball_position()
-			_get_field_panel().queue_redraw()
+			_set_ball_for_event(ev)
 			# End playback en FULLTIME
 			if ev.type == MatchEvent.T_FULLTIME:
 				playing = false
@@ -289,14 +432,56 @@ func _advance_one_event() -> void:
 	pause_button.disabled = true
 
 
+# Calcula el target del balón según el evento. La interpolación posterior
+# produce el movimiento suave en _update_ball_smooth.
+func _set_ball_for_event(ev: MatchEvent) -> void:
+	# Atacante: equipo en posesión. Goal_x: portería a la que se ataca.
+	var attacking_home: bool = (possession_team == "home")
+	var goal_x: float = 0.97 if attacking_home else 0.03
+
+	if ev.type == MatchEvent.T_GOAL or ev.type == MatchEvent.T_SHOT_ON or ev.type == MatchEvent.T_SAVE:
+		# Tiro a portería: balón vuela hacia el palo
+		shot_animation_active = true
+		shot_animation_remaining = play_delay_ms * 0.85
+		var goal_y: float = 0.5 + (randf() - 0.5) * 0.18
+		ball_target = Vector2(goal_x, goal_y)
+		return
+	if ev.type == MatchEvent.T_SHOT_OFF:
+		# Disparo fuera: balón pasa por encima/al lado de la portería
+		shot_animation_active = true
+		shot_animation_remaining = play_delay_ms * 0.85
+		var off_y: float = 0.5 + (randf() - 0.5) * 0.50
+		var off_x: float = goal_x + (0.04 if attacking_home else -0.04)
+		ball_target = Vector2(off_x, clamp(off_y, 0.05, 0.95))
+		return
+	if ev.type == MatchEvent.T_SHOT_BLOCKED:
+		# Bloqueado: balón rebota en zona de remate
+		shot_animation_active = true
+		shot_animation_remaining = play_delay_ms * 0.5
+		var bx: float = 0.78 if attacking_home else 0.22
+		var by: float = 0.5 + (randf() - 0.5) * 0.25
+		ball_target = Vector2(bx, by)
+		return
+	if ev.type == MatchEvent.T_CORNER:
+		# Saque de esquina: en la esquina del campo atacante
+		var cx: float = 0.99 if attacking_home else 0.01
+		var cy: float = 0.05 if randf() < 0.5 else 0.95
+		ball_target = Vector2(cx, cy)
+		return
+	if ev.type == MatchEvent.T_KICKOFF or ev.type == MatchEvent.T_HALFTIME:
+		ball_target = Vector2(0.50, 0.50)
+		return
+	# Resto de eventos (foul, yellow, red, etc): posición por zona estándar
+	_update_ball_position()
+
+
 func _update_ball_position() -> void:
-	# Posición x según zona y POV del equipo en posesión
+	# Target según zona y POV del equipo en posesión (movimiento "normal" del balón)
 	var x: float = ZONE_X_HOME[current_zone]
 	if possession_team == "away":
 		x = 1.0 - x
-	# y aleatorio dentro de un rango razonable
 	var y: float = 0.5 + sin(float(event_idx) * 0.7) * 0.2
-	ball_pos = Vector2(x, y)
+	ball_target = Vector2(x, y)
 
 
 # ============================================================================
@@ -378,20 +563,32 @@ func _draw_field(panel: Control) -> void:
 	# Jugadores home (izquierda)
 	if home_lineup != null:
 		var home_color: Color = _team_color(home_lineup.team, true)
-		_draw_team(panel, rect, home_lineup, home_color, false)
+		var home_has_poss: bool = (possession_team == "home")
+		_draw_team(panel, rect, home_lineup, home_color, false, home_has_poss, home_player_offsets)
 	# Jugadores away (derecha, x invertida)
 	if away_lineup != null:
 		var away_color: Color = _team_color(away_lineup.team, false)
-		_draw_team(panel, rect, away_lineup, away_color, true)
+		var away_has_poss: bool = (possession_team == "away")
+		_draw_team(panel, rect, away_lineup, away_color, true, away_has_poss, away_player_offsets)
+
+	# Trail del balón (solo si está moviéndose)
+	for i in ball_trail.size():
+		var alpha: float = float(i) / float(ball_trail.size())
+		var tp: Vector2 = ball_trail[i]
+		var tx: float = rect.position.x + tp.x * rect.size.x
+		var ty: float = rect.position.y + tp.y * rect.size.y
+		panel.draw_circle(Vector2(tx, ty), 3.0 * alpha + 1.0, Color(1, 1, 1, alpha * 0.4))
 
 	# Pelota
 	var bx: float = rect.position.x + ball_pos.x * rect.size.x
 	var by: float = rect.position.y + ball_pos.y * rect.size.y
-	panel.draw_circle(Vector2(bx, by), 6.0, Color(1, 1, 1))
-	panel.draw_circle(Vector2(bx, by), 6.0, Color(0, 0, 0), false, 1.5)
+	var ball_radius: float = 7.0 if shot_animation_active else 6.0
+	panel.draw_circle(Vector2(bx, by), ball_radius, Color(1, 1, 1))
+	panel.draw_circle(Vector2(bx, by), ball_radius, Color(0, 0, 0), false, 1.5)
 
 
-func _draw_team(panel: Control, rect: Rect2, lineup: Lineup, color: Color, mirror: bool) -> void:
+func _draw_team(panel: Control, rect: Rect2, lineup: Lineup, color: Color, mirror: bool,
+		has_possession: bool, offsets: Array) -> void:
 	# Conta CBs para layout dinámico
 	var cb_count: int = 0
 	for s in lineup.slot_assignments:
@@ -408,17 +605,21 @@ func _draw_team(panel: Control, rect: Rect2, lineup: Lineup, color: Color, mirro
 			var idx: float = float(cb_seen) / float(cb_count - 1)
 			pos.y = lerp(0.32, 0.68, idx)
 			cb_seen += 1
-		# LB/RB: ya tienen y fijos
-		# Centrales del medio: spread vertical
-		if slot == "CM":
-			# si hay 2-3 CMs, repartir verticalmente
-			pass
 
 		if mirror:
 			pos.x = 1.0 - pos.x
 
+		# Offset dinámico (movimiento hacia balón / repliegue)
+		if i < offsets.size():
+			pos += offsets[i]
+
 		var px: float = rect.position.x + pos.x * rect.size.x
 		var py: float = rect.position.y + pos.y * rect.size.y
+
+		# Aro de posesión (suave) bajo el jugador del equipo en posesión
+		if has_possession:
+			panel.draw_circle(Vector2(px, py), 12.0, Color(1.0, 1.0, 0.4, 0.18))
+
 		panel.draw_circle(Vector2(px, py), 9.0, color)
 		panel.draw_circle(Vector2(px, py), 9.0, Color(0, 0, 0, 0.6), false, 1.5)
 		# Dorsal
