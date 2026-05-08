@@ -3,10 +3,8 @@ extends Control
 # Menú principal del simulador.
 # Tres botones: Nueva partida / Continuar / Salir.
 # - Nueva partida: muestra selector de equipo, luego va a game_hub con start_mode=new_game.
-# - Continuar: carga autosave y va a game_hub con start_mode=load (si hay save).
+# - Continuar: abre modal con lista de slots para elegir cuál cargar.
 # - Salir: cierra el juego.
-
-const SAVE_SLOT := "autosave"
 
 var continue_button: Button
 var status_label: Label
@@ -90,14 +88,20 @@ func _make_spacer(h: int) -> Control:
 
 
 func _refresh_continue_state() -> void:
-	# Desactivar Continuar si no hay save
-	var save_data: SaveSystem.SaveData = SaveSystem.load_game(SAVE_SLOT)
-	if save_data == null:
+	# Desactivar Continuar si no hay ningún save en disco
+	var slots: Array = SaveSystem.list_saves()
+	if slots.is_empty():
 		continue_button.disabled = true
-		status_label.text = "(no hay partida guardada)"
+		status_label.text = "(no hay partidas guardadas)"
 	else:
 		continue_button.disabled = false
-		status_label.text = "Última partida: %s, año %d" % [save_data.saved_at, save_data.year]
+		var n: int = slots.size()
+		var top: Dictionary = slots[0]
+		var label: String = "Última: %s · año %d" % [String(top.get("saved_at", "")), int(top.get("year", 0))]
+		if n == 1:
+			status_label.text = label
+		else:
+			status_label.text = "%d slots guardados — %s" % [n, label]
 
 
 # ============================================================================
@@ -145,9 +149,17 @@ func _on_new_game() -> void:
 
 
 func _on_continue() -> void:
-	GameSession.start_mode = "load"
-	GameSession.pending_user_team_id = ""
-	get_tree().change_scene_to_file("res://scenes/game_hub.tscn")
+	var dialog := SaveLoadDialog.new()
+	add_child(dialog)
+	dialog.open_load(func(slot: String, action: String) -> void:
+		dialog.queue_free()
+		if action != "load":
+			return
+		GameSession.start_mode = "load"
+		GameSession.pending_user_team_id = ""
+		GameSession.pending_load_slot = slot
+		get_tree().change_scene_to_file("res://scenes/game_hub.tscn")
+	)
 
 
 func _on_quit() -> void:

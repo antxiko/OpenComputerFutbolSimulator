@@ -106,9 +106,12 @@ func _ready() -> void:
 		_start_season()
 		_show_welcome_message()
 	elif GameSession.start_mode == "load":
+		var slot: String = GameSession.pending_load_slot
+		if slot.is_empty():
+			slot = "autosave"
 		GameSession.consume()
 		_start_season()
-		_on_load_game()
+		_load_from_slot(slot)
 	else:
 		# Modo default: arrancar nueva temporada sin equipo seleccionado
 		_start_season()
@@ -251,13 +254,13 @@ func _build_ui() -> void:
 
 	save_button = Button.new()
 	save_button.text = "💾"
-	save_button.tooltip_text = "Guardar partida (slot autosave)"
+	save_button.tooltip_text = "Guardar partida (multi-slot)"
 	save_button.pressed.connect(_on_save_game)
 	footer.add_child(save_button)
 
 	load_button = Button.new()
 	load_button.text = "📂"
-	load_button.tooltip_text = "Cargar partida (slot autosave)"
+	load_button.tooltip_text = "Cargar partida (multi-slot)"
 	load_button.pressed.connect(_on_load_game)
 	footer.add_child(load_button)
 
@@ -949,21 +952,43 @@ func _set_buttons_disabled(d: bool) -> void:
 # Save / Load
 # =========================================================================== #
 func _on_save_game() -> void:
+	var dialog := SaveLoadDialog.new()
+	add_child(dialog)
+	dialog.open_save(func(slot: String, action: String) -> void:
+		dialog.queue_free()
+		if action != "save":
+			return
+		_save_to_slot(slot)
+	)
+
+
+func _save_to_slot(slot: String) -> void:
 	var result: Dictionary = SaveSystem.save_game(
-		"autosave", year, all_teams,
+		slot, year, all_teams,
 		primera_state.current_jornada, segunda_state.current_jornada,
 		primera_state.league_table, segunda_state.league_table,
 		user_team_id, user_lineup_template, user_career_history)
 	if result.get("ok", false):
-		status_label.text = "Partida guardada (autosave) — %s" % result["saved_at"]
+		status_label.text = "Partida guardada en '%s' — %s" % [slot, result["saved_at"]]
 	else:
 		status_label.text = "ERROR al guardar: %s" % result.get("error", "?")
 
 
 func _on_load_game() -> void:
-	var save_data: SaveSystem.SaveData = SaveSystem.load_game("autosave")
+	var dialog := SaveLoadDialog.new()
+	add_child(dialog)
+	dialog.open_load(func(slot: String, action: String) -> void:
+		dialog.queue_free()
+		if action != "load":
+			return
+		_load_from_slot(slot)
+	)
+
+
+func _load_from_slot(slot: String) -> void:
+	var save_data: SaveSystem.SaveData = SaveSystem.load_game(slot)
 	if save_data == null:
-		status_label.text = "No hay partida guardada (slot 'autosave')."
+		status_label.text = "No se pudo cargar el slot '%s'." % slot
 		return
 
 	# Reemplazar estado del juego con los datos cargados

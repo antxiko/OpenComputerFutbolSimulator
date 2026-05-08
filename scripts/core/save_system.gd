@@ -138,16 +138,43 @@ static func delete_save(slot_name: String) -> bool:
 static func _peek_save(path: String) -> Dictionary:
 	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
-		return { "saved_at": "?", "year": 0 }
+		return { "saved_at": "?", "year": 0, "user_team_id": "", "primera_jornada": 0 }
 	var content: String = file.get_as_text()
 	file.close()
 	var parsed: Variant = JSON.parse_string(content)
 	if typeof(parsed) != TYPE_DICTIONARY:
-		return { "saved_at": "?", "year": 0 }
+		return { "saved_at": "?", "year": 0, "user_team_id": "", "primera_jornada": 0 }
 	return {
 		"saved_at": String(parsed.get("saved_at", "")),
-		"year": int(parsed.get("year", 0)),
+		"year": int(parsed.get("year", 2026)),
+		"user_team_id": String(parsed.get("user_team_id", "")),
+		"primera_jornada": int(parsed.get("primera_jornada", 0)),
+		"segunda_jornada": int(parsed.get("segunda_jornada", 0)),
+		"career_seasons": int((parsed.get("user_career_history", []) as Array).size()),
 	}
+
+
+# Devuelve true si el slot solicitado existe.
+static func slot_exists(slot_name: String) -> bool:
+	return FileAccess.file_exists("%s%s.json" % [SAVE_DIR, slot_name])
+
+
+# Sanea un nombre de slot introducido por el usuario para que sea un nombre
+# de fichero seguro: solo letras, números, guión bajo y guión.
+static func sanitize_slot_name(raw: String) -> String:
+	var s: String = raw.strip_edges().to_lower()
+	var out: String = ""
+	for i in s.length():
+		var ch: String = s[i]
+		if (ch >= "a" and ch <= "z") or (ch >= "0" and ch <= "9") or ch == "_" or ch == "-":
+			out += ch
+		elif ch == " ":
+			out += "_"
+	if out.is_empty():
+		out = "save"
+	if out.length() > 32:
+		out = out.substr(0, 32)
+	return out
 
 
 # ============================================================================
