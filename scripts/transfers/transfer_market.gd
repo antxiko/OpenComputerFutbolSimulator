@@ -60,6 +60,13 @@ class MarketResult:
 	var year: int = 0
 	var transfers: Array = []  # Array[Transfer]
 	var team_summary: Dictionary = {}  # team_id -> { signings_count, departures_count, spend, income, net }
+	# Movimiento de contratos vencidos:
+	#   renewals: Array[{ player_name, team_name, new_until_year }]
+	#   released: Array[{ player_name, team_name, age, ovr }]
+	#   free_agent_signings: Array[{ player_name, signing_team_name, prev_team_name, salary }]
+	var renewals: Array = []
+	var released: Array = []
+	var free_agent_signings: Array = []
 
 
 static func run(teams: Array, season_year: int, seed_value: int, window: WindowConfig = null) -> MarketResult:
@@ -92,6 +99,12 @@ static func run(teams: Array, season_year: int, seed_value: int, window: WindowC
 			"net": 0,
 		}
 
+	# Procesar contratos vencidos antes de las rondas (solo en verano).
+	# En invierno los contratos no se procesan — eso es exclusivo del verano.
+	var free_agents: Array = []
+	if window.label == "verano":
+		free_agents = _process_expired_contracts(teams, season_year, result, rng)
+
 	# Calcular media por slot en la liga (para detectar debilidad relativa)
 	var league_avg: Dictionary = _compute_league_average_by_slot(teams)
 
@@ -104,12 +117,21 @@ static func run(teams: Array, season_year: int, seed_value: int, window: WindowC
 	team_order.sort_custom(func(a: Team, b: Team) -> bool:
 		return float(team_scores[a.id]) > float(team_scores[b.id]))
 
-	# Hacemos varias pasadas: en cada pasada cada equipo intenta UN fichaje.
-	# Eso simula que el mercado se mueve en oleadas.
+	# Hacemos varias pasadas: en cada pasada cada equipo intenta UN fichaje
+	# (mezclamos free agents y transferencias normales). Eso simula que el
+	# mercado se mueve en oleadas.
 	for round_idx in window.rounds:
 		for buyer: Team in team_order:
 			if counts_in[buyer.id] >= window.max_signings:
 				continue
+			# Antes de intentar un fichaje pagado, intenta firmar un free agent
+			# si el equipo tiene un slot débil que un agente libre cubre.
+			# Esto es preferente al fichaje normal (es gratis).
+			if free_agents.size() > 0:
+				var fa_signing := _attempt_free_agent_signing(buyer, free_agents, league_avg, season_year, result)
+				if fa_signing:
+					counts_in[buyer.id] += 1
+					continue
 			# Athletic (basque_only) puede fichar pero solo jugadores basque_eligible.
 			# El filtrado lo aplica _find_best_candidate; aquí no hacemos continue.
 			if budgets[buyer.id] < 500_000:
@@ -120,7 +142,129 @@ static func run(teams: Array, season_year: int, seed_value: int, window: WindowC
 				_apply_transfer(transfer, teams, budgets, counts_in, counts_out, result)
 				transferred_this_window[transfer.player_id] = true
 
+	# Free agents que no fichó nadie — se desvinculan del simulador
+	# (representa que se retiran o se van a otra liga). Quedan registrados
+	# en result.released pero ya no aparecen en ningún team.
+	# (Ya están fuera de teams porque _process_expired_contracts los sacó.)
+
 	return result
+
+
+# ----------------------------------------------------------------------
+# Contratos vencidos: renovación automática o release
+# ----------------------------------------------------------------------
+static func _process_expired_contracts(teams: Array, season_year: int, result: MarketResult, rng: RandomNumberGenerator) -> Array:
+	var free_agents: Array = []  # Array[{player, prev_team}]
+	for t: Team in teams:
+		var to_release: Array[Player] = []
+		for p: Player in t.players:
+			if p.contract == null:
+				continue
+			if p.contract.until_year > season_year:
+				continue  # contrato vigente
+			# Contrato expirado: decidir renovar vs liberar.
+			var ovr: int = PlayerFactory.compute_overall(p, p.primary_position())
+			var age: int = p.age_at(season_year, 7, 1)
+			var renew_prob: float = 0.55
+			# Estrellas: el club siempre intenta retener
+			if p.tier in ["S", "A"]: renew_prob += 0.25
+			elif p.tier == "B": renew_prob += 0.10
+			# Edad alta: menos prob de renovar
+			if age >= 33: renew_prob -= 0.30
+			elif age >= 30: renew_prob -= 0.10
+			# Overall bajo: menos prob de renovar
+			if ovr < 65: renew_prob -= 0.20
+			renew_prob = clampf(renew_prob, 0.05, 0.95)
+
+			if rng.randf() < renew_prob:
+				# Renueva: extiende 2-3 años, ajusta salario al alza si es estrella
+				var extra_years: int = 3 if p.tier in ["S", "A"] else 2
+				p.contract.until_year = season_year + extra_years
+				if p.tier in ["S", "A"]:
+					p.contract.salary_eur_year = int(p.contract.salary_eur_year * 1.15)
+				result.renewals.append({
+					"player_name": p.name,
+					"team_name": t.short_name,
+					"new_until_year": p.contract.until_year,
+				})
+			else:
+				# Liberar: se va al pool de free agents
+				to_release.append(p)
+				result.released.append({
+					"player_name": p.name,
+					"team_name": t.short_name,
+					"age": age,
+					"ovr": ovr,
+					"tier": p.tier,
+				})
+		# Aplicar releases (sacarlos del team)
+		for p in to_release:
+			t.players.erase(p)
+			free_agents.append({ "player": p, "prev_team": t })
+	return free_agents
+
+
+# Intenta firmar un free agent. Si encuentra uno apto, lo añade al equipo y lo
+# elimina del pool. Devuelve true si fichó.
+static func _attempt_free_agent_signing(buyer: Team, free_agents: Array, league_avg: Dictionary, season_year: int, result: MarketResult) -> bool:
+	# 1) ¿Qué slot tiene débil el comprador?
+	var weak_slots: Array = _weakest_slots(buyer, league_avg, 3)
+	if weak_slots.is_empty():
+		return false
+
+	# 2) Buscar el mejor free agent que cubra alguno de esos slots
+	for slot_data: Dictionary in weak_slots:
+		var slot: String = slot_data["slot"]
+		var current_best_ovr: int = slot_data["best_overall"]
+		var min_target: int = current_best_ovr + 1  # un free agent puede ser solo marginalmente mejor
+
+		var best_idx: int = -1
+		var best_ovr: int = 0
+		for i in free_agents.size():
+			var fa: Dictionary = free_agents[i]
+			var p: Player = fa["player"]
+			var prev_team: Team = fa["prev_team"]
+			if not (slot in p.positions):
+				continue
+			# No fichar a tu propio jugador recién liberado (raro pero posible
+			# si su contrato venció y no le renovaste — implicaría cambio
+			# de mente extraño).
+			if prev_team.id == buyer.id:
+				continue
+			# Filtrar por política
+			if buyer.signing_policy == "basque_only" and not p.basque_eligible:
+				continue
+			var ovr: int = PlayerFactory.compute_overall(p, slot)
+			if ovr < min_target:
+				continue
+			if ovr > best_ovr:
+				best_ovr = ovr
+				best_idx = i
+		if best_idx < 0:
+			continue
+
+		# 3) Fichar al free agent: añadir a buyer, sacar del pool, nuevo contrato
+		var fa: Dictionary = free_agents[best_idx]
+		var p: Player = fa["player"]
+		var prev_team: Team = fa["prev_team"]
+		# Nuevo contrato: 3 años, salario reajustado a su MarketValue / 6 (heurística para libre)
+		var new_salary: int = max(150_000, int(MarketValue.compute(p, season_year, slot) / 6))
+		p.contract.until_year = season_year + 3
+		p.contract.salary_eur_year = new_salary
+		p.joined_year = season_year
+		buyer.players.append(p)
+		free_agents.remove_at(best_idx)
+		result.free_agent_signings.append({
+			"player_name": p.name,
+			"signing_team_id": buyer.id,
+			"signing_team_name": buyer.short_name,
+			"prev_team_name": prev_team.short_name,
+			"salary": new_salary,
+			"slot": slot,
+			"overall": best_ovr,
+		})
+		return true
+	return false
 
 
 # Intenta una operación: el comprador escoge su slot más débil, busca un mejor jugador en otro equipo.
