@@ -26,6 +26,11 @@ func _init() -> void:
 	var total_goals: int = 0
 	var match_count: int = 0
 	var jornada1_results: Array = []
+	var total_corners: int = 0
+	var total_shots: int = 0
+	var total_shots_blocked: int = 0
+	var total_shots_on: int = 0
+	var total_shots_off: int = 0
 
 	for j in calendar.size():
 		var jornada: Array = calendar[j]
@@ -49,6 +54,14 @@ func _init() -> void:
 			goal_dist[t] = int(goal_dist.get(t, 0)) + 1
 			total_goals += t
 			match_count += 1
+			# Stats
+			for tid in r.stats.keys():
+				var ts: Dictionary = r.stats[tid]
+				total_corners += int(ts.get("corners", 0))
+				total_shots_on += int(ts.get("shots_on_target", 0))
+				total_shots_off += int(ts.get("shots_off_target", 0))
+				total_shots_blocked += int(ts.get("shots_blocked", 0))
+			total_shots = total_shots_on + total_shots_off + total_shots_blocked
 			# Track top scoreful matches
 			biggest.append({
 				"home": home.short_name, "away": away.short_name,
@@ -66,6 +79,11 @@ func _init() -> void:
 	print("\n  Partidos simulados: %d" % match_count)
 	print("  Goles totales: %d" % total_goals)
 	print("  Promedio goles/partido: %.2f" % (float(total_goals) / float(maxi(match_count, 1))))
+	print("  Promedio córners/partido: %.2f  (real La Liga ~10)" % (float(total_corners) / float(maxi(match_count, 1))))
+	print("  Promedio tiros/partido: %.2f  (real La Liga ~25)" % (float(total_shots) / float(maxi(match_count, 1))))
+	if total_shots > 0:
+		print("  %% tiros bloqueados: %.1f%%  (real La Liga ~20-25%%)" % (100.0 * total_shots_blocked / total_shots))
+		print("  %% tiros a portería: %.1f%%  (real La Liga ~32-38%%)" % (100.0 * total_shots_on / total_shots))
 	print("\n  Distribución de goles por partido (suma de los dos equipos):")
 	var keys: Array = goal_dist.keys()
 	keys.sort()

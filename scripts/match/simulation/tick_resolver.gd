@@ -96,10 +96,10 @@ static func _decide_outcome(zone: String, delta: float, rng: RandomNumberGenerat
 	else:  # atk
 		probs = {
 			"shot":    0.30 + delta * 0.30,
-			"keep":    0.12,
-			"corner":  0.14,
+			"keep":    0.10,
+			"corner":  0.19,   # antes 0.14 (córners reales ~10/partido vs ~6.5 simulados)
 			"offside": 0.05,
-			"lose":    0.33 - delta * 0.30,
+			"lose":    0.30 - delta * 0.30,
 			"foul":    0.06,
 		}
 	# "foul" como outcome principal aquí significa "falta a favor del atacante" (juego parado)
@@ -182,7 +182,8 @@ static func _resolve_shot(
 	# 2) ¿Es bloqueado por defensores?
 	var def_str: float = PositionContribution.zone_strength(defense, "defense", "def")
 	var atk_str: float = PositionContribution.zone_strength(poss, "attack", "atk")
-	var block_p: float = 0.13 + clampf((def_str - atk_str) / maxf(atk_str + def_str, 1.0), -0.08, 0.14)
+	# block_p calibrado a ~22-25% promedio (real La Liga: 20-25% de tiros bloqueados).
+	var block_p: float = 0.14 + clampf((def_str - atk_str) / maxf(atk_str + def_str, 1.0), -0.08, 0.14)
 
 	var roll1: float = rng.randf()
 	if roll1 < block_p:
