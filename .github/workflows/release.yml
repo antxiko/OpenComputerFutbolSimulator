@@ -31,6 +31,12 @@ jobs:
       - name: Verify Godot
         run: godot --version
 
+      - name: Copy export templates to HOME
+        run: |
+          mkdir -p $HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          cp -r /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable/* $HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
+          ls -la $HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
+
       - name: Build Windows
         run: |
           mkdir -p build/windows
@@ -60,6 +66,12 @@ jobs:
 
       - name: Verify Godot
         run: godot --version
+
+      - name: Copy export templates to HOME
+        run: |
+          mkdir -p $HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          cp -r /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable/* $HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
+          ls -la $HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
 
       - name: Build Linux
         run: |
@@ -91,6 +103,12 @@ jobs:
 
       - name: Verify Godot
         run: godot --version
+
+      - name: Copy export templates to HOME
+        run: |
+          mkdir -p $HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          cp -r /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable/* $HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
+          ls -la $HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/
 
       - name: Build macOS
         run: |
