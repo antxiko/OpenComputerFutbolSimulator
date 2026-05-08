@@ -107,6 +107,15 @@ Cosas que sabemos que están a medias o que hay que volver a mirar más adelante
 
 ---
 
+## ⏸️ EN PROGRESO
+
+**Pool de nombres españoles para canteranos**: actualmente los canteranos generados por `Cantera._generate_youth()` tienen nombres placeholder feos (`ATH Canterano 2030 #5`). En partidas largas (10+ años) la plantilla se llena de estos. Pendiente:
+
+1. Crear `data/name_pools/spanish_first_names.json` con ~200 nombres comunes.
+2. Crear `data/name_pools/spanish_last_names.json` con ~200 apellidos comunes.
+3. Modificar `Cantera._generate_youth()` para combinar nombre + apellido aleatorios.
+4. Considerar pool vasco específico para Athletic (signing_policy basque_only).
+
 ## 📝 Notas de sesiones
 
 - **2026-05-07 sesión 1**: pipeline JSON → Resource → atributos → motor partido → temporada → mercado → multi-temporada con asc/desc + aging. 5 temporadas en 161s, 20 temporadas en ~10 min. Bug del comparator no-determinista en TransferMarket arreglado.
