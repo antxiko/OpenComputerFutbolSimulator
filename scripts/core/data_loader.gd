@@ -86,6 +86,15 @@ static func _generate_team_attributes(team: Team, season_year: int, seed_base: i
 		# Seed determinista por jugador: combinamos seed_base con un hash estable del id.
 		var player_seed: int = seed_base ^ hash(p.id)
 		PlayerFactory.generate_attributes(p, season_year, player_seed)
+		# Marcar basque_eligible:
+		# - Todos los jugadores actuales del Athletic se asumen basque (es su filosofía).
+		# - Para los demás equipos, heurística por apellido vasco.
+		# Solo aplicar si no viene ya marcado en el JSON.
+		if not p.basque_eligible:
+			if team.signing_policy == "basque_only":
+				p.basque_eligible = true
+			elif p.nationality == "ES" and BasqueHeuristic.is_basque_name(p.name):
+				p.basque_eligible = true
 
 
 static func _check_player_ids(team: Team, result: LoadResult) -> void:

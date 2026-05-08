@@ -81,8 +81,8 @@ static func run(teams: Array, season_year: int, seed_value: int) -> MarketResult
 		for buyer: Team in team_order:
 			if counts_in[buyer.id] >= MAX_SIGNINGS_PER_TEAM:
 				continue
-			if buyer.signing_policy == "basque_only":
-				continue  # v1: Athletic solo vende
+			# Athletic (basque_only) puede fichar pero solo jugadores basque_eligible.
+			# El filtrado lo aplica _find_best_candidate; aquí no hacemos continue.
 			if budgets[buyer.id] < 500_000:
 				continue
 			var transfer := _attempt_signing(buyer, teams, league_avg, budgets, counts_in, counts_out, transferred_this_window, season_year, rng)
@@ -254,6 +254,9 @@ static func _find_best_candidate(
 				continue
 			# Excluir lesionados / muy jóvenes irrelevantes
 			if p.tier == "Y" and p.age_at(season_year, 7, 1) < 18:
+				continue
+			# Filtrar por política de fichajes del comprador
+			if buyer.signing_policy == "basque_only" and not p.basque_eligible:
 				continue
 			var ovr: int = PlayerFactory.compute_overall(p, slot)
 			if ovr < min_target_ovr:

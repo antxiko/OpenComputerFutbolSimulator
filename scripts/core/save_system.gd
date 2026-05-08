@@ -214,6 +214,7 @@ static func _team_from_dict(d: Dictionary) -> Team:
 		p.red_cards_season = int(pd.get("red_cards_season", 0))
 		p.suspended_matches = int(pd.get("suspended_matches", 0))
 		p.aggression = int(pd.get("aggression", 0))
+		p.basque_eligible = bool(pd.get("basque_eligible", false))
 		p.history = pd.get("history", []).duplicate()
 	return t
 
@@ -238,6 +239,7 @@ static func _player_to_dict(p: Player) -> Dictionary:
 		"red_cards_season": p.red_cards_season,
 		"suspended_matches": p.suspended_matches,
 		"aggression": p.aggression,
+		"basque_eligible": p.basque_eligible,
 		"history": p.history.duplicate(),
 		"contract": _contract_to_dict(p.contract),
 	}

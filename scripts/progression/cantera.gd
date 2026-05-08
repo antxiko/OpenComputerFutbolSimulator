@@ -77,12 +77,19 @@ static func _generate_youth(team: Team, slot: String, season_year: int, rng: Ran
 	var idx: int = team.players.size() + 1
 	p.id = "%s_y%02d_%03d" % [team.short_name.to_lower(), year_short, idx]
 	# Nombre + nacionalidad desde el pool internacional (40% ES, 60% extranjero).
-	# Excepción: Athletic (basque_only) genera siempre canteranos ES.
+	# Excepción: Athletic (basque_only) genera siempre canteranos ES y los marca
+	# como basque_eligible para que el sistema de fichajes pueda razonar con ellos.
 	var name_data: Dictionary
 	if team.signing_policy == "basque_only":
 		name_data = NamePool.generate_spanish(rng)
+		p.basque_eligible = true
 	else:
 		name_data = NamePool.generate(rng)
+		# 5% probabilidad de generar un canterano basque-eligible en otros clubes
+		# (heredan apellidos vascos del pool ES). Esto permite que Athletic pueda
+		# eventualmente fichar de la cantera de otros equipos.
+		if String(name_data.get("nationality", "")) == "ES" and rng.randf() < 0.10:
+			p.basque_eligible = true
 	p.name = String(name_data["name"])
 	p.nationality = String(name_data["nationality"])
 	# Edad 17-19

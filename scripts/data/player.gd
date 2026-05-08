@@ -29,6 +29,10 @@ class_name Player extends Resource
 @export var red_cards_season: int = 0  # acumuladas en la temporada actual
 @export var suspended_matches: int = 0  # partidos pendientes de sanción
 @export var aggression: int = 0  # 0-100. Si 0, AggressionSystem la inicializa al cargar.
+# Elegibilidad para signing_policy=basque_only (Athletic). Se infiere por
+# heurística sobre apellidos vascos en data_loader; canteranos del Athletic
+# se marcan true automáticamente.
+@export var basque_eligible: bool = false
 
 # Historial estadístico por temporada — se rellena al final de cada temporada
 @export var history: Array = []
@@ -81,4 +85,5 @@ static func from_dict(d: Dictionary) -> Player:
 		p.contract = ContractInfo.from_dict(d.get("contract", {}))
 	else:
 		p.contract = ContractInfo.new()
+	p.basque_eligible = bool(d.get("basque_eligible", false))
 	return p
