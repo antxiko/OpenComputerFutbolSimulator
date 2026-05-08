@@ -31,6 +31,7 @@ const VIEW_MATCH := "match"
 const VIEW_TACTICS := "tactics"
 const VIEW_MARKET := "market"
 const VIEW_CAREER := "career"
+const VIEW_CHAMPIONS := "champions"
 
 
 # --------------------------------------------------------------------------- #
@@ -71,6 +72,8 @@ var user_lineup_template: Dictionary = {}
 # { year, division, position, played, won, drawn, lost, gf, ga, points,
 #   top_scorer_name, top_scorer_goals, cup_progress }
 var user_career_history: Array = []
+# Última edición de Champions League simulada (no se persiste en save).
+var champions_state: ChampionsBracket = null
 
 # UI refs (populadas en _build_ui)
 var year_label: Label
@@ -199,6 +202,9 @@ func _build_ui() -> void:
 	var view_career_button := _make_tab_button("📈 Carrera", _on_select_view.bind(VIEW_CAREER))
 	view_career_button.name = "ViewCareerButton"
 	view_tabs.add_child(view_career_button)
+	var view_champions_button := _make_tab_button("🏆 Champions", _on_select_view.bind(VIEW_CHAMPIONS))
+	view_champions_button.name = "ViewChampionsButton"
+	view_tabs.add_child(view_champions_button)
 
 	# Indicador de "Mi club" (solo lectura — el club se elige en Nueva partida)
 	var spacer2 := Control.new()
@@ -646,6 +652,28 @@ func _on_reset_season() -> void:
 	CardSystem.reset_yellow_cards(all_teams)
 	# Mercado de fichajes
 	TransferMarket.run(all_teams, year, SEED_BASE * 7)
+	# Champions League: top 4 españoles del año que acaba (basado en p_table snapshot
+	# previo) vs 12 europeos generados procedurally.
+	if primera_state.league_table != null:
+		var top4_rows: Array = primera_state.league_table.sorted_rows().slice(0, 4)
+		var top4_teams: Array = []
+		for r: LeagueTable.TeamRow in top4_rows:
+			var t: Team = _find_team_by_id(r.team_id)
+			if t != null:
+				top4_teams.append(t)
+		if top4_teams.size() == 4:
+			var euros: Array = EuropeanTeams.generate_all(year, SEED_BASE + year * 13)
+			champions_state = ChampionsSimulator.run(top4_teams, euros, year, SEED_BASE * 17 + year)
+			if champions_state != null and champions_state.champion_name != "":
+				var qualified_user: bool = false
+				for tt: Team in top4_teams:
+					if tt.id == user_team_id:
+						qualified_user = true
+						break
+				if qualified_user:
+					_show_champions_modal(champions_state)
+				else:
+					status_label.text = "🏆 Champions %d: %s campeón (final vs %s)" % [year, champions_state.champion_name, champions_state.runner_up_name]
 	# Supercopa de España (con clasificados de la temporada que acaba de terminar)
 	if sc_qualifiers.size() >= 4:
 		var fallback: Team = null
@@ -770,6 +798,203 @@ func _compute_user_cup_progress(bracket: CupBracket) -> String:
 					furthest_round = "Eliminado en %s" % round_obj.name
 				break
 	return furthest_round
+
+
+# =========================================================================== #
+# Vista: Champions League
+# =========================================================================== #
+func _render_champions_view() -> void:
+	if champions_state == null:
+		var l := Label.new()
+		l.text = "Aún no hay edición de Champions League activa.\nFinaliza una temporada (botón \"🔁 Nueva temp.\") para que se simule la siguiente edición."
+		l.add_theme_font_size_override("font_size", 14)
+		l.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		content_area.add_child(l)
+		return
+
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content_area.add_child(scroll)
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 12)
+	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(vbox)
+
+	# Título + campeón
+	var title := Label.new()
+	title.text = "🏆 Champions League %d-%d" % [champions_state.season_year, champions_state.season_year + 1]
+	title.add_theme_font_size_override("font_size", 18)
+	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	vbox.add_child(title)
+
+	if champions_state.champion_name != "":
+		var champ := Label.new()
+		champ.text = "Campeón: %s   ·   Subcampeón: %s" % [
+			champions_state.champion_name, champions_state.runner_up_name]
+		champ.add_theme_color_override("font_color", Color(0.8, 1.0, 0.6))
+		vbox.add_child(champ)
+
+	# Fase de grupos
+	var groups_label := Label.new()
+	groups_label.text = "── Fase de grupos ──"
+	groups_label.add_theme_font_size_override("font_size", 14)
+	groups_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	vbox.add_child(groups_label)
+
+	var groups_grid := GridContainer.new()
+	groups_grid.columns = 2
+	groups_grid.add_theme_constant_override("h_separation", 24)
+	groups_grid.add_theme_constant_override("v_separation", 12)
+	vbox.add_child(groups_grid)
+
+	for g: ChampionsBracket.Group in champions_state.groups:
+		var gbox := VBoxContainer.new()
+		var gh := Label.new()
+		gh.text = "Grupo %s" % g.letter
+		gh.add_theme_font_size_override("font_size", 13)
+		gh.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+		gbox.add_child(gh)
+		var grid := GridContainer.new()
+		grid.columns = 6
+		grid.add_theme_constant_override("h_separation", 8)
+		# header
+		for h_text in ["Pos", "Equipo", "PJ", "Pts", "GF", "GC"]:
+			var hl := Label.new()
+			hl.text = h_text
+			hl.add_theme_font_size_override("font_size", 11)
+			hl.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+			grid.add_child(hl)
+		var standings: Array = g.sorted_standings()
+		for i in standings.size():
+			var st: ChampionsBracket.GroupStanding = standings[i]
+			var color: Color = Color(1, 1, 1)
+			if i < 2:
+				color = Color(0.7, 1.0, 0.7)  # clasificados
+			else:
+				color = Color(0.85, 0.85, 0.85)
+			grid.add_child(_make_label("%d" % (i + 1), 11, color))
+			grid.add_child(_make_label(st.team_name, 11, color))
+			grid.add_child(_make_label("%d" % st.played, 11, color))
+			grid.add_child(_make_label("%d" % st.points(), 11, color))
+			grid.add_child(_make_label("%d" % st.goals_for, 11, color))
+			grid.add_child(_make_label("%d" % st.goals_against, 11, color))
+		gbox.add_child(grid)
+		groups_grid.add_child(gbox)
+
+	# Eliminatorias
+	var ko_label := Label.new()
+	ko_label.text = "── Eliminatorias ──"
+	ko_label.add_theme_font_size_override("font_size", 14)
+	ko_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	vbox.add_child(ko_label)
+
+	for r: ChampionsBracket.KORound in champions_state.ko_rounds:
+		var rh := Label.new()
+		rh.text = r.name
+		rh.add_theme_font_size_override("font_size", 13)
+		rh.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+		vbox.add_child(rh)
+		for fx: ChampionsBracket.KOFixture in r.fixtures:
+			var line := Label.new()
+			var score: String = "?-?"
+			if fx.result != null:
+				score = "%d-%d" % [fx.result.score_home, fx.result.score_away]
+			var rep: String = "  (rep)" if fx.won_by_reputation else ""
+			var winner_short: String = ""
+			if fx.winner_id == fx.home_id:
+				winner_short = " → " + fx.home_name
+			elif fx.winner_id == fx.away_id:
+				winner_short = " → " + fx.away_name
+			line.text = "  %s %s %s%s%s" % [fx.home_name, score, fx.away_name, winner_short, rep]
+			line.add_theme_font_size_override("font_size", 11)
+			vbox.add_child(line)
+
+
+func _make_label(text: String, font_size: int, color: Color) -> Label:
+	var l := Label.new()
+	l.text = text
+	l.add_theme_font_size_override("font_size", font_size)
+	l.add_theme_color_override("font_color", color)
+	return l
+
+
+# Modal "Has jugado la Champions" cuando el equipo del usuario clasificó.
+func _show_champions_modal(bracket: ChampionsBracket) -> void:
+	var popup := AcceptDialog.new()
+	popup.title = "🏆 Champions League %d" % bracket.season_year
+	popup.size = Vector2(560, 380)
+	popup.ok_button_text = "Continuar"
+	add_child(popup)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	popup.add_child(box)
+
+	# Resultado del usuario en la competición
+	var user_path: String = _user_champions_path(bracket)
+	var path_label := Label.new()
+	path_label.text = "Tu trayectoria: %s" % user_path
+	path_label.add_theme_font_size_override("font_size", 14)
+	path_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+	box.add_child(path_label)
+
+	box.add_child(HSeparator.new())
+
+	if bracket.champion_name != "":
+		var champ := Label.new()
+		champ.text = "Campeón: %s" % bracket.champion_name
+		champ.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		champ.add_theme_font_size_override("font_size", 16)
+		champ.add_theme_color_override("font_color", Color(0.7, 1.0, 0.6))
+		box.add_child(champ)
+		var sub := Label.new()
+		sub.text = "Subcampeón: %s" % bracket.runner_up_name
+		sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		sub.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+		box.add_child(sub)
+
+	var hint := Label.new()
+	hint.text = "Pulsa la pestaña 🏆 Champions para ver el bracket completo."
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.add_theme_font_size_override("font_size", 11)
+	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	box.add_child(hint)
+
+	popup.popup_centered()
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+
+
+func _user_champions_path(bracket: ChampionsBracket) -> String:
+	if bracket.champion_id == user_team_id:
+		return "🏆 CAMPEÓN"
+	if bracket.runner_up_name != "":
+		# Buscar si fuiste subcampeón
+		for r: ChampionsBracket.KORound in bracket.ko_rounds:
+			if r.name == "Final":
+				for fx: ChampionsBracket.KOFixture in r.fixtures:
+					if (fx.home_id == user_team_id or fx.away_id == user_team_id) and fx.winner_id != user_team_id:
+						return "Subcampeón (perdió la Final)"
+	# Buscar la última ronda donde el usuario perdió
+	var last_status: String = "Eliminado en Fase de grupos"
+	for r: ChampionsBracket.KORound in bracket.ko_rounds:
+		for fx: ChampionsBracket.KOFixture in r.fixtures:
+			if fx.home_id == user_team_id or fx.away_id == user_team_id:
+				if fx.winner_id == user_team_id:
+					last_status = "Pasó %s" % r.name
+				else:
+					last_status = "Eliminado en %s" % r.name
+	# Si no aparece en KO, ver si pasó de grupos
+	for g: ChampionsBracket.Group in bracket.groups:
+		if user_team_id in g.team_ids:
+			var sorted: Array = g.sorted_standings()
+			for i in sorted.size():
+				if sorted[i].team_id == user_team_id:
+					if i >= 2:
+						return "Eliminado en Fase de grupos (%dº del grupo %s)" % [i + 1, g.letter]
+					break
+	return last_status
 
 
 # =========================================================================== #
@@ -1090,6 +1315,7 @@ func _refresh_ui() -> void:
 		VIEW_TACTICS: _render_tactics_view()
 		VIEW_MARKET: _render_market_view()
 		VIEW_CAREER: _render_career_view()
+		VIEW_CHAMPIONS: _render_champions_view()
 
 
 # --------------------------------------------------------------------------- #

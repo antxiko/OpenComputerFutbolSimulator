@@ -22,6 +22,9 @@ class SeasonRecord:
 	var segunda_champion_name: String = ""
 	var copa_champion_name: String = ""
 	var copa_runner_up_name: String = ""
+	var champions_winner_name: String = ""
+	var champions_runner_up_name: String = ""
+	var champions_spanish_qualifiers: Array = []  # nombres de los 4 españoles que jugaron
 	var promoted_names: Array = []
 	var relegated_names: Array = []
 	var retirements_count: int = 0
@@ -32,6 +35,7 @@ class SeasonRecord:
 	var primera_simulation_secs: float = 0.0
 	var segunda_simulation_secs: float = 0.0
 	var copa_simulation_secs: float = 0.0
+	var champions_simulation_secs: float = 0.0
 
 
 class History:
@@ -40,7 +44,10 @@ class History:
 	var primera_titles: Dictionary = {}  # team_id -> count
 	var segunda_titles: Dictionary = {}
 	var copa_titles: Dictionary = {}     # team_name -> count (Copa del Rey)
+	var champions_titles: Dictionary = {}  # team_name -> count
 	var career_goals: Dictionary = {}  # player_id -> { name, team_short, goals }
+	# Bracket completo de la última Champions simulada (para mostrar en UI).
+	var last_champions_bracket: ChampionsBracket = null
 
 
 static func run(all_teams: Array, start_year: int, n_seasons: int, seed_base: int) -> History:
@@ -121,6 +128,29 @@ static func run(all_teams: Array, start_year: int, n_seasons: int, seed_base: in
 		if cup_bracket.champion_name != "":
 			history.copa_titles[cup_bracket.champion_name] = int(history.copa_titles.get(cup_bracket.champion_name, 0)) + 1
 
+		# 4.2) Champions League (con top 4 Liga de ESTA temporada como clasificados
+		# para la temporada europea siguiente; en simulación de carrera larga,
+		# representamos la Champions del próximo año aquí mismo).
+		var spanish_top4: Array = []
+		for k in range(0, min(4, p_sorted.size())):
+			var top_team_id: String = p_sorted[k].team_id
+			for tt: Team in all_teams:
+				if tt.id == top_team_id:
+					spanish_top4.append(tt)
+					break
+		if spanish_top4.size() == 4:
+			var t_chl_start: int = Time.get_ticks_msec()
+			var euros: Array = EuropeanTeams.generate_all(year + 1, seed_base + i * 13)
+			var ch_bracket := ChampionsSimulator.run(spanish_top4, euros, year + 1, seed_base + i * 10 + 7)
+			var t_chl_end: int = Time.get_ticks_msec()
+			record.champions_simulation_secs = (t_chl_end - t_chl_start) / 1000.0
+			record.champions_winner_name = ch_bracket.champion_name
+			record.champions_runner_up_name = ch_bracket.runner_up_name
+			record.champions_spanish_qualifiers = spanish_top4.map(func(t: Team) -> String: return t.name)
+			if ch_bracket.champion_name != "":
+				history.champions_titles[ch_bracket.champion_name] = int(history.champions_titles.get(ch_bracket.champion_name, 0)) + 1
+			history.last_champions_bracket = ch_bracket
+
 		# 4.5) Actualizar reputaciones según resultados
 		ReputationUpdate.apply_after_season(p_result.table, s_result.table, all_teams)
 
@@ -186,15 +216,14 @@ static func _short_for_team_id(teams: Array, team_id: String) -> String:
 
 
 static func _print_year_summary(r: SeasonRecord) -> void:
-	var sim_total: float = r.primera_simulation_secs + r.segunda_simulation_secs + r.copa_simulation_secs
-	print("  %d-%d  Liga: %-28s  Copa: %-28s  Pichichi: %-22s (%2dg)  Retiros:%2d  Canteranos:%2d  [%.1fs]" % [
+	var sim_total: float = r.primera_simulation_secs + r.segunda_simulation_secs + r.copa_simulation_secs + r.champions_simulation_secs
+	print("  %d-%d  Liga: %-22s  Copa: %-22s  Champ: %-22s  Pich: %-18s (%2dg)  [%.1fs]" % [
 		r.year, r.year + 1,
-		r.primera_champion_name.left(28),
-		r.copa_champion_name.left(28) if r.copa_champion_name else "(no jugada)",
-		r.primera_top_scorer_name.left(22),
+		r.primera_champion_name.left(22),
+		r.copa_champion_name.left(22) if r.copa_champion_name else "(no jugada)",
+		r.champions_winner_name.left(22) if r.champions_winner_name else "(no jugada)",
+		r.primera_top_scorer_name.left(18),
 		r.primera_top_scorer_goals,
-		r.retirements_count,
-		r.canteranos_added,
 		sim_total,
 	])
 
