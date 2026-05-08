@@ -451,10 +451,15 @@ func _do_advance_jornada() -> void:
 	if not any_advanced:
 		status_label.text = "Temporada completada. Pulsa 'Nueva temporada'."
 		return
-	# Si el usuario tuvo partido, mostrar resumen post-partido
+	# Si el usuario tuvo partido, mostrar resumen post-partido (o abrir 2D
+	# directamente si lo pidió en el modal pre-partido).
 	var user_result := _find_user_result_in_last_jornada()
 	if user_result != null:
-		_show_post_match_modal(user_result)
+		if auto_open_2d_after_match:
+			auto_open_2d_after_match = false
+			_on_open_2d_viewer(user_result)
+		else:
+			_show_post_match_modal(user_result)
 	_refresh_ui()
 
 
@@ -471,8 +476,10 @@ func _find_user_result_in_last_jornada() -> MatchResult:
 func _show_post_match_modal(r: MatchResult) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "Resultado de tu partido"
-	popup.size = Vector2(540, 420)
+	popup.size = Vector2(560, 460)
 	popup.ok_button_text = "Continuar"
+	# Botón extra: Ver en 2D (replay del partido del usuario)
+	var view_2d_btn: Button = popup.add_button("🎬 Ver replay en 2D", true, "view_2d")
 	add_child(popup)
 
 	var box := VBoxContainer.new()
@@ -569,6 +576,12 @@ func _show_post_match_modal(r: MatchResult) -> void:
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
+	# Custom action: ver replay en 2D
+	popup.custom_action.connect(func(action: StringName) -> void:
+		if String(action) == "view_2d":
+			popup.queue_free()
+			_on_open_2d_viewer(r)
+	)
 	popup.popup_centered()
 
 
@@ -631,9 +644,11 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 
 	var popup := ConfirmationDialog.new()
 	popup.title = "Pre-partido — Jornada %d (%s)" % [user_fx_data["jornada_num"], String(user_fx_data["division"]).capitalize()]
-	popup.size = Vector2(540, 320)
-	popup.ok_button_text = "▶ Jugar partido"
+	popup.size = Vector2(560, 360)
+	popup.ok_button_text = "▶ Jugar (resultado directo)"
 	popup.cancel_button_text = "Configurar alineación"
+	# Botón extra: jugar y abrir visor 2D automáticamente al terminar
+	popup.add_button("🎬 Jugar y ver en 2D", true, "play_with_2d")
 	add_child(popup)
 
 	var content := VBoxContainer.new()
@@ -693,6 +708,7 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 
 	popup.confirmed.connect(func() -> void:
 		popup.queue_free()
+		auto_open_2d_after_match = false
 		_do_advance_jornada()
 	)
 	popup.canceled.connect(func() -> void:
@@ -700,6 +716,12 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 		# Llevar al usuario a la pestaña de alineación para que ajuste
 		current_view = VIEW_TACTICS
 		_refresh_ui()
+	)
+	popup.custom_action.connect(func(action: StringName) -> void:
+		if String(action) == "play_with_2d":
+			popup.queue_free()
+			auto_open_2d_after_match = true
+			_do_advance_jornada()
 	)
 	popup.popup_centered()
 
@@ -2078,6 +2100,9 @@ func _on_team_selector_changed(idx: int, st: DivisionState) -> void:
 # Visor 2D del partido (overlay)
 # =========================================================================== #
 var match_viewer_overlay: Node = null
+# Flag: si el usuario eligió "Jugar y ver en 2D", abrir el visor automáticamente
+# tras simular su partido (en _show_post_match_modal).
+var auto_open_2d_after_match: bool = false
 
 func _on_open_2d_viewer(result: MatchResult) -> void:
 	if match_viewer_overlay != null:

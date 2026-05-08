@@ -342,6 +342,8 @@ static func _pick_actor(lineup: Lineup, role: String, zone: String, rng: RandomN
 
 static func _pick_assistant(lineup: Lineup, shooter: Player, rng: RandomNumberGenerator) -> Player:
 	# Asistente: peso = pase * presence en mid+atk de jugadores creativos. Excluye al shooter.
+	# v2: añadimos contribución por pase largo de defensa (CB/LB/RB con pase ≥70)
+	# para reflejar las asistencias por trazo largo CB→ST que antes ignorábamos.
 	var weights: Array = []
 	var players: Array = []
 	var total: float = 0.0
@@ -353,8 +355,14 @@ static func _pick_assistant(lineup: Lineup, shooter: Player, rng: RandomNumberGe
 		var w_mid: float = PositionContribution.actor_weight(p, slot, "attack", "mid")
 		var w_atk: float = PositionContribution.actor_weight(p, slot, "attack", "atk")
 		# Bonus por pase
-		var pase_bonus: float = float(p.attributes.get("pase", 50)) / 50.0
+		var pase: float = float(p.attributes.get("pase", 50))
+		var pase_bonus: float = pase / 50.0
 		var w: float = (w_mid * 0.4 + w_atk * 0.6) * pase_bonus
+		# Pase largo desde defensa: jugadores defensivos con buen pase
+		# pueden ocasionalmente dar asistencia (CB→ST, lateral con pase
+		# diagonal a extremo, etc.). Ratio realista ~10-15% de las asistencias.
+		if slot in ["CB", "LB", "RB", "CDM", "LWB", "RWB"] and pase >= 70:
+			w += (pase - 60.0) / 100.0 * 0.5
 		if w > 0.0:
 			weights.append(w)
 			players.append(p)
