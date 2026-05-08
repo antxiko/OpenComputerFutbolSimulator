@@ -107,14 +107,15 @@ Cosas que sabemos que están a medias o que hay que volver a mirar más adelante
 
 ---
 
+## ✅ COMPLETADO recientemente
+
+- **Pool internacional de nombres para canteranos** (40% ES, 60% internacional). Athletic fuerza ES por basque_only. Ya no hay nombres placeholder feos.
+- **Sistema de aggression** con scrape Marca + tarjetas concentradas en agresivos (max 11 TA real).
+- **Sanciones por tarjetas** + Mini-resumen post-partido + Histórico carrera + Supercopa Final 4.
+
 ## ⏸️ EN PROGRESO
 
-**Pool de nombres españoles para canteranos**: actualmente los canteranos generados por `Cantera._generate_youth()` tienen nombres placeholder feos (`ATH Canterano 2030 #5`). En partidas largas (10+ años) la plantilla se llena de estos. Pendiente:
-
-1. Crear `data/name_pools/spanish_first_names.json` con ~200 nombres comunes.
-2. Crear `data/name_pools/spanish_last_names.json` con ~200 apellidos comunes.
-3. Modificar `Cantera._generate_youth()` para combinar nombre + apellido aleatorios.
-4. Considerar pool vasco específico para Athletic (signing_policy basque_only).
+(nada concreto al cierre de la última sesión — siguiente prioridad libre)
 
 ## 📝 Notas de sesiones
 
