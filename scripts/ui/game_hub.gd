@@ -32,6 +32,8 @@ const VIEW_TACTICS := "tactics"
 const VIEW_MARKET := "market"
 const VIEW_CAREER := "career"
 const VIEW_CHAMPIONS := "champions"
+const VIEW_FINANCES := "finances"
+const VIEW_CALENDAR := "calendar"
 
 
 # --------------------------------------------------------------------------- #
@@ -74,6 +76,11 @@ var user_lineup_template: Dictionary = {}
 var user_career_history: Array = []
 # Flag para saber si el mercado de invierno ya se ha ejecutado esta temporada.
 var winter_market_done: bool = false
+# Objetivo del club para esta temporada (depende de la reputación + posición previa).
+# Estructura: { "type": "liga"/"copa"/"champions", "target_position": int, "description": String }
+var season_objective: Dictionary = {}
+# Si el objetivo se ha mostrado al usuario al inicio de temporada
+var objective_shown: bool = false
 # Última edición de competiciones europeas (no se persisten en save).
 var champions_state: ChampionsBracket = null
 var europa_state: ChampionsBracket = null
@@ -211,6 +218,10 @@ func _build_ui() -> void:
 	var view_champions_button := _make_tab_button("🏆 Champions", _on_select_view.bind(VIEW_CHAMPIONS))
 	view_champions_button.name = "ViewChampionsButton"
 	view_tabs.add_child(view_champions_button)
+	var view_finances_button := _make_tab_button("💰 Finanzas", _on_select_view.bind(VIEW_FINANCES))
+	view_tabs.add_child(view_finances_button)
+	var view_calendar_button := _make_tab_button("📅 Calendario", _on_select_view.bind(VIEW_CALENDAR))
+	view_tabs.add_child(view_calendar_button)
 
 	# Indicador de "Mi club" (solo lectura — el club se elige en Nueva partida)
 	var spacer2 := Control.new()
@@ -315,9 +326,14 @@ func _start_season() -> void:
 	selected_team = null
 	selected_match = null
 	winter_market_done = false  # se podrá abrir el mercado invernal otra vez
+	# Generar objetivo del club para esta temporada
+	if user_team_id != "":
+		_generate_season_objective()
 	# Pre-temporada: 3 amistosos para el equipo del usuario antes de la jornada 1
 	if user_team_id != "":
 		_run_preseason_friendlies()
+		# Mostrar objetivo del club
+		_show_season_objective_modal()
 	_refresh_ui()
 
 
@@ -659,6 +675,202 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 			l.add_theme_font_size_override("font_size", 11)
 			box.add_child(l)
 			shown += 1
+
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
+
+
+# =========================================================================== #
+# Objetivos del club (por temporada)
+# =========================================================================== #
+# Genera el objetivo de Liga al inicio de cada temporada, basado en la
+# reputación del club y su posición la temporada anterior.
+func _generate_season_objective() -> void:
+	var team := _find_team_by_id(user_team_id)
+	if team == null:
+		return
+	var rep: int = team.reputation
+	var target_position: int
+	var description: String
+	if team.division == "primera":
+		# Primera: posición esperada según reputación
+		if rep >= 92:
+			target_position = 1
+			description = "Conquistar la Liga. Esperamos el título."
+		elif rep >= 85:
+			target_position = 4
+			description = "Plaza Champions League (top 4)."
+		elif rep >= 78:
+			target_position = 7
+			description = "Plaza europea (top 7)."
+		elif rep >= 70:
+			target_position = 12
+			description = "Mantener categoría con tranquilidad (top 12)."
+		else:
+			target_position = 17
+			description = "Salvar la categoría."
+	else:
+		# Segunda: ascender o playoff
+		if rep >= 75:
+			target_position = 2
+			description = "Ascender directo a Primera."
+		elif rep >= 65:
+			target_position = 6
+			description = "Playoff de ascenso."
+		else:
+			target_position = 14
+			description = "Mantener la categoría."
+	season_objective = {
+		"type": "liga",
+		"target_position": target_position,
+		"description": description,
+	}
+	objective_shown = false
+
+
+# Modal con el objetivo al inicio de la temporada (se llama desde _start_season
+# tras los amistosos).
+func _show_season_objective_modal() -> void:
+	if season_objective.is_empty() or objective_shown:
+		return
+	objective_shown = true
+	var team := _find_team_by_id(user_team_id)
+	if team == null:
+		return
+	var popup := AcceptDialog.new()
+	popup.title = "🎯 Objetivo de la temporada"
+	popup.size = Vector2(520, 280)
+	popup.ok_button_text = "Entendido"
+	add_child(popup)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	popup.add_child(box)
+
+	var header := Label.new()
+	header.text = "%s · Temporada %d-%d" % [team.name, year, year + 1]
+	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	header.add_theme_font_size_override("font_size", 16)
+	header.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	box.add_child(header)
+
+	var goal_label := Label.new()
+	goal_label.text = "🎯 %s" % String(season_objective.get("description", ""))
+	goal_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	goal_label.add_theme_font_size_override("font_size", 14)
+	goal_label.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+	box.add_child(goal_label)
+
+	var detail := Label.new()
+	detail.text = "Posición objetivo: %dº o mejor" % int(season_objective.get("target_position", 1))
+	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	detail.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	box.add_child(detail)
+
+	var hint := Label.new()
+	hint.text = "Si lo cumples, la directiva incrementará el presupuesto.\nSi te quedas muy lejos, podrías recibir críticas."
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint.add_theme_font_size_override("font_size", 11)
+	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	box.add_child(hint)
+
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
+
+
+# Evalúa el cumplimiento del objetivo al final de temporada y aplica
+# refuerzo / sanción al presupuesto del club.
+func _evaluate_season_objective() -> Dictionary:
+	if season_objective.is_empty() or user_team_id == "":
+		return {}
+	var team := _find_team_by_id(user_team_id)
+	if team == null or team.finances == null:
+		return {}
+	var state: DivisionState = primera_state if team.division == "primera" else segunda_state
+	if state.league_table == null:
+		return {}
+	var sorted: Array = state.league_table.sorted_rows()
+	var actual_position: int = -1
+	for i in sorted.size():
+		if sorted[i].team_id == user_team_id:
+			actual_position = i + 1
+			break
+	if actual_position == -1:
+		return {}
+	var target: int = int(season_objective.get("target_position", 1))
+	var description: String = String(season_objective.get("description", ""))
+	var verdict: String
+	var verdict_color: Color
+	var budget_change: float
+	if actual_position <= target - 2:
+		verdict = "EXCELENTE — superaste con creces el objetivo"
+		verdict_color = Color(0.4, 1.0, 0.5)
+		budget_change = 0.30  # +30% presupuesto
+	elif actual_position <= target:
+		verdict = "OBJETIVO CUMPLIDO"
+		verdict_color = Color(0.7, 1.0, 0.7)
+		budget_change = 0.15  # +15%
+	elif actual_position <= target + 3:
+		verdict = "PRÓXIMO al objetivo, ligero descontento"
+		verdict_color = Color(1.0, 0.85, 0.4)
+		budget_change = 0.0
+	else:
+		verdict = "FRACASO — muy lejos del objetivo"
+		verdict_color = Color(1.0, 0.5, 0.5)
+		budget_change = -0.20  # -20%
+	# Aplicar al presupuesto
+	team.finances.budget_transfers_eur = int(float(team.finances.budget_transfers_eur) * (1.0 + budget_change))
+	return {
+		"actual_position": actual_position,
+		"target_position": target,
+		"description": description,
+		"verdict": verdict,
+		"verdict_color": verdict_color,
+		"budget_change": budget_change,
+	}
+
+
+func _show_objective_evaluation_modal(eval: Dictionary) -> void:
+	if eval.is_empty():
+		return
+	var popup := AcceptDialog.new()
+	popup.title = "🎯 Evaluación del objetivo"
+	popup.size = Vector2(540, 320)
+	popup.ok_button_text = "Continuar"
+	add_child(popup)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	popup.add_child(box)
+
+	var verdict_label := Label.new()
+	verdict_label.text = String(eval["verdict"])
+	verdict_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	verdict_label.add_theme_font_size_override("font_size", 17)
+	verdict_label.add_theme_color_override("font_color", eval["verdict_color"])
+	box.add_child(verdict_label)
+
+	box.add_child(HSeparator.new())
+
+	var detail := Label.new()
+	detail.text = "Objetivo: %dº (%s)\nPosición final: %dº" % [
+		int(eval["target_position"]),
+		String(eval["description"]),
+		int(eval["actual_position"]),
+	]
+	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	detail.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	box.add_child(detail)
+
+	var change: float = float(eval["budget_change"])
+	if change != 0.0:
+		var change_label := Label.new()
+		change_label.text = "Presupuesto fichajes: %s%.0f%%" % ["+" if change > 0 else "", change * 100]
+		change_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		change_label.add_theme_font_size_override("font_size", 13)
+		change_label.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7) if change > 0 else Color(1.0, 0.7, 0.7))
+		box.add_child(change_label)
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
@@ -1020,6 +1232,11 @@ func _on_reset_season() -> void:
 				var ffx: CupBracket.Fixture = final_round.fixtures[0]
 				var loser_id: String = ffx.away_id if ffx.winner_id == ffx.home_id else ffx.home_id
 				sc_qualifiers.append(_find_team_by_id(loser_id))
+		# Evaluar objetivo de temporada antes del reset
+		if user_team_id != "" and not season_objective.is_empty():
+			var eval: Dictionary = _evaluate_season_objective()
+			if not eval.is_empty():
+				_show_objective_evaluation_modal(eval)
 		# Reputación dinámica con la temporada que acaba de terminar
 		ReputationUpdate.apply_after_season(primera_state.league_table, segunda_state.league_table, all_teams)
 		PromotionRelegation.apply(primera_state.league_table, segunda_state.league_table, all_teams)
@@ -1032,6 +1249,13 @@ func _on_reset_season() -> void:
 	AggressionSystem.update_after_season(all_teams)
 	# Reset de amarillas/rojas para la nueva temporada (mantiene sanciones)
 	CardSystem.reset_yellow_cards(all_teams)
+	# Reset estadísticas individuales (mantiene history acumulada en Player.history)
+	for t: Team in all_teams:
+		for p: Player in t.players:
+			p.season_goals = 0
+			p.season_assists = 0
+			p.season_matches = 0
+			p.season_minutes = 0
 	# Mercado de fichajes (verano)
 	var summer_result: TransferMarket.MarketResult = TransferMarket.run(all_teams, year, SEED_BASE * 7)
 	# Modal de resumen (solo si hubo movimientos relevantes)
@@ -1646,6 +1870,172 @@ func _user_champions_path(bracket: ChampionsBracket) -> String:
 # =========================================================================== #
 # Vista: Mi carrera (histórico)
 # =========================================================================== #
+# =========================================================================== #
+# Vista: 💰 Finanzas (presupuesto, salarios, balance del club del usuario)
+# =========================================================================== #
+func _render_finances_view() -> void:
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 14)
+	content_area.add_child(box)
+
+	if user_team_id == "":
+		var l := Label.new()
+		l.text = "No has elegido un club. Vuelve al menú principal y empieza Nueva partida."
+		l.add_theme_font_size_override("font_size", 14)
+		box.add_child(l)
+		return
+
+	var team := _find_team_by_id(user_team_id)
+	if team == null or team.finances == null:
+		return
+
+	# Cabecera
+	var title := Label.new()
+	title.text = "💰 Finanzas — %s · Temporada %d-%d" % [team.name, year, year + 1]
+	title.add_theme_font_size_override("font_size", 18)
+	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	box.add_child(title)
+
+	# Sección 1: presupuesto
+	var section1 := Label.new()
+	section1.text = "── Presupuesto ──"
+	section1.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	box.add_child(section1)
+	var grid1 := GridContainer.new()
+	grid1.columns = 2
+	grid1.add_theme_constant_override("h_separation", 24)
+	box.add_child(grid1)
+	_finances_row(grid1, "Presupuesto fichajes (verano)", team.finances.budget_transfers_eur)
+	_finances_row(grid1, "Tope salarial / año", team.finances.wage_budget_eur_year)
+	_finances_row(grid1, "Ingresos TV / año", team.finances.tv_revenue_eur_year)
+
+	# Sección 2: salarios actuales
+	var section2 := Label.new()
+	section2.text = "── Salarios actuales ──"
+	section2.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	box.add_child(section2)
+	var total_salary: int = 0
+	var top_paid: Array = []
+	for p: Player in team.players:
+		var s: int = p.contract.salary_eur_year if p.contract else 0
+		total_salary += s
+		top_paid.append({ "name": p.name, "salary": s, "tier": p.tier, "age": p.age_at(year, 7, 1) })
+	top_paid.sort_custom(func(a, b): return int(a["salary"]) > int(b["salary"]))
+	var grid2 := GridContainer.new()
+	grid2.columns = 2
+	grid2.add_theme_constant_override("h_separation", 24)
+	box.add_child(grid2)
+	_finances_row(grid2, "Salarios totales / año", total_salary)
+	_finances_row(grid2, "Margen sobre tope", team.finances.wage_budget_eur_year - total_salary)
+	_finances_row(grid2, "Salario medio / jugador", total_salary / max(1, team.players.size()))
+
+	# Top 5 mejor pagados
+	var sub := Label.new()
+	sub.text = "Top 5 mejor pagados:"
+	sub.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	sub.add_theme_font_size_override("font_size", 12)
+	box.add_child(sub)
+	for i in mini(5, top_paid.size()):
+		var t: Dictionary = top_paid[i]
+		var l := Label.new()
+		l.text = "  %s (%s, %d años) — %s €/año" % [
+			String(t["name"]), String(t["tier"]), int(t["age"]),
+			TransferMarket._fmt_eur(int(t["salary"])),
+		]
+		l.add_theme_font_size_override("font_size", 11)
+		box.add_child(l)
+
+	# Sección 3: valor de plantilla
+	var section3 := Label.new()
+	section3.text = "── Valor de la plantilla ──"
+	section3.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	box.add_child(section3)
+	var total_value: int = 0
+	for p: Player in team.players:
+		total_value += MarketValue.compute(p, year, "")
+	var grid3 := GridContainer.new()
+	grid3.columns = 2
+	grid3.add_theme_constant_override("h_separation", 24)
+	box.add_child(grid3)
+	_finances_row(grid3, "Valor de mercado total", total_value)
+	_finances_row(grid3, "Valor medio / jugador", total_value / max(1, team.players.size()))
+
+
+func _finances_row(grid: GridContainer, label: String, amount: int) -> void:
+	var l1 := Label.new()
+	l1.text = label
+	l1.add_theme_font_size_override("font_size", 12)
+	grid.add_child(l1)
+	var l2 := Label.new()
+	l2.text = "%s €" % TransferMarket._fmt_eur(amount)
+	l2.add_theme_font_size_override("font_size", 12)
+	l2.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7) if amount >= 0 else Color(1.0, 0.7, 0.7))
+	l2.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	grid.add_child(l2)
+
+
+# =========================================================================== #
+# Vista: 📅 Calendario (todas las jornadas con resultados)
+# =========================================================================== #
+func _render_calendar_view() -> void:
+	var st := _current_state()
+	if st.calendar.is_empty():
+		var l := Label.new()
+		l.text = "No hay calendario disponible."
+		content_area.add_child(l)
+		return
+
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content_area.add_child(scroll)
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 8)
+	scroll.add_child(vbox)
+
+	var title := Label.new()
+	title.text = "📅 Calendario %s · Temporada %d-%d" % [
+		selected_division.capitalize(), year, year + 1]
+	title.add_theme_font_size_override("font_size", 18)
+	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	vbox.add_child(title)
+
+	# Por cada jornada: encabezado + 10 partidos
+	for j_idx in st.calendar.size():
+		var jornada: Array = st.calendar[j_idx]
+		var played: bool = j_idx < st.current_jornada
+		var header := Label.new()
+		header.text = "── Jornada %d %s──" % [j_idx + 1, "(jugada) " if played else ""]
+		header.add_theme_font_size_override("font_size", 13)
+		var hdr_color: Color = Color(0.85, 0.85, 0.85) if played else Color(0.5, 0.5, 0.5)
+		# Marcar jornada actual
+		if j_idx == st.current_jornada:
+			hdr_color = Color(1.0, 0.85, 0.2)
+			header.text = "── Jornada %d (próxima) ──" % (j_idx + 1)
+		header.add_theme_color_override("font_color", hdr_color)
+		vbox.add_child(header)
+
+		for fixture: Dictionary in jornada:
+			var home_id: String = String(fixture["home_id"])
+			var away_id: String = String(fixture["away_id"])
+			var home: Team = _find_team_by_id(home_id)
+			var away: Team = _find_team_by_id(away_id)
+			if home == null or away == null:
+				continue
+			var line := Label.new()
+			var is_user: bool = home_id == user_team_id or away_id == user_team_id
+			var prefix: String = "▶ " if is_user else "  "
+			# Si la jornada se jugó, intentar encontrar el resultado en season history
+			# (no lo persistimos por jornada, así que solo mostramos resultado para "última jornada")
+			line.text = "%s%-30s vs %30s" % [prefix, home.name.left(30), away.name.left(30)]
+			line.add_theme_font_size_override("font_size", 11)
+			if is_user:
+				line.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+			elif played:
+				line.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+			vbox.add_child(line)
+
+
 func _render_career_view() -> void:
 	if user_team_id == "":
 		var l := Label.new()
@@ -1792,22 +2182,37 @@ func _simulate_jornada(state: DivisionState) -> void:
 			state.last_jornada_results.append(result)
 			# Procesar tarjetas → posibles sanciones para el próximo partido
 			CardSystem.process_match(result, all_teams)
-			# Acumular goleadores de la temporada
+			# Stats de jugador por temporada: matches + minutos (titulares = 90 min)
+			for p: Player in home_lineup.starting_eleven:
+				p.season_matches += 1
+				p.season_minutes += 90
+			for p: Player in away_lineup.starting_eleven:
+				p.season_matches += 1
+				p.season_minutes += 90
+			# Goles
 			for pid in result.scorers.keys():
 				var goals: int = int(result.scorers[pid])
+				var pgoal: Player = _find_player_globally(pid)
+				if pgoal != null:
+					pgoal.season_goals += goals
 				if not state.season_scorers.has(pid):
-					var p: Player = _find_player_globally(pid)
 					var team_short: String = ""
 					for t: Team in state.teams:
 						if t.find_player(pid) != null:
 							team_short = t.short_name
 							break
 					state.season_scorers[pid] = {
-						"name": p.name if p else pid,
+						"name": pgoal.name if pgoal else pid,
 						"team_short": team_short,
 						"goals": 0,
 					}
 				state.season_scorers[pid]["goals"] += goals
+			# Asistencias (de los eventos GOAL con secondary_player_id)
+			for ev: MatchEvent in result.events:
+				if ev.type == MatchEvent.T_GOAL and ev.secondary_player_id != "":
+					var passist: Player = _find_player_globally(ev.secondary_player_id)
+					if passist != null:
+						passist.season_assists += 1
 	state.current_jornada += 1
 
 
@@ -1965,6 +2370,8 @@ func _refresh_ui() -> void:
 		VIEW_MARKET: _render_market_view()
 		VIEW_CAREER: _render_career_view()
 		VIEW_CHAMPIONS: _render_champions_view()
+		VIEW_FINANCES: _render_finances_view()
+		VIEW_CALENDAR: _render_calendar_view()
 
 
 # --------------------------------------------------------------------------- #
@@ -2328,12 +2735,12 @@ func _render_team_view() -> void:
 
 	# Tabla de plantilla
 	var grid := GridContainer.new()
-	grid.columns = 10
-	grid.add_theme_constant_override("h_separation", 14)
+	grid.columns = 13
+	grid.add_theme_constant_override("h_separation", 12)
 	grid.add_theme_constant_override("v_separation", 3)
 	content_area.add_child(grid)
 
-	var headers: Array[String] = ["#", "Nombre", "Pos", "Edad", "Nac", "Tier", "Pot", "Ovr", "Estado", "Cont"]
+	var headers: Array[String] = ["#", "Nombre", "Pos", "Edad", "Nac", "Tier", "Pot", "Ovr", "PJ", "G", "A", "Estado", "Cont"]
 	for h in headers:
 		var l := Label.new()
 		l.text = h
@@ -2353,7 +2760,9 @@ func _render_team_view() -> void:
 		var until_year: int = p.contract.until_year if p.contract != null else 0
 		var injury_str: String = InjurySystem.injury_summary(p)
 		var status_str: String = "—"
-		if injury_str != "":
+		if p.loan_origin_team_id != "":
+			status_str = "🤝 cedido (vuelve %d)" % p.loan_until_year
+		elif injury_str != "":
 			status_str = "🏥 " + injury_str
 		elif CardSystem.is_suspended(p):
 			status_str = "🟥 sancionado %d" % p.suspended_matches
@@ -2370,6 +2779,9 @@ func _render_team_view() -> void:
 			p.tier,
 			p.potential_tier,
 			str(ovr),
+			str(p.season_matches),
+			str(p.season_goals),
+			str(p.season_assists),
 			status_str,
 			str(until_year),
 		]
@@ -2385,6 +2797,9 @@ func _render_team_view() -> void:
 		var is_susp: bool = CardSystem.is_suspended(p)
 		if is_inj or is_susp:
 			color = Color(1.0, 0.5, 0.5)
+		# Cedido: color violeta para diferenciar
+		if p.loan_origin_team_id != "":
+			color = Color(0.85, 0.7, 1.0)
 		for i in cells.size():
 			var l := Label.new()
 			l.text = cells[i]

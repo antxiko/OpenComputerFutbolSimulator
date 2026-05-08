@@ -38,6 +38,11 @@ class_name Player extends Resource
 # vacío/0 = el jugador NO está cedido (es del club donde está).
 @export var loan_origin_team_id: String = ""
 @export var loan_until_year: int = 0
+# Estadísticas de la temporada actual (se resetean al inicio de cada temporada).
+@export var season_goals: int = 0
+@export var season_assists: int = 0
+@export var season_matches: int = 0
+@export var season_minutes: int = 0  # 90 por partido jugado, simplificación
 
 # Historial estadístico por temporada — se rellena al final de cada temporada
 @export var history: Array = []

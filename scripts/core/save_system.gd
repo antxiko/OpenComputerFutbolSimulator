@@ -217,6 +217,10 @@ static func _team_from_dict(d: Dictionary) -> Team:
 		p.basque_eligible = bool(pd.get("basque_eligible", false))
 		p.loan_origin_team_id = String(pd.get("loan_origin_team_id", ""))
 		p.loan_until_year = int(pd.get("loan_until_year", 0))
+		p.season_goals = int(pd.get("season_goals", 0))
+		p.season_assists = int(pd.get("season_assists", 0))
+		p.season_matches = int(pd.get("season_matches", 0))
+		p.season_minutes = int(pd.get("season_minutes", 0))
 		p.history = pd.get("history", []).duplicate()
 	return t
 
@@ -244,6 +248,10 @@ static func _player_to_dict(p: Player) -> Dictionary:
 		"basque_eligible": p.basque_eligible,
 		"loan_origin_team_id": p.loan_origin_team_id,
 		"loan_until_year": p.loan_until_year,
+		"season_goals": p.season_goals,
+		"season_assists": p.season_assists,
+		"season_matches": p.season_matches,
+		"season_minutes": p.season_minutes,
 		"history": p.history.duplicate(),
 		"contract": _contract_to_dict(p.contract),
 	}
