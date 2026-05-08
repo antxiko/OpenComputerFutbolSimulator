@@ -37,220 +37,697 @@
   },
   "players": [
     {
-      "id": "fcb_p001", "name": "Marc-André ter Stegen",
-      "birth_date": { "year": 1992, "month": 4, "day": 30 },
-      "nationality": "DE", "positions": ["GK"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "S", "shirt_number": 1, "captain": false,
-      "traits": ["leader", "passing_accurate"], "overrides": {},
+      "id": "fcb_p001",
+      "name": "Marc-André ter Stegen",
+      "birth_date": {
+        "year": 1992,
+        "month": 4,
+        "day": 30
+      },
+      "nationality": "DE",
+      "positions": [
+        "GK"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 1,
+      "captain": false,
+      "traits": [
+        "leader",
+        "passing_accurate"
+      ],
+      "overrides": {},
       "joined_year": 2014,
-      "contract": { "until_year": 2028, "salary_eur_year": 9500000, "release_clause_eur": 70000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 9500000,
+        "release_clause_eur": 70000000
+      }
     },
     {
-      "id": "fcb_p013", "name": "Iñaki Peña",
-      "birth_date": { "year": 1999, "month": 3, "day": 2 },
-      "nationality": "ES", "positions": ["GK"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "B", "shirt_number": 13, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "fcb_p013",
+      "name": "Iñaki Peña",
+      "birth_date": {
+        "year": 1999,
+        "month": 3,
+        "day": 2
+      },
+      "nationality": "ES",
+      "positions": [
+        "GK"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "B",
+      "shirt_number": 13,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2014,
-      "contract": { "until_year": 2026, "salary_eur_year": 1500000, "release_clause_eur": 30000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1500000,
+        "release_clause_eur": 30000000
+      }
     },
     {
-      "id": "fcb_p025", "name": "Wojciech Szczęsny",
-      "birth_date": { "year": 1990, "month": 4, "day": 18 },
-      "nationality": "PL", "positions": ["GK"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 25, "captain": false,
-      "traits": ["leader"], "overrides": {},
+      "id": "fcb_p025",
+      "name": "Wojciech Szczęsny",
+      "birth_date": {
+        "year": 1990,
+        "month": 4,
+        "day": 18
+      },
+      "nationality": "PL",
+      "positions": [
+        "GK"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 25,
+      "captain": false,
+      "traits": [
+        "leader"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2026, "salary_eur_year": 3000000, "release_clause_eur": 15000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 3000000,
+        "release_clause_eur": 15000000
+      }
     },
     {
-      "id": "fcb_p023", "name": "Jules Koundé",
-      "birth_date": { "year": 1998, "month": 11, "day": 12 },
-      "nationality": "FR", "positions": ["RB", "CB"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "A", "shirt_number": 23, "captain": false,
-      "traits": ["pace", "passing_accurate"], "overrides": {},
+      "id": "fcb_p023",
+      "name": "Jules Koundé",
+      "birth_date": {
+        "year": 1998,
+        "month": 11,
+        "day": 12
+      },
+      "nationality": "FR",
+      "positions": [
+        "RB"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "A",
+      "shirt_number": 23,
+      "captain": false,
+      "traits": [
+        "pace",
+        "passing_accurate"
+      ],
+      "overrides": {},
       "joined_year": 2022,
-      "contract": { "until_year": 2027, "salary_eur_year": 7500000, "release_clause_eur": 80000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 7500000,
+        "release_clause_eur": 80000000
+      }
     },
     {
-      "id": "fcb_p004", "name": "Ronald Araújo",
-      "birth_date": { "year": 1999, "month": 3, "day": 7 },
-      "nationality": "UY", "positions": ["CB"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "S", "shirt_number": 4, "captain": true,
-      "traits": ["aerial_strong", "leader", "pace", "aggressive"], "overrides": {},
+      "id": "fcb_p004",
+      "name": "Ronald Araújo",
+      "birth_date": {
+        "year": 1999,
+        "month": 3,
+        "day": 7
+      },
+      "nationality": "UY",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 4,
+      "captain": true,
+      "traits": [
+        "aerial_strong",
+        "leader",
+        "pace",
+        "aggressive"
+      ],
+      "overrides": {},
       "joined_year": 2018,
-      "contract": { "until_year": 2031, "salary_eur_year": 8000000, "release_clause_eur": 1000000000 }
+      "contract": {
+        "until_year": 2031,
+        "salary_eur_year": 8000000,
+        "release_clause_eur": 1000000000
+      }
     },
     {
-      "id": "fcb_p005", "name": "Pau Cubarsí",
-      "birth_date": { "year": 2007, "month": 1, "day": 22 },
-      "nationality": "ES", "positions": ["CB"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "S", "shirt_number": 5, "captain": false,
-      "traits": ["passing_accurate"], "overrides": {},
+      "id": "fcb_p005",
+      "name": "Pau Cubarsí",
+      "birth_date": {
+        "year": 2007,
+        "month": 1,
+        "day": 22
+      },
+      "nationality": "ES",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 5,
+      "captain": false,
+      "traits": [
+        "passing_accurate"
+      ],
+      "overrides": {},
       "joined_year": 2017,
-      "contract": { "until_year": 2029, "salary_eur_year": 3000000, "release_clause_eur": 1000000000 }
+      "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 3000000,
+        "release_clause_eur": 1000000000
+      }
     },
     {
-      "id": "fcb_p015", "name": "Andreas Christensen",
-      "birth_date": { "year": 1996, "month": 4, "day": 10 },
-      "nationality": "DK", "positions": ["CB", "CDM"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 15, "captain": false,
-      "traits": ["passing_accurate"], "overrides": {},
+      "id": "fcb_p015",
+      "name": "Andreas Christensen",
+      "birth_date": {
+        "year": 1996,
+        "month": 4,
+        "day": 10
+      },
+      "nationality": "DK",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 15,
+      "captain": false,
+      "traits": [
+        "passing_accurate"
+      ],
+      "overrides": {},
       "joined_year": 2022,
-      "contract": { "until_year": 2026, "salary_eur_year": 5500000, "release_clause_eur": 50000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 5500000,
+        "release_clause_eur": 50000000
+      }
     },
     {
-      "id": "fcb_p024", "name": "Eric García",
-      "birth_date": { "year": 2001, "month": 1, "day": 9 },
-      "nationality": "ES", "positions": ["CB", "CDM"], "preferred_foot": "R",
-      "tier": "C", "potential_tier": "B", "shirt_number": 24, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "fcb_p024",
+      "name": "Eric García",
+      "birth_date": {
+        "year": 2001,
+        "month": 1,
+        "day": 9
+      },
+      "nationality": "ES",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 24,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2021,
-      "contract": { "until_year": 2026, "salary_eur_year": 2000000, "release_clause_eur": 30000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 2000000,
+        "release_clause_eur": 30000000
+      }
     },
     {
-      "id": "fcb_p003", "name": "Alejandro Balde",
-      "birth_date": { "year": 2003, "month": 10, "day": 18 },
-      "nationality": "ES", "positions": ["LB"], "preferred_foot": "L",
-      "tier": "A", "potential_tier": "S", "shirt_number": 3, "captain": false,
-      "traits": ["pace", "stamina"], "overrides": {},
+      "id": "fcb_p003",
+      "name": "Alejandro Balde",
+      "birth_date": {
+        "year": 2003,
+        "month": 10,
+        "day": 18
+      },
+      "nationality": "ES",
+      "positions": [
+        "LB"
+      ],
+      "preferred_foot": "L",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 3,
+      "captain": false,
+      "traits": [
+        "pace",
+        "stamina"
+      ],
+      "overrides": {},
       "joined_year": 2014,
-      "contract": { "until_year": 2028, "salary_eur_year": 5000000, "release_clause_eur": 1000000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 5000000,
+        "release_clause_eur": 1000000000
+      }
     },
     {
-      "id": "fcb_p035", "name": "Gerard Martín",
-      "birth_date": { "year": 2002, "month": 4, "day": 9 },
-      "nationality": "ES", "positions": ["LB"], "preferred_foot": "L",
-      "tier": "C", "potential_tier": "B", "shirt_number": 35, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "fcb_p035",
+      "name": "Gerard Martín",
+      "birth_date": {
+        "year": 2002,
+        "month": 4,
+        "day": 9
+      },
+      "nationality": "ES",
+      "positions": [
+        "LB"
+      ],
+      "preferred_foot": "L",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 35,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2027, "salary_eur_year": 1000000, "release_clause_eur": 20000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 20000000
+      }
     },
     {
-      "id": "fcb_p032", "name": "Héctor Fort",
-      "birth_date": { "year": 2006, "month": 8, "day": 2 },
-      "nationality": "ES", "positions": ["RB"], "preferred_foot": "R",
-      "tier": "Y", "potential_tier": "B", "shirt_number": 32, "captain": false,
-      "traits": ["pace"], "overrides": {},
+      "id": "fcb_p032",
+      "name": "Héctor Fort",
+      "birth_date": {
+        "year": 2006,
+        "month": 8,
+        "day": 2
+      },
+      "nationality": "ES",
+      "positions": [
+        "RB"
+      ],
+      "preferred_foot": "R",
+      "tier": "Y",
+      "potential_tier": "B",
+      "shirt_number": 32,
+      "captain": false,
+      "traits": [
+        "pace"
+      ],
+      "overrides": {},
       "joined_year": 2017,
-      "contract": { "until_year": 2027, "salary_eur_year": 700000, "release_clause_eur": 25000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 700000,
+        "release_clause_eur": 25000000
+      }
     },
     {
-      "id": "fcb_p021", "name": "Frenkie de Jong",
-      "birth_date": { "year": 1997, "month": 5, "day": 12 },
-      "nationality": "NL", "positions": ["CM", "CDM"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "S", "shirt_number": 21, "captain": false,
-      "traits": ["passing_accurate", "dribbling"], "overrides": {},
+      "id": "fcb_p021",
+      "name": "Frenkie de Jong",
+      "birth_date": {
+        "year": 1997,
+        "month": 5,
+        "day": 12
+      },
+      "nationality": "NL",
+      "positions": [
+        "CM"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 21,
+      "captain": false,
+      "traits": [
+        "passing_accurate",
+        "dribbling"
+      ],
+      "overrides": {},
       "joined_year": 2019,
-      "contract": { "until_year": 2026, "salary_eur_year": 14000000, "release_clause_eur": 80000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 14000000,
+        "release_clause_eur": 80000000
+      }
     },
     {
-      "id": "fcb_p008", "name": "Pedri",
-      "birth_date": { "year": 2002, "month": 11, "day": 25 },
-      "nationality": "ES", "positions": ["CM", "CAM"], "preferred_foot": "R",
-      "tier": "S", "potential_tier": "S", "shirt_number": 8, "captain": false,
-      "traits": ["passing_accurate", "dribbling"], "overrides": { "pase": 92 },
+      "id": "fcb_p008",
+      "name": "Pedri",
+      "birth_date": {
+        "year": 2002,
+        "month": 11,
+        "day": 25
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM"
+      ],
+      "preferred_foot": "R",
+      "tier": "S",
+      "potential_tier": "S",
+      "shirt_number": 8,
+      "captain": false,
+      "traits": [
+        "passing_accurate",
+        "dribbling"
+      ],
+      "overrides": {
+        "pase": 92
+      },
       "joined_year": 2020,
-      "contract": { "until_year": 2030, "salary_eur_year": 9000000, "release_clause_eur": 1000000000 }
+      "contract": {
+        "until_year": 2030,
+        "salary_eur_year": 9000000,
+        "release_clause_eur": 1000000000
+      }
     },
     {
-      "id": "fcb_p006", "name": "Gavi",
-      "birth_date": { "year": 2004, "month": 8, "day": 5 },
-      "nationality": "ES", "positions": ["CM"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "S", "shirt_number": 6, "captain": false,
-      "traits": ["aggressive", "stamina", "leader"], "overrides": {},
+      "id": "fcb_p006",
+      "name": "Gavi",
+      "birth_date": {
+        "year": 2004,
+        "month": 8,
+        "day": 5
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 6,
+      "captain": false,
+      "traits": [
+        "aggressive",
+        "stamina",
+        "leader"
+      ],
+      "overrides": {},
       "joined_year": 2015,
-      "contract": { "until_year": 2030, "salary_eur_year": 6000000, "release_clause_eur": 1000000000 }
+      "contract": {
+        "until_year": 2030,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 1000000000
+      }
     },
     {
-      "id": "fcb_p017", "name": "Marc Casadó",
-      "birth_date": { "year": 2003, "month": 9, "day": 14 },
-      "nationality": "ES", "positions": ["CDM"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 17, "captain": false,
-      "traits": ["tackling"], "overrides": {},
+      "id": "fcb_p017",
+      "name": "Marc Casadó",
+      "birth_date": {
+        "year": 2003,
+        "month": 9,
+        "day": 14
+      },
+      "nationality": "ES",
+      "positions": [
+        "CDM"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 17,
+      "captain": false,
+      "traits": [
+        "tackling"
+      ],
+      "overrides": {},
       "joined_year": 2014,
-      "contract": { "until_year": 2028, "salary_eur_year": 1500000, "release_clause_eur": 100000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 1500000,
+        "release_clause_eur": 100000000
+      }
     },
     {
-      "id": "fcb_p022", "name": "Marc Bernal",
-      "birth_date": { "year": 2007, "month": 5, "day": 1 },
-      "nationality": "ES", "positions": ["CDM"], "preferred_foot": "R",
-      "tier": "Y", "potential_tier": "S", "shirt_number": 22, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "fcb_p022",
+      "name": "Marc Bernal",
+      "birth_date": {
+        "year": 2007,
+        "month": 5,
+        "day": 1
+      },
+      "nationality": "ES",
+      "positions": [
+        "CDM"
+      ],
+      "preferred_foot": "R",
+      "tier": "Y",
+      "potential_tier": "S",
+      "shirt_number": 22,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2017,
-      "contract": { "until_year": 2027, "salary_eur_year": 800000, "release_clause_eur": 100000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 800000,
+        "release_clause_eur": 100000000
+      }
     },
     {
-      "id": "fcb_p016", "name": "Fermín López",
-      "birth_date": { "year": 2003, "month": 5, "day": 11 },
-      "nationality": "ES", "positions": ["CM", "CAM"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "S", "shirt_number": 16, "captain": false,
-      "traits": ["late_runs", "long_shots"], "overrides": {},
+      "id": "fcb_p016",
+      "name": "Fermín López",
+      "birth_date": {
+        "year": 2003,
+        "month": 5,
+        "day": 11
+      },
+      "nationality": "ES",
+      "positions": [
+        "CAM"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 16,
+      "captain": false,
+      "traits": [
+        "late_runs",
+        "long_shots"
+      ],
+      "overrides": {},
       "joined_year": 2014,
-      "contract": { "until_year": 2029, "salary_eur_year": 3000000, "release_clause_eur": 500000000 }
+      "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 3000000,
+        "release_clause_eur": 500000000
+      }
     },
     {
-      "id": "fcb_p020", "name": "Dani Olmo",
-      "birth_date": { "year": 1998, "month": 5, "day": 7 },
-      "nationality": "ES", "positions": ["CAM", "LW"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "A", "shirt_number": 20, "captain": false,
-      "traits": ["dribbling", "long_shots"], "overrides": {},
+      "id": "fcb_p020",
+      "name": "Dani Olmo",
+      "birth_date": {
+        "year": 1998,
+        "month": 5,
+        "day": 7
+      },
+      "nationality": "ES",
+      "positions": [
+        "CAM"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "A",
+      "shirt_number": 20,
+      "captain": false,
+      "traits": [
+        "dribbling",
+        "long_shots"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2030, "salary_eur_year": 8000000, "release_clause_eur": 500000000 }
+      "contract": {
+        "until_year": 2030,
+        "salary_eur_year": 8000000,
+        "release_clause_eur": 500000000
+      }
     },
     {
-      "id": "fcb_p019", "name": "Lamine Yamal",
-      "birth_date": { "year": 2007, "month": 7, "day": 13 },
-      "nationality": "ES", "positions": ["RW", "LW"], "preferred_foot": "L",
-      "tier": "S", "potential_tier": "S", "shirt_number": 19, "captain": false,
-      "traits": ["dribbling", "skill_moves", "pace", "long_shots"], "overrides": { "tiro": 90 },
+      "id": "fcb_p019",
+      "name": "Lamine Yamal",
+      "birth_date": {
+        "year": 2007,
+        "month": 7,
+        "day": 13
+      },
+      "nationality": "ES",
+      "positions": [
+        "RW"
+      ],
+      "preferred_foot": "L",
+      "tier": "S",
+      "potential_tier": "S",
+      "shirt_number": 19,
+      "captain": false,
+      "traits": [
+        "dribbling",
+        "skill_moves",
+        "pace",
+        "long_shots"
+      ],
+      "overrides": {
+        "tiro": 90
+      },
       "joined_year": 2014,
-      "contract": { "until_year": 2031, "salary_eur_year": 12000000, "release_clause_eur": 1000000000 }
+      "contract": {
+        "until_year": 2031,
+        "salary_eur_year": 12000000,
+        "release_clause_eur": 1000000000
+      }
     },
     {
-      "id": "fcb_p011", "name": "Raphinha",
-      "birth_date": { "year": 1996, "month": 12, "day": 14 },
-      "nationality": "BR", "positions": ["LW", "RW"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "S", "shirt_number": 11, "captain": false,
-      "traits": ["pace", "long_shots", "set_pieces"], "overrides": {},
+      "id": "fcb_p011",
+      "name": "Raphinha",
+      "birth_date": {
+        "year": 1996,
+        "month": 12,
+        "day": 14
+      },
+      "nationality": "BR",
+      "positions": [
+        "LW"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 11,
+      "captain": false,
+      "traits": [
+        "pace",
+        "long_shots",
+        "set_pieces"
+      ],
+      "overrides": {},
       "joined_year": 2022,
-      "contract": { "until_year": 2028, "salary_eur_year": 9500000, "release_clause_eur": 1000000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 9500000,
+        "release_clause_eur": 1000000000
+      }
     },
     {
-      "id": "fcb_p009", "name": "Robert Lewandowski",
-      "birth_date": { "year": 1988, "month": 8, "day": 21 },
-      "nationality": "PL", "positions": ["ST"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "S", "shirt_number": 9, "captain": false,
-      "traits": ["finishing", "aerial_strong", "leader"], "overrides": { "tiro": 90 },
+      "id": "fcb_p009",
+      "name": "Robert Lewandowski",
+      "birth_date": {
+        "year": 1988,
+        "month": 8,
+        "day": 21
+      },
+      "nationality": "PL",
+      "positions": [
+        "ST"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 9,
+      "captain": false,
+      "traits": [
+        "finishing",
+        "aerial_strong",
+        "leader"
+      ],
+      "overrides": {
+        "tiro": 90
+      },
       "joined_year": 2022,
-      "contract": { "until_year": 2026, "salary_eur_year": 11000000, "release_clause_eur": 100000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 11000000,
+        "release_clause_eur": 100000000
+      }
     },
     {
-      "id": "fcb_p007", "name": "Ferran Torres",
-      "birth_date": { "year": 2000, "month": 2, "day": 29 },
-      "nationality": "ES", "positions": ["LW", "ST", "RW"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 7, "captain": false,
-      "traits": ["pace", "finishing"], "overrides": {},
+      "id": "fcb_p007",
+      "name": "Ferran Torres",
+      "birth_date": {
+        "year": 2000,
+        "month": 2,
+        "day": 29
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 7,
+      "captain": false,
+      "traits": [
+        "pace",
+        "finishing"
+      ],
+      "overrides": {},
       "joined_year": 2022,
-      "contract": { "until_year": 2027, "salary_eur_year": 5500000, "release_clause_eur": 100000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 5500000,
+        "release_clause_eur": 100000000
+      }
     },
     {
-      "id": "fcb_p014", "name": "Marcus Rashford",
-      "birth_date": { "year": 1997, "month": 10, "day": 31 },
-      "nationality": "GB-ENG", "positions": ["LW", "ST"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "A", "shirt_number": 14, "captain": false,
-      "traits": ["pace", "dribbling", "finishing"], "overrides": {},
+      "id": "fcb_p014",
+      "name": "Marcus Rashford",
+      "birth_date": {
+        "year": 1997,
+        "month": 10,
+        "day": 31
+      },
+      "nationality": "GB-ENG",
+      "positions": [
+        "LW"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "A",
+      "shirt_number": 14,
+      "captain": false,
+      "traits": [
+        "pace",
+        "dribbling",
+        "finishing"
+      ],
+      "overrides": {},
       "joined_year": 2025,
-      "contract": { "until_year": 2026, "salary_eur_year": 6000000, "release_clause_eur": 0 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 0
+      }
     },
     {
-      "id": "fcb_p010", "name": "Ansu Fati",
-      "birth_date": { "year": 2002, "month": 10, "day": 31 },
-      "nationality": "ES", "positions": ["LW"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 10, "captain": false,
-      "traits": ["dribbling", "skill_moves"], "overrides": {},
+      "id": "fcb_p010",
+      "name": "Ansu Fati",
+      "birth_date": {
+        "year": 2002,
+        "month": 10,
+        "day": 31
+      },
+      "nationality": "ES",
+      "positions": [
+        "LW"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 10,
+      "captain": false,
+      "traits": [
+        "dribbling",
+        "skill_moves"
+      ],
+      "overrides": {},
       "joined_year": 2010,
-      "contract": { "until_year": 2027, "salary_eur_year": 4000000, "release_clause_eur": 400000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 4000000,
+        "release_clause_eur": 400000000
+      }
     }
   ]
 }

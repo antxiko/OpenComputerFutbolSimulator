@@ -37,211 +37,658 @@
   },
   "players": [
     {
-      "id": "atm_p013", "name": "Jan Oblak",
-      "birth_date": { "year": 1993, "month": 1, "day": 7 },
-      "nationality": "SI", "positions": ["GK"], "preferred_foot": "R",
-      "tier": "S", "potential_tier": "S", "shirt_number": 13, "captain": false,
-      "traits": ["leader"], "overrides": {},
+      "id": "atm_p013",
+      "name": "Jan Oblak",
+      "birth_date": {
+        "year": 1993,
+        "month": 1,
+        "day": 7
+      },
+      "nationality": "SI",
+      "positions": [
+        "GK"
+      ],
+      "preferred_foot": "R",
+      "tier": "S",
+      "potential_tier": "S",
+      "shirt_number": 13,
+      "captain": false,
+      "traits": [
+        "leader"
+      ],
+      "overrides": {},
       "joined_year": 2014,
-      "contract": { "until_year": 2028, "salary_eur_year": 10000000, "release_clause_eur": 80000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 10000000,
+        "release_clause_eur": 80000000
+      }
     },
     {
-      "id": "atm_p001", "name": "Juan Musso",
-      "birth_date": { "year": 1994, "month": 5, "day": 6 },
-      "nationality": "AR", "positions": ["GK"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "B", "shirt_number": 1, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "atm_p001",
+      "name": "Juan Musso",
+      "birth_date": {
+        "year": 1994,
+        "month": 5,
+        "day": 6
+      },
+      "nationality": "AR",
+      "positions": [
+        "GK"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "B",
+      "shirt_number": 1,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2027, "salary_eur_year": 2500000, "release_clause_eur": 20000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 2500000,
+        "release_clause_eur": 20000000
+      }
     },
     {
-      "id": "atm_p002", "name": "José María Giménez",
-      "birth_date": { "year": 1995, "month": 1, "day": 20 },
-      "nationality": "UY", "positions": ["CB"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 2, "captain": false,
-      "traits": ["aerial_strong", "aggressive"], "overrides": {},
+      "id": "atm_p002",
+      "name": "José María Giménez",
+      "birth_date": {
+        "year": 1995,
+        "month": 1,
+        "day": 20
+      },
+      "nationality": "UY",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 2,
+      "captain": false,
+      "traits": [
+        "aerial_strong",
+        "aggressive"
+      ],
+      "overrides": {},
       "joined_year": 2013,
-      "contract": { "until_year": 2027, "salary_eur_year": 6000000, "release_clause_eur": 60000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 60000000
+      }
     },
     {
-      "id": "atm_p024", "name": "Robin Le Normand",
-      "birth_date": { "year": 1996, "month": 11, "day": 11 },
-      "nationality": "ES", "positions": ["CB"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "A", "shirt_number": 24, "captain": false,
-      "traits": ["aerial_strong", "passing_accurate"], "overrides": {},
+      "id": "atm_p024",
+      "name": "Robin Le Normand",
+      "birth_date": {
+        "year": 1996,
+        "month": 11,
+        "day": 11
+      },
+      "nationality": "ES",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "A",
+      "shirt_number": 24,
+      "captain": false,
+      "traits": [
+        "aerial_strong",
+        "passing_accurate"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2029, "salary_eur_year": 6500000, "release_clause_eur": 60000000 }
+      "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 6500000,
+        "release_clause_eur": 60000000
+      }
     },
     {
-      "id": "atm_p003", "name": "César Azpilicueta",
-      "birth_date": { "year": 1989, "month": 8, "day": 28 },
-      "nationality": "ES", "positions": ["RB", "CB"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 3, "captain": false,
-      "traits": ["leader"], "overrides": {},
+      "id": "atm_p003",
+      "name": "César Azpilicueta",
+      "birth_date": {
+        "year": 1989,
+        "month": 8,
+        "day": 28
+      },
+      "nationality": "ES",
+      "positions": [
+        "RB",
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 3,
+      "captain": false,
+      "traits": [
+        "leader"
+      ],
+      "overrides": {},
       "joined_year": 2023,
-      "contract": { "until_year": 2026, "salary_eur_year": 3500000, "release_clause_eur": 10000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 3500000,
+        "release_clause_eur": 10000000
+      }
     },
     {
-      "id": "atm_p016", "name": "Nahuel Molina",
-      "birth_date": { "year": 1998, "month": 4, "day": 6 },
-      "nationality": "AR", "positions": ["RB"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 16, "captain": false,
-      "traits": ["pace"], "overrides": {},
+      "id": "atm_p016",
+      "name": "Nahuel Molina",
+      "birth_date": {
+        "year": 1998,
+        "month": 4,
+        "day": 6
+      },
+      "nationality": "AR",
+      "positions": [
+        "RB"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 16,
+      "captain": false,
+      "traits": [
+        "pace"
+      ],
+      "overrides": {},
       "joined_year": 2022,
-      "contract": { "until_year": 2027, "salary_eur_year": 5000000, "release_clause_eur": 50000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 5000000,
+        "release_clause_eur": 50000000
+      }
     },
     {
-      "id": "atm_p023", "name": "Reinildo Mandava",
-      "birth_date": { "year": 1994, "month": 1, "day": 21 },
-      "nationality": "MZ", "positions": ["LB"], "preferred_foot": "L",
-      "tier": "B", "potential_tier": "B", "shirt_number": 23, "captain": false,
-      "traits": ["pace"], "overrides": {},
+      "id": "atm_p023",
+      "name": "Reinildo Mandava",
+      "birth_date": {
+        "year": 1994,
+        "month": 1,
+        "day": 21
+      },
+      "nationality": "MZ",
+      "positions": [
+        "LB"
+      ],
+      "preferred_foot": "L",
+      "tier": "B",
+      "potential_tier": "B",
+      "shirt_number": 23,
+      "captain": false,
+      "traits": [
+        "pace"
+      ],
+      "overrides": {},
       "joined_year": 2022,
-      "contract": { "until_year": 2026, "salary_eur_year": 3500000, "release_clause_eur": 25000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 3500000,
+        "release_clause_eur": 25000000
+      }
     },
     {
-      "id": "atm_p018", "name": "Javi Galán",
-      "birth_date": { "year": 1994, "month": 11, "day": 19 },
-      "nationality": "ES", "positions": ["LB"], "preferred_foot": "L",
-      "tier": "C", "potential_tier": "B", "shirt_number": 18, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "atm_p018",
+      "name": "Javi Galán",
+      "birth_date": {
+        "year": 1994,
+        "month": 11,
+        "day": 19
+      },
+      "nationality": "ES",
+      "positions": [
+        "LB"
+      ],
+      "preferred_foot": "L",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 18,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2023,
-      "contract": { "until_year": 2026, "salary_eur_year": 2000000, "release_clause_eur": 15000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 2000000,
+        "release_clause_eur": 15000000
+      }
     },
     {
-      "id": "atm_p006", "name": "Koke",
-      "birth_date": { "year": 1992, "month": 1, "day": 8 },
-      "nationality": "ES", "positions": ["CM", "CDM"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "A", "shirt_number": 6, "captain": true,
-      "traits": ["leader", "passing_accurate", "stamina"], "overrides": {},
+      "id": "atm_p006",
+      "name": "Koke",
+      "birth_date": {
+        "year": 1992,
+        "month": 1,
+        "day": 8
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "A",
+      "shirt_number": 6,
+      "captain": true,
+      "traits": [
+        "leader",
+        "passing_accurate",
+        "stamina"
+      ],
+      "overrides": {},
       "joined_year": 2009,
-      "contract": { "until_year": 2027, "salary_eur_year": 7500000, "release_clause_eur": 30000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 7500000,
+        "release_clause_eur": 30000000
+      }
     },
     {
-      "id": "atm_p005", "name": "Rodrigo De Paul",
-      "birth_date": { "year": 1994, "month": 5, "day": 24 },
-      "nationality": "AR", "positions": ["CM"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 5, "captain": false,
-      "traits": ["stamina", "passing_accurate"], "overrides": {},
+      "id": "atm_p005",
+      "name": "Rodrigo De Paul",
+      "birth_date": {
+        "year": 1994,
+        "month": 5,
+        "day": 24
+      },
+      "nationality": "AR",
+      "positions": [
+        "CM"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 5,
+      "captain": false,
+      "traits": [
+        "stamina",
+        "passing_accurate"
+      ],
+      "overrides": {},
       "joined_year": 2021,
-      "contract": { "until_year": 2026, "salary_eur_year": 5500000, "release_clause_eur": 30000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 5500000,
+        "release_clause_eur": 30000000
+      }
     },
     {
-      "id": "atm_p008", "name": "Pablo Barrios",
-      "birth_date": { "year": 2003, "month": 6, "day": 15 },
-      "nationality": "ES", "positions": ["CM", "CDM"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 8, "captain": false,
-      "traits": ["tackling"], "overrides": {},
+      "id": "atm_p008",
+      "name": "Pablo Barrios",
+      "birth_date": {
+        "year": 2003,
+        "month": 6,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 8,
+      "captain": false,
+      "traits": [
+        "tackling"
+      ],
+      "overrides": {},
       "joined_year": 2022,
-      "contract": { "until_year": 2030, "salary_eur_year": 2500000, "release_clause_eur": 100000000 }
+      "contract": {
+        "until_year": 2030,
+        "salary_eur_year": 2500000,
+        "release_clause_eur": 100000000
+      }
     },
     {
-      "id": "atm_p014", "name": "Marcos Llorente",
-      "birth_date": { "year": 1995, "month": 1, "day": 30 },
-      "nationality": "ES", "positions": ["CM", "CDM"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 14, "captain": false,
-      "traits": ["pace", "stamina"], "overrides": {},
+      "id": "atm_p014",
+      "name": "Marcos Llorente",
+      "birth_date": {
+        "year": 1995,
+        "month": 1,
+        "day": 30
+      },
+      "nationality": "ES",
+      "positions": [
+        "RB"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 14,
+      "captain": false,
+      "traits": [
+        "pace",
+        "stamina"
+      ],
+      "overrides": {},
       "joined_year": 2019,
-      "contract": { "until_year": 2027, "salary_eur_year": 6000000, "release_clause_eur": 50000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 50000000
+      }
     },
     {
-      "id": "atm_p004", "name": "Conor Gallagher",
-      "birth_date": { "year": 2000, "month": 2, "day": 6 },
-      "nationality": "GB-ENG", "positions": ["CM"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 4, "captain": false,
-      "traits": ["stamina", "tackling"], "overrides": {},
+      "id": "atm_p004",
+      "name": "Conor Gallagher",
+      "birth_date": {
+        "year": 2000,
+        "month": 2,
+        "day": 6
+      },
+      "nationality": "GB-ENG",
+      "positions": [
+        "CM"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 4,
+      "captain": false,
+      "traits": [
+        "stamina",
+        "tackling"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2029, "salary_eur_year": 5000000, "release_clause_eur": 60000000 }
+      "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 5000000,
+        "release_clause_eur": 60000000
+      }
     },
     {
-      "id": "atm_p017", "name": "Saúl Ñíguez",
-      "birth_date": { "year": 1994, "month": 11, "day": 21 },
-      "nationality": "ES", "positions": ["CM", "CDM"], "preferred_foot": "R",
-      "tier": "C", "potential_tier": "A", "shirt_number": 17, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "atm_p017",
+      "name": "Saúl Ñíguez",
+      "birth_date": {
+        "year": 1994,
+        "month": 11,
+        "day": 21
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM",
+        "CDM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "A",
+      "shirt_number": 17,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2010,
-      "contract": { "until_year": 2026, "salary_eur_year": 4500000, "release_clause_eur": 25000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 4500000,
+        "release_clause_eur": 25000000
+      }
     },
     {
-      "id": "atm_p007", "name": "Antoine Griezmann",
-      "birth_date": { "year": 1991, "month": 3, "day": 21 },
-      "nationality": "FR", "positions": ["CAM", "ST"], "preferred_foot": "L",
-      "tier": "S", "potential_tier": "S", "shirt_number": 7, "captain": false,
-      "traits": ["finishing", "passing_accurate", "leader", "set_pieces"], "overrides": {},
+      "id": "atm_p007",
+      "name": "Antoine Griezmann",
+      "birth_date": {
+        "year": 1991,
+        "month": 3,
+        "day": 21
+      },
+      "nationality": "FR",
+      "positions": [
+        "CAM"
+      ],
+      "preferred_foot": "L",
+      "tier": "S",
+      "potential_tier": "S",
+      "shirt_number": 7,
+      "captain": false,
+      "traits": [
+        "finishing",
+        "passing_accurate",
+        "leader",
+        "set_pieces"
+      ],
+      "overrides": {},
       "joined_year": 2021,
-      "contract": { "until_year": 2027, "salary_eur_year": 18000000, "release_clause_eur": 100000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 18000000,
+        "release_clause_eur": 100000000
+      }
     },
     {
-      "id": "atm_p019", "name": "Julián Álvarez",
-      "birth_date": { "year": 2000, "month": 1, "day": 31 },
-      "nationality": "AR", "positions": ["ST", "CAM"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "S", "shirt_number": 19, "captain": false,
-      "traits": ["finishing", "stamina", "pace"], "overrides": {},
+      "id": "atm_p019",
+      "name": "Julián Álvarez",
+      "birth_date": {
+        "year": 2000,
+        "month": 1,
+        "day": 31
+      },
+      "nationality": "AR",
+      "positions": [
+        "ST"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 19,
+      "captain": false,
+      "traits": [
+        "finishing",
+        "stamina",
+        "pace"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2030, "salary_eur_year": 11000000, "release_clause_eur": 200000000 }
+      "contract": {
+        "until_year": 2030,
+        "salary_eur_year": 11000000,
+        "release_clause_eur": 200000000
+      }
     },
     {
-      "id": "atm_p009", "name": "Alexander Sørloth",
-      "birth_date": { "year": 1995, "month": 12, "day": 5 },
-      "nationality": "NO", "positions": ["ST"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 9, "captain": false,
-      "traits": ["aerial_strong", "finishing"], "overrides": {},
+      "id": "atm_p009",
+      "name": "Alexander Sørloth",
+      "birth_date": {
+        "year": 1995,
+        "month": 12,
+        "day": 5
+      },
+      "nationality": "NO",
+      "positions": [
+        "ST"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 9,
+      "captain": false,
+      "traits": [
+        "aerial_strong",
+        "finishing"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2028, "salary_eur_year": 5000000, "release_clause_eur": 60000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 5000000,
+        "release_clause_eur": 60000000
+      }
     },
     {
-      "id": "atm_p010", "name": "Ángel Correa",
-      "birth_date": { "year": 1995, "month": 3, "day": 9 },
-      "nationality": "AR", "positions": ["CAM", "RW", "ST"], "preferred_foot": "L",
-      "tier": "B", "potential_tier": "A", "shirt_number": 10, "captain": false,
-      "traits": ["dribbling"], "overrides": {},
+      "id": "atm_p010",
+      "name": "Ángel Correa",
+      "birth_date": {
+        "year": 1995,
+        "month": 3,
+        "day": 9
+      },
+      "nationality": "AR",
+      "positions": [
+        "CAM",
+        "RW",
+        "ST"
+      ],
+      "preferred_foot": "L",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 10,
+      "captain": false,
+      "traits": [
+        "dribbling"
+      ],
+      "overrides": {},
       "joined_year": 2014,
-      "contract": { "until_year": 2026, "salary_eur_year": 4500000, "release_clause_eur": 30000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 4500000,
+        "release_clause_eur": 30000000
+      }
     },
     {
-      "id": "atm_p011", "name": "Samuel Lino",
-      "birth_date": { "year": 1999, "month": 12, "day": 23 },
-      "nationality": "BR", "positions": ["LW"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 11, "captain": false,
-      "traits": ["dribbling", "pace"], "overrides": {},
+      "id": "atm_p011",
+      "name": "Samuel Lino",
+      "birth_date": {
+        "year": 1999,
+        "month": 12,
+        "day": 23
+      },
+      "nationality": "BR",
+      "positions": [
+        "LW"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 11,
+      "captain": false,
+      "traits": [
+        "dribbling",
+        "pace"
+      ],
+      "overrides": {},
       "joined_year": 2022,
-      "contract": { "until_year": 2028, "salary_eur_year": 3500000, "release_clause_eur": 60000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 3500000,
+        "release_clause_eur": 60000000
+      }
     },
     {
-      "id": "atm_p021", "name": "Rodrigo Riquelme",
-      "birth_date": { "year": 2000, "month": 4, "day": 2 },
-      "nationality": "ES", "positions": ["RW", "LW"], "preferred_foot": "L",
-      "tier": "C", "potential_tier": "B", "shirt_number": 21, "captain": false,
-      "traits": ["pace"], "overrides": {},
+      "id": "atm_p021",
+      "name": "Rodrigo Riquelme",
+      "birth_date": {
+        "year": 2000,
+        "month": 4,
+        "day": 2
+      },
+      "nationality": "ES",
+      "positions": [
+        "RW",
+        "LW"
+      ],
+      "preferred_foot": "L",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 21,
+      "captain": false,
+      "traits": [
+        "pace"
+      ],
+      "overrides": {},
       "joined_year": 2014,
-      "contract": { "until_year": 2028, "salary_eur_year": 1500000, "release_clause_eur": 30000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 1500000,
+        "release_clause_eur": 30000000
+      }
     },
     {
-      "id": "atm_p015", "name": "Giuliano Simeone",
-      "birth_date": { "year": 2002, "month": 12, "day": 18 },
-      "nationality": "AR", "positions": ["RW"], "preferred_foot": "R",
-      "tier": "C", "potential_tier": "B", "shirt_number": 15, "captain": false,
-      "traits": ["pace", "stamina"], "overrides": {},
+      "id": "atm_p015",
+      "name": "Giuliano Simeone",
+      "birth_date": {
+        "year": 2002,
+        "month": 12,
+        "day": 18
+      },
+      "nationality": "AR",
+      "positions": [
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 15,
+      "captain": false,
+      "traits": [
+        "pace",
+        "stamina"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2028, "salary_eur_year": 1200000, "release_clause_eur": 25000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 1200000,
+        "release_clause_eur": 25000000
+      }
     },
     {
-      "id": "atm_p025", "name": "Antonio Gomis",
-      "birth_date": { "year": 2004, "month": 5, "day": 22 },
-      "nationality": "ES", "positions": ["GK"], "preferred_foot": "R",
-      "tier": "Y", "potential_tier": "B", "shirt_number": 25, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "atm_p025",
+      "name": "Antonio Gomis",
+      "birth_date": {
+        "year": 2004,
+        "month": 5,
+        "day": 22
+      },
+      "nationality": "ES",
+      "positions": [
+        "GK"
+      ],
+      "preferred_foot": "R",
+      "tier": "Y",
+      "potential_tier": "B",
+      "shirt_number": 25,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2027, "salary_eur_year": 350000, "release_clause_eur": 5000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 350000,
+        "release_clause_eur": 5000000
+      }
     },
     {
-      "id": "atm_p028", "name": "Aitor Gismera",
-      "birth_date": { "year": 2003, "month": 8, "day": 15 },
-      "nationality": "ES", "positions": ["CB"], "preferred_foot": "R",
-      "tier": "Y", "potential_tier": "B", "shirt_number": 28, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "atm_p028",
+      "name": "Aitor Gismera",
+      "birth_date": {
+        "year": 2003,
+        "month": 8,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "Y",
+      "potential_tier": "B",
+      "shirt_number": 28,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2023,
-      "contract": { "until_year": 2027, "salary_eur_year": 400000, "release_clause_eur": 10000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 400000,
+        "release_clause_eur": 10000000
+      }
     }
   ]
 }

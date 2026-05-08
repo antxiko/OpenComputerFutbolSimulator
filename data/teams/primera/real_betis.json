@@ -37,211 +37,651 @@
   },
   "players": [
     {
-      "id": "bet_p001", "name": "Rui Silva",
-      "birth_date": { "year": 1994, "month": 2, "day": 7 },
-      "nationality": "PT", "positions": ["GK"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 1, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "bet_p001",
+      "name": "Rui Silva",
+      "birth_date": {
+        "year": 1994,
+        "month": 2,
+        "day": 7
+      },
+      "nationality": "PT",
+      "positions": [
+        "GK"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 1,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2021,
-      "contract": { "until_year": 2027, "salary_eur_year": 3500000, "release_clause_eur": 30000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 3500000,
+        "release_clause_eur": 30000000
+      }
     },
     {
-      "id": "bet_p013", "name": "Adrián San Miguel",
-      "birth_date": { "year": 1987, "month": 1, "day": 3 },
-      "nationality": "ES", "positions": ["GK"], "preferred_foot": "L",
-      "tier": "C", "potential_tier": "B", "shirt_number": 13, "captain": false,
-      "traits": ["leader"], "overrides": {},
+      "id": "bet_p013",
+      "name": "Adrián San Miguel",
+      "birth_date": {
+        "year": 1987,
+        "month": 1,
+        "day": 3
+      },
+      "nationality": "ES",
+      "positions": [
+        "GK"
+      ],
+      "preferred_foot": "L",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 13,
+      "captain": false,
+      "traits": [
+        "leader"
+      ],
+      "overrides": {},
       "joined_year": 2023,
-      "contract": { "until_year": 2026, "salary_eur_year": 1800000, "release_clause_eur": 5000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1800000,
+        "release_clause_eur": 5000000
+      }
     },
     {
-      "id": "bet_p025", "name": "Fran Vieites",
-      "birth_date": { "year": 1999, "month": 5, "day": 11 },
-      "nationality": "ES", "positions": ["GK"], "preferred_foot": "R",
-      "tier": "C", "potential_tier": "B", "shirt_number": 25, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "bet_p025",
+      "name": "Fran Vieites",
+      "birth_date": {
+        "year": 1999,
+        "month": 5,
+        "day": 11
+      },
+      "nationality": "ES",
+      "positions": [
+        "GK"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 25,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2022,
-      "contract": { "until_year": 2026, "salary_eur_year": 600000, "release_clause_eur": 5000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 600000,
+        "release_clause_eur": 5000000
+      }
     },
     {
-      "id": "bet_p005", "name": "Marc Bartra",
-      "birth_date": { "year": 1991, "month": 1, "day": 15 },
-      "nationality": "ES", "positions": ["CB"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "B", "shirt_number": 5, "captain": false,
-      "traits": ["passing_accurate", "leader"], "overrides": {},
+      "id": "bet_p005",
+      "name": "Marc Bartra",
+      "birth_date": {
+        "year": 1991,
+        "month": 1,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "B",
+      "shirt_number": 5,
+      "captain": false,
+      "traits": [
+        "passing_accurate",
+        "leader"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2026, "salary_eur_year": 2000000, "release_clause_eur": 12000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 2000000,
+        "release_clause_eur": 12000000
+      }
     },
     {
-      "id": "bet_p015", "name": "Diego Llorente",
-      "birth_date": { "year": 1993, "month": 8, "day": 16 },
-      "nationality": "ES", "positions": ["CB"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 15, "captain": false,
-      "traits": ["aerial_strong"], "overrides": {},
+      "id": "bet_p015",
+      "name": "Diego Llorente",
+      "birth_date": {
+        "year": 1993,
+        "month": 8,
+        "day": 16
+      },
+      "nationality": "ES",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 15,
+      "captain": false,
+      "traits": [
+        "aerial_strong"
+      ],
+      "overrides": {},
       "joined_year": 2023,
-      "contract": { "until_year": 2027, "salary_eur_year": 2500000, "release_clause_eur": 20000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 2500000,
+        "release_clause_eur": 20000000
+      }
     },
     {
-      "id": "bet_p024", "name": "Chadi Riad",
-      "birth_date": { "year": 2003, "month": 6, "day": 17 },
-      "nationality": "MA", "positions": ["CB"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 24, "captain": false,
-      "traits": ["aerial_strong"], "overrides": {},
+      "id": "bet_p024",
+      "name": "Chadi Riad",
+      "birth_date": {
+        "year": 2003,
+        "month": 6,
+        "day": 17
+      },
+      "nationality": "MA",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 24,
+      "captain": false,
+      "traits": [
+        "aerial_strong"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2029, "salary_eur_year": 1500000, "release_clause_eur": 40000000 }
+      "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 1500000,
+        "release_clause_eur": 40000000
+      }
     },
     {
-      "id": "bet_p012", "name": "Natan",
-      "birth_date": { "year": 2001, "month": 2, "day": 13 },
-      "nationality": "BR", "positions": ["CB"], "preferred_foot": "L",
-      "tier": "B", "potential_tier": "A", "shirt_number": 12, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "bet_p012",
+      "name": "Natan",
+      "birth_date": {
+        "year": 2001,
+        "month": 2,
+        "day": 13
+      },
+      "nationality": "BR",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "L",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 12,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2028, "salary_eur_year": 1500000, "release_clause_eur": 25000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 1500000,
+        "release_clause_eur": 25000000
+      }
     },
     {
-      "id": "bet_p022", "name": "Aitor Ruibal",
-      "birth_date": { "year": 1996, "month": 3, "day": 22 },
-      "nationality": "ES", "positions": ["RB", "LM", "RW"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "B", "shirt_number": 22, "captain": false,
-      "traits": ["stamina"], "overrides": {},
+      "id": "bet_p022",
+      "name": "Aitor Ruibal",
+      "birth_date": {
+        "year": 1996,
+        "month": 3,
+        "day": 22
+      },
+      "nationality": "ES",
+      "positions": [
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "B",
+      "shirt_number": 22,
+      "captain": false,
+      "traits": [
+        "stamina"
+      ],
+      "overrides": {},
       "joined_year": 2014,
-      "contract": { "until_year": 2027, "salary_eur_year": 1800000, "release_clause_eur": 25000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1800000,
+        "release_clause_eur": 25000000
+      }
     },
     {
-      "id": "bet_p023", "name": "Youssouf Sabaly",
-      "birth_date": { "year": 1993, "month": 3, "day": 5 },
-      "nationality": "SN", "positions": ["RB"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "B", "shirt_number": 23, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "bet_p023",
+      "name": "Youssouf Sabaly",
+      "birth_date": {
+        "year": 1993,
+        "month": 3,
+        "day": 5
+      },
+      "nationality": "SN",
+      "positions": [
+        "RB"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "B",
+      "shirt_number": 23,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2021,
-      "contract": { "until_year": 2026, "salary_eur_year": 2000000, "release_clause_eur": 12000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 2000000,
+        "release_clause_eur": 12000000
+      }
     },
     {
-      "id": "bet_p003", "name": "Romain Perraud",
-      "birth_date": { "year": 1997, "month": 9, "day": 22 },
-      "nationality": "FR", "positions": ["LB"], "preferred_foot": "L",
-      "tier": "B", "potential_tier": "B", "shirt_number": 3, "captain": false,
-      "traits": ["pace", "set_pieces"], "overrides": {},
+      "id": "bet_p003",
+      "name": "Romain Perraud",
+      "birth_date": {
+        "year": 1997,
+        "month": 9,
+        "day": 22
+      },
+      "nationality": "FR",
+      "positions": [
+        "LB"
+      ],
+      "preferred_foot": "L",
+      "tier": "B",
+      "potential_tier": "B",
+      "shirt_number": 3,
+      "captain": false,
+      "traits": [
+        "pace",
+        "set_pieces"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2028, "salary_eur_year": 2000000, "release_clause_eur": 25000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 2000000,
+        "release_clause_eur": 25000000
+      }
     },
     {
-      "id": "bet_p018", "name": "Ricardo Rodríguez",
-      "birth_date": { "year": 1992, "month": 8, "day": 25 },
-      "nationality": "CH", "positions": ["LB"], "preferred_foot": "L",
-      "tier": "C", "potential_tier": "B", "shirt_number": 18, "captain": false,
-      "traits": ["set_pieces"], "overrides": {},
+      "id": "bet_p018",
+      "name": "Ricardo Rodríguez",
+      "birth_date": {
+        "year": 1992,
+        "month": 8,
+        "day": 25
+      },
+      "nationality": "CH",
+      "positions": [
+        "LB"
+      ],
+      "preferred_foot": "L",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 18,
+      "captain": false,
+      "traits": [
+        "set_pieces"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2026, "salary_eur_year": 1800000, "release_clause_eur": 8000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1800000,
+        "release_clause_eur": 8000000
+      }
     },
     {
-      "id": "bet_p008", "name": "Pablo Fornals",
-      "birth_date": { "year": 1996, "month": 2, "day": 22 },
-      "nationality": "ES", "positions": ["CM", "CAM"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 8, "captain": false,
-      "traits": ["passing_accurate", "long_shots"], "overrides": {},
+      "id": "bet_p008",
+      "name": "Pablo Fornals",
+      "birth_date": {
+        "year": 1996,
+        "month": 2,
+        "day": 22
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 8,
+      "captain": false,
+      "traits": [
+        "passing_accurate",
+        "long_shots"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2028, "salary_eur_year": 3500000, "release_clause_eur": 40000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 3500000,
+        "release_clause_eur": 40000000
+      }
     },
     {
-      "id": "bet_p016", "name": "Marc Roca",
-      "birth_date": { "year": 1996, "month": 11, "day": 26 },
-      "nationality": "ES", "positions": ["CDM", "CM"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 16, "captain": false,
-      "traits": ["passing_accurate"], "overrides": {},
+      "id": "bet_p016",
+      "name": "Marc Roca",
+      "birth_date": {
+        "year": 1996,
+        "month": 11,
+        "day": 26
+      },
+      "nationality": "ES",
+      "positions": [
+        "CDM"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 16,
+      "captain": false,
+      "traits": [
+        "passing_accurate"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2028, "salary_eur_year": 2500000, "release_clause_eur": 30000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 2500000,
+        "release_clause_eur": 30000000
+      }
     },
     {
-      "id": "bet_p017", "name": "Johnny Cardoso",
-      "birth_date": { "year": 2001, "month": 9, "day": 20 },
-      "nationality": "US", "positions": ["CDM"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 17, "captain": false,
-      "traits": ["tackling", "stamina"], "overrides": {},
+      "id": "bet_p017",
+      "name": "Johnny Cardoso",
+      "birth_date": {
+        "year": 2001,
+        "month": 9,
+        "day": 20
+      },
+      "nationality": "US",
+      "positions": [
+        "CDM"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 17,
+      "captain": false,
+      "traits": [
+        "tackling",
+        "stamina"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2028, "salary_eur_year": 1800000, "release_clause_eur": 30000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 1800000,
+        "release_clause_eur": 30000000
+      }
     },
     {
-      "id": "bet_p014", "name": "William Carvalho",
-      "birth_date": { "year": 1992, "month": 4, "day": 7 },
-      "nationality": "PT", "positions": ["CDM"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 14, "captain": false,
-      "traits": ["tackling"], "overrides": {},
+      "id": "bet_p014",
+      "name": "William Carvalho",
+      "birth_date": {
+        "year": 1992,
+        "month": 4,
+        "day": 7
+      },
+      "nationality": "PT",
+      "positions": [
+        "CDM"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 14,
+      "captain": false,
+      "traits": [
+        "tackling"
+      ],
+      "overrides": {},
       "joined_year": 2018,
-      "contract": { "until_year": 2026, "salary_eur_year": 3000000, "release_clause_eur": 12000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 3000000,
+        "release_clause_eur": 12000000
+      }
     },
     {
-      "id": "bet_p020", "name": "Sergi Altimira",
-      "birth_date": { "year": 2001, "month": 8, "day": 15 },
-      "nationality": "ES", "positions": ["CM"], "preferred_foot": "R",
-      "tier": "C", "potential_tier": "B", "shirt_number": 20, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "bet_p020",
+      "name": "Sergi Altimira",
+      "birth_date": {
+        "year": 2001,
+        "month": 8,
+        "day": 15
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 20,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2023,
-      "contract": { "until_year": 2027, "salary_eur_year": 1000000, "release_clause_eur": 25000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1000000,
+        "release_clause_eur": 25000000
+      }
     },
     {
-      "id": "bet_p010", "name": "Isco",
-      "birth_date": { "year": 1992, "month": 4, "day": 21 },
-      "nationality": "ES", "positions": ["CAM", "CM"], "preferred_foot": "L",
-      "tier": "A", "potential_tier": "S", "shirt_number": 10, "captain": true,
-      "traits": ["dribbling", "passing_accurate", "leader"], "overrides": {},
+      "id": "bet_p010",
+      "name": "Isco",
+      "birth_date": {
+        "year": 1992,
+        "month": 4,
+        "day": 21
+      },
+      "nationality": "ES",
+      "positions": [
+        "CAM"
+      ],
+      "preferred_foot": "L",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 10,
+      "captain": true,
+      "traits": [
+        "dribbling",
+        "passing_accurate",
+        "leader"
+      ],
+      "overrides": {},
       "joined_year": 2023,
-      "contract": { "until_year": 2027, "salary_eur_year": 4500000, "release_clause_eur": 25000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 4500000,
+        "release_clause_eur": 25000000
+      }
     },
     {
-      "id": "bet_p021", "name": "Nabil Fekir",
-      "birth_date": { "year": 1993, "month": 7, "day": 18 },
-      "nationality": "FR", "positions": ["CAM", "LW"], "preferred_foot": "L",
-      "tier": "B", "potential_tier": "A", "shirt_number": 21, "captain": false,
-      "traits": ["dribbling", "skill_moves"], "overrides": {},
+      "id": "bet_p021",
+      "name": "Nabil Fekir",
+      "birth_date": {
+        "year": 1993,
+        "month": 7,
+        "day": 18
+      },
+      "nationality": "FR",
+      "positions": [
+        "CAM",
+        "LW"
+      ],
+      "preferred_foot": "L",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 21,
+      "captain": false,
+      "traits": [
+        "dribbling",
+        "skill_moves"
+      ],
+      "overrides": {},
       "joined_year": 2019,
-      "contract": { "until_year": 2026, "salary_eur_year": 4500000, "release_clause_eur": 20000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 4500000,
+        "release_clause_eur": 20000000
+      }
     },
     {
-      "id": "bet_p007", "name": "Abde Ezzalzouli",
-      "birth_date": { "year": 2001, "month": 12, "day": 17 },
-      "nationality": "MA", "positions": ["LW"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 7, "captain": false,
-      "traits": ["dribbling", "pace"], "overrides": {},
+      "id": "bet_p007",
+      "name": "Abde Ezzalzouli",
+      "birth_date": {
+        "year": 2001,
+        "month": 12,
+        "day": 17
+      },
+      "nationality": "MA",
+      "positions": [
+        "LW"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 7,
+      "captain": false,
+      "traits": [
+        "dribbling",
+        "pace"
+      ],
+      "overrides": {},
       "joined_year": 2023,
-      "contract": { "until_year": 2028, "salary_eur_year": 2200000, "release_clause_eur": 50000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 2200000,
+        "release_clause_eur": 50000000
+      }
     },
     {
-      "id": "bet_p011", "name": "Antony",
-      "birth_date": { "year": 2000, "month": 2, "day": 24 },
-      "nationality": "BR", "positions": ["RW"], "preferred_foot": "L",
-      "tier": "B", "potential_tier": "A", "shirt_number": 11, "captain": false,
-      "traits": ["dribbling", "skill_moves"], "overrides": {},
+      "id": "bet_p011",
+      "name": "Antony",
+      "birth_date": {
+        "year": 2000,
+        "month": 2,
+        "day": 24
+      },
+      "nationality": "BR",
+      "positions": [
+        "RW"
+      ],
+      "preferred_foot": "L",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 11,
+      "captain": false,
+      "traits": [
+        "dribbling",
+        "skill_moves"
+      ],
+      "overrides": {},
       "joined_year": 2025,
-      "contract": { "until_year": 2030, "salary_eur_year": 6000000, "release_clause_eur": 60000000 }
+      "contract": {
+        "until_year": 2030,
+        "salary_eur_year": 6000000,
+        "release_clause_eur": 60000000
+      }
     },
     {
-      "id": "bet_p019", "name": "Vitor Roque",
-      "birth_date": { "year": 2005, "month": 2, "day": 28 },
-      "nationality": "BR", "positions": ["ST"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 19, "captain": false,
-      "traits": ["finishing", "pace"], "overrides": {},
+      "id": "bet_p019",
+      "name": "Vitor Roque",
+      "birth_date": {
+        "year": 2005,
+        "month": 2,
+        "day": 28
+      },
+      "nationality": "BR",
+      "positions": [
+        "ST"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 19,
+      "captain": false,
+      "traits": [
+        "finishing",
+        "pace"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2029, "salary_eur_year": 2500000, "release_clause_eur": 60000000 }
+      "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 2500000,
+        "release_clause_eur": 60000000
+      }
     },
     {
-      "id": "bet_p009", "name": "Cucho Hernández",
-      "birth_date": { "year": 1999, "month": 4, "day": 22 },
-      "nationality": "CO", "positions": ["ST"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 9, "captain": false,
-      "traits": ["finishing", "skill_moves"], "overrides": {},
+      "id": "bet_p009",
+      "name": "Cucho Hernández",
+      "birth_date": {
+        "year": 1999,
+        "month": 4,
+        "day": 22
+      },
+      "nationality": "CO",
+      "positions": [
+        "ST"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 9,
+      "captain": false,
+      "traits": [
+        "finishing",
+        "skill_moves"
+      ],
+      "overrides": {},
       "joined_year": 2025,
-      "contract": { "until_year": 2030, "salary_eur_year": 4000000, "release_clause_eur": 50000000 }
+      "contract": {
+        "until_year": 2030,
+        "salary_eur_year": 4000000,
+        "release_clause_eur": 50000000
+      }
     },
     {
-      "id": "bet_p030", "name": "Borja Iglesias",
-      "birth_date": { "year": 1993, "month": 1, "day": 17 },
-      "nationality": "ES", "positions": ["ST"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "B", "shirt_number": 30, "captain": false,
-      "traits": ["aerial_strong", "finishing"], "overrides": {},
+      "id": "bet_p030",
+      "name": "Borja Iglesias",
+      "birth_date": {
+        "year": 1993,
+        "month": 1,
+        "day": 17
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "B",
+      "shirt_number": 30,
+      "captain": false,
+      "traits": [
+        "aerial_strong",
+        "finishing"
+      ],
+      "overrides": {},
       "joined_year": 2019,
-      "contract": { "until_year": 2026, "salary_eur_year": 3500000, "release_clause_eur": 15000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 3500000,
+        "release_clause_eur": 15000000
+      }
     }
   ]
 }

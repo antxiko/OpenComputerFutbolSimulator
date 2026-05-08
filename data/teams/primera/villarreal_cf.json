@@ -37,195 +37,593 @@
   },
   "players": [
     {
-      "id": "vil_p001", "name": "Luiz Júnior",
-      "birth_date": { "year": 2003, "month": 4, "day": 12 },
-      "nationality": "BR", "positions": ["GK"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 1, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "vil_p001",
+      "name": "Luiz Júnior",
+      "birth_date": {
+        "year": 2003,
+        "month": 4,
+        "day": 12
+      },
+      "nationality": "BR",
+      "positions": [
+        "GK"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 1,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2029, "salary_eur_year": 1500000, "release_clause_eur": 30000000 }
+      "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 1500000,
+        "release_clause_eur": 30000000
+      }
     },
     {
-      "id": "vil_p013", "name": "Diego Conde",
-      "birth_date": { "year": 2003, "month": 8, "day": 29 },
-      "nationality": "ES", "positions": ["GK"], "preferred_foot": "R",
-      "tier": "C", "potential_tier": "B", "shirt_number": 13, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "vil_p013",
+      "name": "Diego Conde",
+      "birth_date": {
+        "year": 2003,
+        "month": 8,
+        "day": 29
+      },
+      "nationality": "ES",
+      "positions": [
+        "GK"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 13,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2027, "salary_eur_year": 700000, "release_clause_eur": 10000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 700000,
+        "release_clause_eur": 10000000
+      }
     },
     {
-      "id": "vil_p025", "name": "Filip Jörgensen",
-      "birth_date": { "year": 2002, "month": 4, "day": 16 },
-      "nationality": "DK", "positions": ["GK"], "preferred_foot": "R",
-      "tier": "C", "potential_tier": "B", "shirt_number": 25, "captain": false,
+      "id": "vil_p025",
+      "name": "Filip Jörgensen",
+      "birth_date": {
+        "year": 2002,
+        "month": 4,
+        "day": 16
+      },
+      "nationality": "DK",
+      "positions": [
+        "GK"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 25,
+      "captain": false,
       "traits": [],
       "overrides": {},
       "joined_year": 2025,
-      "contract": { "until_year": 2027, "salary_eur_year": 800000, "release_clause_eur": 12000000 },
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 800000,
+        "release_clause_eur": 12000000
+      },
       "_note": "Filip Jörgensen se fue al Chelsea 2024; este slot es placeholder a verificar para el 3er portero real 2025-26."
     },
     {
-      "id": "vil_p003", "name": "Raúl Albiol",
-      "birth_date": { "year": 1985, "month": 9, "day": 4 },
-      "nationality": "ES", "positions": ["CB"], "preferred_foot": "R",
-      "tier": "C", "potential_tier": "B", "shirt_number": 3, "captain": false,
-      "traits": ["aerial_strong", "leader"], "overrides": {},
+      "id": "vil_p003",
+      "name": "Raúl Albiol",
+      "birth_date": {
+        "year": 1985,
+        "month": 9,
+        "day": 4
+      },
+      "nationality": "ES",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 3,
+      "captain": false,
+      "traits": [
+        "aerial_strong",
+        "leader"
+      ],
+      "overrides": {},
       "joined_year": 2019,
-      "contract": { "until_year": 2026, "salary_eur_year": 1500000, "release_clause_eur": 5000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1500000,
+        "release_clause_eur": 5000000
+      }
     },
     {
-      "id": "vil_p004", "name": "Logan Costa",
-      "birth_date": { "year": 2001, "month": 4, "day": 1 },
-      "nationality": "CV", "positions": ["CB"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 4, "captain": false,
-      "traits": ["aerial_strong"], "overrides": {},
+      "id": "vil_p004",
+      "name": "Logan Costa",
+      "birth_date": {
+        "year": 2001,
+        "month": 4,
+        "day": 1
+      },
+      "nationality": "CV",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 4,
+      "captain": false,
+      "traits": [
+        "aerial_strong"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2029, "salary_eur_year": 1800000, "release_clause_eur": 35000000 }
+      "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 1800000,
+        "release_clause_eur": 35000000
+      }
     },
     {
-      "id": "vil_p005", "name": "Yerson Mosquera",
-      "birth_date": { "year": 2001, "month": 5, "day": 2 },
-      "nationality": "CO", "positions": ["CB"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 5, "captain": false,
-      "traits": ["aerial_strong"], "overrides": {},
+      "id": "vil_p005",
+      "name": "Yerson Mosquera",
+      "birth_date": {
+        "year": 2001,
+        "month": 5,
+        "day": 2
+      },
+      "nationality": "CO",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 5,
+      "captain": false,
+      "traits": [
+        "aerial_strong"
+      ],
+      "overrides": {},
       "joined_year": 2023,
-      "contract": { "until_year": 2028, "salary_eur_year": 1500000, "release_clause_eur": 30000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 1500000,
+        "release_clause_eur": 30000000
+      }
     },
     {
-      "id": "vil_p002", "name": "Juan Foyth",
-      "birth_date": { "year": 1998, "month": 1, "day": 12 },
-      "nationality": "AR", "positions": ["RB", "CB"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "A", "shirt_number": 2, "captain": true,
-      "traits": ["passing_accurate", "leader"], "overrides": {},
+      "id": "vil_p002",
+      "name": "Juan Foyth",
+      "birth_date": {
+        "year": 1998,
+        "month": 1,
+        "day": 12
+      },
+      "nationality": "AR",
+      "positions": [
+        "CB"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "A",
+      "shirt_number": 2,
+      "captain": true,
+      "traits": [
+        "passing_accurate",
+        "leader"
+      ],
+      "overrides": {},
       "joined_year": 2021,
-      "contract": { "until_year": 2027, "salary_eur_year": 4500000, "release_clause_eur": 50000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 4500000,
+        "release_clause_eur": 50000000
+      }
     },
     {
-      "id": "vil_p021", "name": "Kiko Femenía",
-      "birth_date": { "year": 1991, "month": 2, "day": 2 },
-      "nationality": "ES", "positions": ["RB"], "preferred_foot": "R",
-      "tier": "C", "potential_tier": "B", "shirt_number": 21, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "vil_p021",
+      "name": "Kiko Femenía",
+      "birth_date": {
+        "year": 1991,
+        "month": 2,
+        "day": 2
+      },
+      "nationality": "ES",
+      "positions": [
+        "RB"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 21,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2022,
-      "contract": { "until_year": 2026, "salary_eur_year": 1200000, "release_clause_eur": 8000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1200000,
+        "release_clause_eur": 8000000
+      }
     },
     {
-      "id": "vil_p018", "name": "Alfonso Pedraza",
-      "birth_date": { "year": 1996, "month": 4, "day": 9 },
-      "nationality": "ES", "positions": ["LB", "LM"], "preferred_foot": "L",
-      "tier": "B", "potential_tier": "B", "shirt_number": 18, "captain": false,
-      "traits": ["pace"], "overrides": {},
+      "id": "vil_p018",
+      "name": "Alfonso Pedraza",
+      "birth_date": {
+        "year": 1996,
+        "month": 4,
+        "day": 9
+      },
+      "nationality": "ES",
+      "positions": [
+        "LB"
+      ],
+      "preferred_foot": "L",
+      "tier": "B",
+      "potential_tier": "B",
+      "shirt_number": 18,
+      "captain": false,
+      "traits": [
+        "pace"
+      ],
+      "overrides": {},
       "joined_year": 2017,
-      "contract": { "until_year": 2027, "salary_eur_year": 2000000, "release_clause_eur": 20000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 2000000,
+        "release_clause_eur": 20000000
+      }
     },
     {
-      "id": "vil_p015", "name": "Sergi Cardona",
-      "birth_date": { "year": 1999, "month": 9, "day": 8 },
-      "nationality": "ES", "positions": ["LB"], "preferred_foot": "L",
-      "tier": "C", "potential_tier": "B", "shirt_number": 15, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "vil_p015",
+      "name": "Sergi Cardona",
+      "birth_date": {
+        "year": 1999,
+        "month": 9,
+        "day": 8
+      },
+      "nationality": "ES",
+      "positions": [
+        "LB"
+      ],
+      "preferred_foot": "L",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 15,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2023,
-      "contract": { "until_year": 2027, "salary_eur_year": 1100000, "release_clause_eur": 15000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1100000,
+        "release_clause_eur": 15000000
+      }
     },
     {
-      "id": "vil_p010", "name": "Dani Parejo",
-      "birth_date": { "year": 1989, "month": 4, "day": 16 },
-      "nationality": "ES", "positions": ["CM", "CAM"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 10, "captain": false,
-      "traits": ["passing_accurate", "set_pieces", "leader"], "overrides": {},
+      "id": "vil_p010",
+      "name": "Dani Parejo",
+      "birth_date": {
+        "year": 1989,
+        "month": 4,
+        "day": 16
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 10,
+      "captain": false,
+      "traits": [
+        "passing_accurate",
+        "set_pieces",
+        "leader"
+      ],
+      "overrides": {},
       "joined_year": 2020,
-      "contract": { "until_year": 2026, "salary_eur_year": 4000000, "release_clause_eur": 15000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 4000000,
+        "release_clause_eur": 15000000
+      }
     },
     {
-      "id": "vil_p019", "name": "Pape Gueye",
-      "birth_date": { "year": 1999, "month": 1, "day": 24 },
-      "nationality": "SN", "positions": ["CDM", "CM"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 19, "captain": false,
-      "traits": ["tackling"], "overrides": {},
+      "id": "vil_p019",
+      "name": "Pape Gueye",
+      "birth_date": {
+        "year": 1999,
+        "month": 1,
+        "day": 24
+      },
+      "nationality": "SN",
+      "positions": [
+        "CM"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 19,
+      "captain": false,
+      "traits": [
+        "tackling"
+      ],
+      "overrides": {},
       "joined_year": 2023,
-      "contract": { "until_year": 2028, "salary_eur_year": 2500000, "release_clause_eur": 30000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 2500000,
+        "release_clause_eur": 30000000
+      }
     },
     {
-      "id": "vil_p014", "name": "Santiago Comesaña",
-      "birth_date": { "year": 1997, "month": 10, "day": 5 },
-      "nationality": "ES", "positions": ["CDM"], "preferred_foot": "R",
-      "tier": "C", "potential_tier": "B", "shirt_number": 14, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "vil_p014",
+      "name": "Santiago Comesaña",
+      "birth_date": {
+        "year": 1997,
+        "month": 10,
+        "day": 5
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 14,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2022,
-      "contract": { "until_year": 2027, "salary_eur_year": 1400000, "release_clause_eur": 15000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 1400000,
+        "release_clause_eur": 15000000
+      }
     },
     {
-      "id": "vil_p008", "name": "Manu Trigueros",
-      "birth_date": { "year": 1991, "month": 10, "day": 17 },
-      "nationality": "ES", "positions": ["CM"], "preferred_foot": "R",
-      "tier": "C", "potential_tier": "B", "shirt_number": 8, "captain": false,
-      "traits": ["passing_accurate"], "overrides": {},
+      "id": "vil_p008",
+      "name": "Manu Trigueros",
+      "birth_date": {
+        "year": 1991,
+        "month": 10,
+        "day": 17
+      },
+      "nationality": "ES",
+      "positions": [
+        "CM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 8,
+      "captain": false,
+      "traits": [
+        "passing_accurate"
+      ],
+      "overrides": {},
       "joined_year": 2010,
-      "contract": { "until_year": 2026, "salary_eur_year": 1800000, "release_clause_eur": 8000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 1800000,
+        "release_clause_eur": 8000000
+      }
     },
     {
-      "id": "vil_p022", "name": "Álex Baena",
-      "birth_date": { "year": 2001, "month": 7, "day": 20 },
-      "nationality": "ES", "positions": ["CAM", "LM"], "preferred_foot": "R",
-      "tier": "A", "potential_tier": "S", "shirt_number": 22, "captain": false,
-      "traits": ["dribbling", "long_shots", "set_pieces"], "overrides": {},
+      "id": "vil_p022",
+      "name": "Álex Baena",
+      "birth_date": {
+        "year": 2001,
+        "month": 7,
+        "day": 20
+      },
+      "nationality": "ES",
+      "positions": [
+        "CAM",
+        "LM"
+      ],
+      "preferred_foot": "R",
+      "tier": "A",
+      "potential_tier": "S",
+      "shirt_number": 22,
+      "captain": false,
+      "traits": [
+        "dribbling",
+        "long_shots",
+        "set_pieces"
+      ],
+      "overrides": {},
       "joined_year": 2014,
-      "contract": { "until_year": 2028, "salary_eur_year": 4000000, "release_clause_eur": 80000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 4000000,
+        "release_clause_eur": 80000000
+      }
     },
     {
-      "id": "vil_p011", "name": "Yeremy Pino",
-      "birth_date": { "year": 2002, "month": 10, "day": 20 },
-      "nationality": "ES", "positions": ["RW", "LW"], "preferred_foot": "L",
-      "tier": "B", "potential_tier": "A", "shirt_number": 11, "captain": false,
-      "traits": ["dribbling", "pace"], "overrides": {},
+      "id": "vil_p011",
+      "name": "Yeremy Pino",
+      "birth_date": {
+        "year": 2002,
+        "month": 10,
+        "day": 20
+      },
+      "nationality": "ES",
+      "positions": [
+        "RW",
+        "LW"
+      ],
+      "preferred_foot": "L",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 11,
+      "captain": false,
+      "traits": [
+        "dribbling",
+        "pace"
+      ],
+      "overrides": {},
       "joined_year": 2014,
-      "contract": { "until_year": 2027, "salary_eur_year": 3500000, "release_clause_eur": 60000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 3500000,
+        "release_clause_eur": 60000000
+      }
     },
     {
-      "id": "vil_p020", "name": "Ilias Akhomach",
-      "birth_date": { "year": 2004, "month": 4, "day": 16 },
-      "nationality": "MA", "positions": ["LW", "RW"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 20, "captain": false,
-      "traits": ["dribbling", "skill_moves"], "overrides": {},
+      "id": "vil_p020",
+      "name": "Ilias Akhomach",
+      "birth_date": {
+        "year": 2004,
+        "month": 4,
+        "day": 16
+      },
+      "nationality": "MA",
+      "positions": [
+        "LW",
+        "RW"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 20,
+      "captain": false,
+      "traits": [
+        "dribbling",
+        "skill_moves"
+      ],
+      "overrides": {},
       "joined_year": 2023,
-      "contract": { "until_year": 2028, "salary_eur_year": 1500000, "release_clause_eur": 50000000 }
+      "contract": {
+        "until_year": 2028,
+        "salary_eur_year": 1500000,
+        "release_clause_eur": 50000000
+      }
     },
     {
-      "id": "vil_p016", "name": "Ayoze Pérez",
-      "birth_date": { "year": 1993, "month": 7, "day": 29 },
-      "nationality": "ES", "positions": ["ST", "RW"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 16, "captain": false,
-      "traits": ["finishing"], "overrides": {},
+      "id": "vil_p016",
+      "name": "Ayoze Pérez",
+      "birth_date": {
+        "year": 1993,
+        "month": 7,
+        "day": 29
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 16,
+      "captain": false,
+      "traits": [
+        "finishing"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2027, "salary_eur_year": 2500000, "release_clause_eur": 25000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 2500000,
+        "release_clause_eur": 25000000
+      }
     },
     {
-      "id": "vil_p009", "name": "Thierno Barry",
-      "birth_date": { "year": 2002, "month": 11, "day": 30 },
-      "nationality": "FR", "positions": ["ST"], "preferred_foot": "R",
-      "tier": "B", "potential_tier": "A", "shirt_number": 9, "captain": false,
-      "traits": ["finishing", "aerial_strong", "pace"], "overrides": {},
+      "id": "vil_p009",
+      "name": "Thierno Barry",
+      "birth_date": {
+        "year": 2002,
+        "month": 11,
+        "day": 30
+      },
+      "nationality": "FR",
+      "positions": [
+        "ST"
+      ],
+      "preferred_foot": "R",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 9,
+      "captain": false,
+      "traits": [
+        "finishing",
+        "aerial_strong",
+        "pace"
+      ],
+      "overrides": {},
       "joined_year": 2024,
-      "contract": { "until_year": 2029, "salary_eur_year": 2200000, "release_clause_eur": 60000000 }
+      "contract": {
+        "until_year": 2029,
+        "salary_eur_year": 2200000,
+        "release_clause_eur": 60000000
+      }
     },
     {
-      "id": "vil_p007", "name": "Gerard Moreno",
-      "birth_date": { "year": 1992, "month": 4, "day": 7 },
-      "nationality": "ES", "positions": ["ST"], "preferred_foot": "L",
-      "tier": "B", "potential_tier": "A", "shirt_number": 7, "captain": false,
-      "traits": ["finishing", "set_pieces"], "overrides": {},
+      "id": "vil_p007",
+      "name": "Gerard Moreno",
+      "birth_date": {
+        "year": 1992,
+        "month": 4,
+        "day": 7
+      },
+      "nationality": "ES",
+      "positions": [
+        "ST"
+      ],
+      "preferred_foot": "L",
+      "tier": "B",
+      "potential_tier": "A",
+      "shirt_number": 7,
+      "captain": false,
+      "traits": [
+        "finishing",
+        "set_pieces"
+      ],
+      "overrides": {},
       "joined_year": 2018,
-      "contract": { "until_year": 2027, "salary_eur_year": 4500000, "release_clause_eur": 30000000 }
+      "contract": {
+        "until_year": 2027,
+        "salary_eur_year": 4500000,
+        "release_clause_eur": 30000000
+      }
     },
     {
-      "id": "vil_p024", "name": "Étienne Capoue",
-      "birth_date": { "year": 1988, "month": 7, "day": 11 },
-      "nationality": "FR", "positions": ["CDM"], "preferred_foot": "R",
-      "tier": "C", "potential_tier": "B", "shirt_number": 24, "captain": false,
-      "traits": [], "overrides": {},
+      "id": "vil_p024",
+      "name": "Étienne Capoue",
+      "birth_date": {
+        "year": 1988,
+        "month": 7,
+        "day": 11
+      },
+      "nationality": "FR",
+      "positions": [
+        "CDM"
+      ],
+      "preferred_foot": "R",
+      "tier": "C",
+      "potential_tier": "B",
+      "shirt_number": 24,
+      "captain": false,
+      "traits": [],
+      "overrides": {},
       "joined_year": 2021,
-      "contract": { "until_year": 2026, "salary_eur_year": 2000000, "release_clause_eur": 5000000 }
+      "contract": {
+        "until_year": 2026,
+        "salary_eur_year": 2000000,
+        "release_clause_eur": 5000000
+      }
     }
   ]
 }

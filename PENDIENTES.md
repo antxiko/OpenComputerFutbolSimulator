@@ -109,6 +109,10 @@ Cosas que sabemos que están a medias o que hay que volver a mirar más adelante
 
 ## ✅ COMPLETADO recientemente
 
+- **Posiciones reales por jugador (Transfermarkt 25-26)**: scrapeadas 39/42 clubes, ~849 jugadores con position específica (era 25%, ahora 89%). Ya no hay un central marcado como `[CB,LB,RB]` ni un delantero como `[ST,LW,RW]`. Cobertura completa de los 10 slots esenciales en todos los equipos.
+  - Quedan ~122 con positions genéricas heredadas: apodos entre comillas (`"Capi"`, `"Chuki"`, `"Suso"`) y jugadores ya transferidos no presentes en TM 25-26.
+  - Las Palmas regenerado entero (su plantilla estaba corrupta: `name = "27 años"` para todos).
+  - 3 equipos del repo no están en TM 25-26 (Eldense, Cartagena, Tenerife): TM tiene en su lugar Deportivo, Cultural Leonesa. Mantenemos los nuestros.
 - **Pool internacional de nombres para canteranos** (40% ES, 60% internacional). Athletic fuerza ES por basque_only. Ya no hay nombres placeholder feos.
 - **Sistema de aggression** con scrape Marca + tarjetas concentradas en agresivos (max 11 TA real).
 - **Sanciones por tarjetas** + Mini-resumen post-partido + Histórico carrera + Supercopa Final 4.

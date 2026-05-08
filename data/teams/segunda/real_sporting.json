@@ -84,8 +84,6 @@
       },
       "nationality": "ES",
       "positions": [
-        "CB",
-        "LB",
         "RB"
       ],
       "preferred_foot": "R",
@@ -112,9 +110,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "CB",
-        "LB",
-        "RB"
+        "LB"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -140,9 +136,7 @@
       },
       "nationality": "FR",
       "positions": [
-        "CB",
-        "LB",
-        "RB"
+        "CB"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -168,9 +162,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "CB",
-        "LB",
-        "RB"
+        "CB"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -196,9 +188,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "CB",
-        "LB",
-        "RB"
+        "LB"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -224,9 +214,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "CB",
-        "LB",
-        "RB"
+        "CB"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -252,8 +240,6 @@
       },
       "nationality": "ES",
       "positions": [
-        "CB",
-        "LB",
         "RB"
       ],
       "preferred_foot": "R",
@@ -280,9 +266,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "CB",
-        "LB",
-        "RB"
+        "CB"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -308,9 +292,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "CB",
-        "LB",
-        "RB"
+        "CB"
       ],
       "preferred_foot": "R",
       "tier": "Y",
@@ -336,9 +318,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "CM",
-        "CDM",
-        "CAM"
+        "CM"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -364,7 +344,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "CDM"
+        "CM"
       ],
       "preferred_foot": "R",
       "tier": "Y",
@@ -390,8 +370,6 @@
       },
       "nationality": "ES",
       "positions": [
-        "CM",
-        "CDM",
         "CAM"
       ],
       "preferred_foot": "R",
@@ -418,9 +396,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "CM",
-        "CDM",
-        "CAM"
+        "CM"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -446,9 +422,7 @@
       },
       "nationality": "SN",
       "positions": [
-        "CM",
-        "CDM",
-        "CAM"
+        "CDM"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -474,9 +448,7 @@
       },
       "nationality": "CA",
       "positions": [
-        "CM",
-        "CDM",
-        "CAM"
+        "CM"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -502,9 +474,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "CM",
-        "CDM",
-        "CAM"
+        "CM"
       ],
       "preferred_foot": "R",
       "tier": "A",
@@ -530,9 +500,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "ST",
-        "LW",
-        "RW"
+        "LW"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -558,9 +526,7 @@
       },
       "nationality": "UY",
       "positions": [
-        "ST",
-        "LW",
-        "RW"
+        "ST"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -586,9 +552,7 @@
       },
       "nationality": "ES",
       "positions": [
-        "ST",
-        "LW",
-        "RW"
+        "LW"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -614,8 +578,6 @@
       },
       "nationality": "BE",
       "positions": [
-        "ST",
-        "LW",
         "RW"
       ],
       "preferred_foot": "R",
@@ -642,9 +604,7 @@
       },
       "nationality": "SN",
       "positions": [
-        "ST",
-        "LW",
-        "RW"
+        "ST"
       ],
       "preferred_foot": "R",
       "tier": "C",
@@ -670,9 +630,7 @@
       },
       "nationality": "CO",
       "positions": [
-        "ST",
-        "LW",
-        "RW"
+        "ST"
       ],
       "preferred_foot": "R",
       "tier": "C",
