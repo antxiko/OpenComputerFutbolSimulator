@@ -67,7 +67,7 @@ var score_away: int = 0
 var possession_team: String = "home"  # home | away
 var current_zone: String = "mid"
 var playing: bool = false
-var play_delay_ms: float = 0.4   # segundos entre eventos
+var play_delay_ms: float = 0.7   # segundos entre eventos (>= BALL_TRANSIT_TIME para que la animación complete)
 var time_acc: float = 0.0
 
 # Movimiento de jugadores: offsets dinámicos sobre la posición de formación.
@@ -201,11 +201,12 @@ func _build_ui() -> void:
 	speed_label.text = "Velocidad:"
 	top.add_child(speed_label)
 	speed_slider = HSlider.new()
-	speed_slider.min_value = 0.05
-	speed_slider.max_value = 1.5
+	speed_slider.min_value = 0.10
+	speed_slider.max_value = 2.0
 	speed_slider.step = 0.05
-	speed_slider.value = 0.4
+	speed_slider.value = 0.7
 	speed_slider.custom_minimum_size.x = 120
+	speed_slider.tooltip_text = "Tiempo entre eventos. Menor = más rápido."
 	speed_slider.value_changed.connect(func(v: float) -> void: play_delay_ms = v)
 	top.add_child(speed_slider)
 
