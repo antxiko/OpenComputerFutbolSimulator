@@ -72,6 +72,8 @@ var user_lineup_template: Dictionary = {}
 # { year, division, position, played, won, drawn, lost, gf, ga, points,
 #   top_scorer_name, top_scorer_goals, cup_progress }
 var user_career_history: Array = []
+# Flag para saber si el mercado de invierno ya se ha ejecutado esta temporada.
+var winter_market_done: bool = false
 # Última edición de Champions League simulada (no se persiste en save).
 var champions_state: ChampionsBracket = null
 
@@ -308,6 +310,7 @@ func _start_season() -> void:
 	current_view = VIEW_TABLE
 	selected_team = null
 	selected_match = null
+	winter_market_done = false  # se podrá abrir el mercado invernal otra vez
 	# Pre-temporada: 3 amistosos para el equipo del usuario antes de la jornada 1
 	if user_team_id != "":
 		_run_preseason_friendlies()
@@ -416,6 +419,98 @@ func _show_preseason_modal(user_team: Team, results: Array) -> void:
 	popup.popup_centered()
 
 
+# =========================================================================== #
+# Mercado de invierno (jornada 19 — mitad de Liga)
+# =========================================================================== #
+func _run_winter_market() -> void:
+	var window: TransferMarket.WindowConfig = TransferMarket.winter_window()
+	var market_result := TransferMarket.run(all_teams, year, SEED_BASE * 31 + year, window)
+	# Mostrar modal solo si hubo movimiento o si el usuario tiene fichaje/venta
+	var user_relevant: bool = false
+	for tr: TransferMarket.Transfer in market_result.transfers:
+		if tr.to_team_id == user_team_id or tr.from_team_id == user_team_id:
+			user_relevant = true
+			break
+	if market_result.transfers.size() == 0:
+		status_label.text = "❄️ Mercado de invierno: sin movimientos relevantes."
+		return
+	if user_relevant or market_result.transfers.size() >= 5:
+		_show_winter_market_modal(market_result)
+	else:
+		status_label.text = "❄️ Mercado de invierno cerrado: %d operaciones en la liga." % market_result.transfers.size()
+
+
+func _show_winter_market_modal(market_result: TransferMarket.MarketResult) -> void:
+	var popup := AcceptDialog.new()
+	popup.title = "❄️ Mercado de invierno %d" % year
+	popup.size = Vector2(620, 420)
+	popup.ok_button_text = "Continuar"
+	add_child(popup)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	popup.add_child(box)
+
+	var header := Label.new()
+	header.text = "Cerró la ventana de invierno con %d operaciones." % market_result.transfers.size()
+	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	header.add_theme_font_size_override("font_size", 14)
+	header.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	box.add_child(header)
+
+	box.add_child(HSeparator.new())
+
+	# Tu equipo destacado
+	var user_signings: Array = []
+	var user_departures: Array = []
+	for tr: TransferMarket.Transfer in market_result.transfers:
+		if tr.to_team_id == user_team_id:
+			user_signings.append(tr)
+		elif tr.from_team_id == user_team_id:
+			user_departures.append(tr)
+	if user_signings.size() > 0 or user_departures.size() > 0:
+		var your_label := Label.new()
+		your_label.text = "🏟 Tu club:"
+		your_label.add_theme_font_size_override("font_size", 13)
+		your_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+		box.add_child(your_label)
+		for tr: TransferMarket.Transfer in user_signings:
+			var l := Label.new()
+			l.text = "  ✅ Firma: %s (de %s, %s €)" % [tr.player_name, tr.from_team_name, TransferMarket._fmt_eur(tr.fee_eur)]
+			l.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+			box.add_child(l)
+		for tr: TransferMarket.Transfer in user_departures:
+			var l := Label.new()
+			l.text = "  ❌ Vende: %s (a %s, %s €)" % [tr.player_name, tr.to_team_name, TransferMarket._fmt_eur(tr.fee_eur)]
+			l.add_theme_color_override("font_color", Color(1.0, 0.7, 0.7))
+			box.add_child(l)
+		box.add_child(HSeparator.new())
+
+	# Resto de transferencias destacadas (top 8 por fee)
+	var sorted_t: Array = market_result.transfers.duplicate()
+	sorted_t.sort_custom(func(a: TransferMarket.Transfer, b: TransferMarket.Transfer) -> bool:
+		return a.fee_eur > b.fee_eur)
+	var others_label := Label.new()
+	others_label.text = "Top fichajes de la ventana:"
+	others_label.add_theme_font_size_override("font_size", 12)
+	others_label.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	box.add_child(others_label)
+	var shown: int = 0
+	for tr: TransferMarket.Transfer in sorted_t:
+		if shown >= 8:
+			break
+		if tr.to_team_id == user_team_id or tr.from_team_id == user_team_id:
+			continue
+		var l := Label.new()
+		l.text = "  %s · %s → %s · %s €" % [tr.player_name, tr.from_team_name, tr.to_team_name, TransferMarket._fmt_eur(tr.fee_eur)]
+		l.add_theme_font_size_override("font_size", 11)
+		box.add_child(l)
+		shown += 1
+
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
+
+
 func _init_division(state: DivisionState, seed_offset: int) -> void:
 	var ids: Array = state.teams.map(func(t: Team) -> String: return t.id)
 	state.calendar = CalendarGenerator.generate(ids, SEED_BASE + seed_offset)
@@ -448,6 +543,12 @@ func _do_advance_jornada() -> void:
 	if segunda_state.current_jornada < segunda_state.calendar.size():
 		_simulate_jornada(segunda_state)
 		any_advanced = true
+
+	# Mercado de invierno: tras la jornada 19 (mitad de Liga), si no se ha
+	# ejecutado todavía este año, abrir la mini-ventana invernal.
+	if not winter_market_done and primera_state.current_jornada >= 19:
+		_run_winter_market()
+		winter_market_done = true
 	if not any_advanced:
 		status_label.text = "Temporada completada. Pulsa 'Nueva temporada'."
 		return
@@ -1582,6 +1683,9 @@ func _load_from_slot(slot: String) -> void:
 	user_team_id = save_data.user_team_id
 	user_lineup_template = save_data.user_lineup_template.duplicate(true)
 	user_career_history = save_data.user_career_history.duplicate(true)
+	# Si la save está mid-season tras la jornada 19, asumimos que el winter
+	# market ya se ejecutó. Evita disparo duplicado al avanzar jornadas.
+	winter_market_done = (save_data.primera_jornada >= 19)
 
 	current_view = VIEW_TABLE
 	selected_team = null

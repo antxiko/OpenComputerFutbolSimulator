@@ -17,6 +17,31 @@ const MAX_SIGNINGS_PER_TEAM: int = 3
 const MAX_DEPARTURES_PER_TEAM: int = 4
 const SLOTS_TO_EVALUATE: Array[String] = ["GK", "CB", "LB", "RB", "CDM", "CM", "CAM", "LW", "RW", "ST"]
 
+# Configuración de la ventana de mercado.
+# Verano: 4 rondas, 3 fichajes max, presupuesto completo.
+# Invierno: 2 rondas, 1 fichaje max, presupuesto reducido al 30%.
+class WindowConfig:
+	var rounds: int = 4
+	var max_signings: int = 3
+	var max_departures: int = 4
+	var budget_factor: float = 1.0
+	var label: String = "verano"
+
+
+static func summer_window() -> WindowConfig:
+	var w := WindowConfig.new()
+	return w
+
+
+static func winter_window() -> WindowConfig:
+	var w := WindowConfig.new()
+	w.rounds = 2
+	w.max_signings = 1
+	w.max_departures = 2
+	w.budget_factor = 0.30
+	w.label = "invierno"
+	return w
+
 
 class Transfer:
 	var player_id: String
@@ -37,7 +62,10 @@ class MarketResult:
 	var team_summary: Dictionary = {}  # team_id -> { signings_count, departures_count, spend, income, net }
 
 
-static func run(teams: Array, season_year: int, seed_value: int) -> MarketResult:
+static func run(teams: Array, season_year: int, seed_value: int, window: WindowConfig = null) -> MarketResult:
+	if window == null:
+		window = summer_window()
+
 	var result := MarketResult.new()
 	result.year = season_year
 
@@ -51,7 +79,8 @@ static func run(teams: Array, season_year: int, seed_value: int) -> MarketResult
 	# Jugadores ya transferidos en esta ventana — no se pueden re-vender
 	var transferred_this_window: Dictionary = {}
 	for t: Team in teams:
-		budgets[t.id] = t.finances.budget_transfers_eur if t.finances != null else 0
+		var base_budget: int = t.finances.budget_transfers_eur if t.finances != null else 0
+		budgets[t.id] = int(float(base_budget) * window.budget_factor)
 		counts_in[t.id] = 0
 		counts_out[t.id] = 0
 		result.team_summary[t.id] = {
@@ -77,15 +106,15 @@ static func run(teams: Array, season_year: int, seed_value: int) -> MarketResult
 
 	# Hacemos varias pasadas: en cada pasada cada equipo intenta UN fichaje.
 	# Eso simula que el mercado se mueve en oleadas.
-	for round_idx in 4:
+	for round_idx in window.rounds:
 		for buyer: Team in team_order:
-			if counts_in[buyer.id] >= MAX_SIGNINGS_PER_TEAM:
+			if counts_in[buyer.id] >= window.max_signings:
 				continue
 			# Athletic (basque_only) puede fichar pero solo jugadores basque_eligible.
 			# El filtrado lo aplica _find_best_candidate; aquí no hacemos continue.
 			if budgets[buyer.id] < 500_000:
 				continue
-			var transfer := _attempt_signing(buyer, teams, league_avg, budgets, counts_in, counts_out, transferred_this_window, season_year, rng)
+			var transfer := _attempt_signing(buyer, teams, league_avg, budgets, counts_in, counts_out, transferred_this_window, season_year, rng, window)
 			if transfer != null:
 				result.transfers.append(transfer)
 				_apply_transfer(transfer, teams, budgets, counts_in, counts_out, result)
@@ -104,7 +133,8 @@ static func _attempt_signing(
 	counts_out: Dictionary,
 	transferred_this_window: Dictionary,
 	season_year: int,
-	rng: RandomNumberGenerator
+	rng: RandomNumberGenerator,
+	window: WindowConfig = null
 ) -> Transfer:
 	# 1) Encontrar el slot más débil del comprador
 	var weak_slots: Array = _weakest_slots(buyer, league_avg, 3)
@@ -122,9 +152,19 @@ static func _attempt_signing(
 		var candidate: Player = candidate_data["player"]
 		var seller: Team = candidate_data["seller"]
 		var fee: int = candidate_data["fee"]
+		# En invierno los clubes no quieren soltar a sus titulares en mid-season:
+		# añade penalización al probability de aceptar.
+		if window != null and window.label == "invierno":
+			# Aumenta la lealtad efectiva: el vendedor es más reticente.
+			# Lo hacemos pidiendo +30% sobre el fee acordado (el comprador paga premium o falla).
+			fee = int(float(fee) * 1.30)
+			if fee > budgets[buyer.id]:
+				continue
 
 		# 3) Probabilidad de venta
 		var accept_prob: float = _seller_acceptance_prob(candidate, seller, fee, season_year, buyer)
+		if window != null and window.label == "invierno":
+			accept_prob -= 0.20  # mid-season los clubes se aferran a sus jugadores
 		if rng.randf() > accept_prob:
 			continue
 
