@@ -103,6 +103,8 @@ var div_tabs_box: HBoxContainer
 var view_tabs_box: HBoxContainer
 var top_header_separator: HSeparator
 var top_header_box: HBoxContainer
+var footer_global_box: HBoxContainer
+var view_title_label: Label  # Título de la vista actual en sub-vistas
 var primera_div_button: Button
 var segunda_div_button: Button
 var view_table_button: Button
@@ -187,10 +189,11 @@ func _build_ui() -> void:
 	hub_btn.pressed.connect(_on_select_view.bind(VIEW_HUB))
 	header.add_child(hub_btn)
 
-	var title := Label.new()
-	title.text = "OpenComputerFutbolSimulator"
-	title.add_theme_font_size_override("font_size", 22)
-	header.add_child(title)
+	view_title_label = Label.new()
+	view_title_label.text = ""
+	view_title_label.add_theme_font_size_override("font_size", 18)
+	view_title_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	header.add_child(view_title_label)
 
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -270,9 +273,10 @@ func _build_ui() -> void:
 	vbox.add_child(HSeparator.new())
 
 	# --- Footer: status + botones ---
-	var footer := HBoxContainer.new()
-	footer.add_theme_constant_override("separation", 12)
-	vbox.add_child(footer)
+	footer_global_box = HBoxContainer.new()
+	footer_global_box.add_theme_constant_override("separation", 12)
+	vbox.add_child(footer_global_box)
+	var footer := footer_global_box
 
 	status_label = Label.new()
 	status_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1716,7 +1720,7 @@ func _accept_manager_offer(new_team_id: String, new_team_name: String) -> void:
 	user_lineup_template = {}
 	_initialize_user_lineup()
 	# Forzar refresco UI
-	current_view = VIEW_TABLE
+	current_view = VIEW_HUB
 	selected_team = null
 	status_label.text = "✅ Has aceptado dirigir a %s%s" % [
 			new_team_name,
@@ -2797,7 +2801,7 @@ func _load_from_slot(slot: String) -> void:
 	# market ya se ejecutó. Evita disparo duplicado al avanzar jornadas.
 	winter_market_done = (save_data.primera_jornada >= 19)
 
-	current_view = VIEW_TABLE
+	current_view = VIEW_HUB
 	selected_team = null
 	selected_match = null
 	status_label.text = "Partida cargada — %s, jornada %d" % [save_data.saved_at, save_data.primera_jornada]
@@ -2809,9 +2813,9 @@ func _load_from_slot(slot: String) -> void:
 # =========================================================================== #
 func _on_select_division(div: String) -> void:
 	selected_division = div
-	# Si estábamos en una vista contextual a un equipo/partido, volvemos a la tabla
+	# Si estábamos en una vista contextual a un equipo/partido, volvemos al hub
 	if current_view in [VIEW_TEAM, VIEW_MATCH]:
-		current_view = VIEW_TABLE
+		current_view = VIEW_HUB
 	_refresh_ui()
 
 
@@ -2838,17 +2842,23 @@ func _refresh_ui() -> void:
 	jornada_label.text = "Jornada %d / %d (%s)" % [
 		st.current_jornada, st.calendar.size(), selected_division.capitalize()]
 
-	# En modo HUB, ocultar tabs antiguas y header superior — el hub tiene
-	# su propia cabecera/footer. En sub-vistas, mostrarlas todas.
+	# Modo HUB: ocultar TODA la chrome antigua (header, tabs, footer global)
+	# — el hub tiene su propia cabecera/centro/footer.
+	# Sub-vistas: header reducido (botón Hub + título de la vista) + footer
+	# global con status + acciones. Las tabs viejas se ocultan SIEMPRE.
 	var in_hub: bool = (current_view == VIEW_HUB)
 	if top_header_box != null:
 		top_header_box.visible = not in_hub
 	if div_tabs_box != null:
-		div_tabs_box.visible = not in_hub
+		div_tabs_box.visible = false  # las tabs se eliminan del flujo
 	if view_tabs_box != null:
-		view_tabs_box.visible = not in_hub
+		view_tabs_box.visible = false
 	if top_header_separator != null:
 		top_header_separator.visible = not in_hub
+	if footer_global_box != null:
+		footer_global_box.visible = not in_hub
+	if view_title_label != null:
+		view_title_label.text = _view_title_for(current_view)
 
 	primera_div_button.disabled = (selected_division == "primera")
 	segunda_div_button.disabled = (selected_division == "segunda")
@@ -2957,6 +2967,21 @@ func _render_hub_view() -> void:
 	var sp2 := Control.new()
 	sp2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header_h.add_child(sp2)
+	# Toggle de división (Primera / Segunda) — para ver clasificación de la otra
+	var div_toggle := HBoxContainer.new()
+	div_toggle.add_theme_constant_override("separation", 4)
+	header_h.add_child(div_toggle)
+	for div_data in [["1ª", "primera"], ["2ª", "segunda"]]:
+		var div_label: String = String(div_data[0])
+		var div_id: String = String(div_data[1])
+		var b := Button.new()
+		b.text = div_label
+		b.flat = (selected_division != div_id)
+		b.disabled = (selected_division == div_id)
+		b.tooltip_text = "Ver datos de %s división" % ("Primera" if div_id == "primera" else "Segunda")
+		b.pressed.connect(_on_select_division.bind(div_id))
+		div_toggle.add_child(b)
+
 	# Fecha + jornada + competición
 	var info_v := VBoxContainer.new()
 	header_h.add_child(info_v)
@@ -3068,6 +3093,23 @@ func _render_hub_view() -> void:
 		["🏟", "ESTADIO", "Mejoras y ampliaciones", _on_select_view.bind(VIEW_FINANCES)],
 	]))
 
+	# === STATUS BAR (encima del footer) ===
+	# Muestra el último mensaje de status_label (compartido con sub-vistas).
+	var status_panel := PanelContainer.new()
+	var status_bg := StyleBoxFlat.new()
+	status_bg.bg_color = Color(0.08, 0.10, 0.14)
+	status_bg.content_margin_left = 12
+	status_bg.content_margin_right = 12
+	status_bg.content_margin_top = 4
+	status_bg.content_margin_bottom = 4
+	status_panel.add_theme_stylebox_override("panel", status_bg)
+	root.add_child(status_panel)
+	var status_mirror := Label.new()
+	status_mirror.text = status_label.text if status_label != null else ""
+	status_mirror.add_theme_font_size_override("font_size", 11)
+	status_mirror.add_theme_color_override("font_color", Color(0.7, 0.85, 0.7))
+	status_panel.add_child(status_mirror)
+
 	# === FOOTER ===
 	var footer_p := PanelContainer.new()
 	var footer_bg := StyleBoxFlat.new()
@@ -3083,10 +3125,11 @@ func _render_hub_view() -> void:
 	var footer_h := HBoxContainer.new()
 	footer_h.add_theme_constant_override("separation", 8)
 	footer_p.add_child(footer_h)
-	# Botones
+	# Botones izquierda
 	for b_data in [
 		["🚪 SALIR", _on_back_to_menu],
 		["💾 GUARDAR", _on_save_game],
+		["📂 CARGAR", _on_load_game],
 		["📰 NOTICIAS", _on_select_view.bind(VIEW_CAREER)],
 	]:
 		var b := Button.new()
@@ -3101,9 +3144,15 @@ func _render_hub_view() -> void:
 	var seguir_btn := Button.new()
 	seguir_btn.text = "▶ SEGUIR"
 	seguir_btn.add_theme_font_size_override("font_size", 16)
-	seguir_btn.custom_minimum_size = Vector2(160, 0)
+	seguir_btn.custom_minimum_size = Vector2(140, 0)
 	seguir_btn.pressed.connect(_on_advance_jornada)
 	footer_h.add_child(seguir_btn)
+	# Saltar temporada completa
+	var skip_btn := Button.new()
+	skip_btn.text = "▶▶ TEMPORADA"
+	skip_btn.tooltip_text = "Simular toda la temporada sin pausas"
+	skip_btn.pressed.connect(_on_advance_full_season)
+	footer_h.add_child(skip_btn)
 	# Reset season
 	var rs_btn := Button.new()
 	rs_btn.text = "🔁 NUEVA TEMP."
@@ -3358,6 +3407,23 @@ func _render_decisions_view() -> void:
 	ch_btn.text = "🏆 Champions / Europa / Conference"
 	ch_btn.pressed.connect(_on_select_view.bind(VIEW_CHAMPIONS))
 	box.add_child(ch_btn)
+
+
+func _view_title_for(view: String) -> String:
+	match view:
+		VIEW_TABLE:     return "🏆 Clasificación"
+		VIEW_FIXTURES:  return "📊 Resultados última jornada"
+		VIEW_TEAM:      return "👥 Plantilla"
+		VIEW_TACTICS:   return "🎯 Mi alineación"
+		VIEW_MARKET:    return "💸 Mercado"
+		VIEW_CAREER:    return "📈 Carrera"
+		VIEW_CHAMPIONS: return "🏆 Competiciones europeas"
+		VIEW_FINANCES:  return "💰 Finanzas"
+		VIEW_CALENDAR:  return "📅 Calendario"
+		VIEW_RIVAL:     return "🔍 Ver rival"
+		VIEW_DECISIONS: return "⚖ Decisiones"
+		VIEW_MATCH:     return "📺 Detalle de partido"
+		_: return ""
 
 
 func _make_spacer(h: int) -> Control:
