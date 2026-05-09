@@ -10,9 +10,11 @@ Todas las versiones publicadas, qué se hizo y qué queda. Formato basado en [Ke
 - **⭐ Camera A2 light — jugador protagonista**: `Lineup.protagonist_id` (solo seteado en el lineup del usuario). En `_pick_actor`/`_pick_assistant` con `role="attack"`, el protagonista recibe +30% peso → más probable que sea shooter/creator. UI: selector encima de la plantilla del equipo del usuario. Visor: anillo amarillo pulsante + nombre sobre el jugador. Persiste en save.
 - Calibración intacta tras los cambios: 2.35 g/p, 25.10 tiros/p, 9.11 córners/p (target ~2.5 / ~25 / ~10).
 
+### Añadido (v0.4.1 candidato)
+- **Más variedad granular**: nuevos tipos `T_CROSS` (centro desde banda — laterales/extremos), `T_TACKLE_FAIL` (regate fallido con caída — 25% de los regates ahora salen mal en vez de limpios), `T_TACTICAL_FOUL` (falta táctica del defensor cortando contra en zona peligrosa — 30% de las pérdidas en `atk`). El visor dibuja X roja sobre el jugador caído (timer 0.6s) y shake horizontal sobre el que comete falta táctica (timer 0.5s).
+
 ### Pendiente (v0.4.0+)
 - Camera mode A2 full (control directo del jugador con teclado — refactor enorme)
-- Más variedad de eventos granulares (faltas tácticas, regates frustrados con caída)
 
 ### Añadido (v0.3.0 candidato)
 - **Tracking europeo en histórico de carrera**: cada temporada guarda progreso en Champions, Europa y Conference (Campeón / Subcampeón / Pasó X / Eliminado en X / Fase de grupos). Vista Carrera con 11 columnas.
