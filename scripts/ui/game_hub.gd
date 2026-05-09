@@ -150,9 +150,9 @@ func _show_welcome_message() -> void:
 	var team := _find_team_by_id(user_team_id)
 	if team == null:
 		return
-	status_label.text = "¡Bienvenido como mánager de %s! Configura 'Mi alineación' antes de empezar." % team.name
-	# Forzar pestaña Mi alineación de bienvenida
-	current_view = VIEW_TACTICS
+	status_label.text = "¡Bienvenido como mánager de %s! Pulsa ENTRENADOR → ALINEACIÓN para configurar tu once." % team.name
+	# Mantener VIEW_HUB como vista por defecto
+	current_view = VIEW_HUB
 	_refresh_ui()
 
 
@@ -3266,11 +3266,6 @@ func _render_rival_view() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 12)
 	content_area.add_child(box)
-	# Botón volver al hub
-	var back := Button.new()
-	back.text = "← Volver al hub"
-	back.pressed.connect(_on_select_view.bind(VIEW_HUB))
-	box.add_child(back)
 
 	if rival == null:
 		var l := Label.new()
@@ -3347,16 +3342,7 @@ func _render_decisions_view() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 12)
 	content_area.add_child(box)
-	var back := Button.new()
-	back.text = "← Volver al hub"
-	back.pressed.connect(_on_select_view.bind(VIEW_HUB))
-	box.add_child(back)
-
-	var title := Label.new()
-	title.text = "⚖ Decisiones del club"
-	title.add_theme_font_size_override("font_size", 20)
-	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
-	box.add_child(title)
+	# (el botón 🏠 Hub está en el header global; no añadimos otro aquí)
 
 	# Objetivo
 	if not season_objective.is_empty():
