@@ -2586,18 +2586,76 @@ func _render_calendar_view() -> void:
 	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	content_area.add_child(vbox)
 
+	var user_team := _find_team_by_id(user_team_id) if user_team_id != "" else null
 	var title := Label.new()
-	title.text = "📅 Calendario %s · Temporada %d-%d" % [
-		selected_division.capitalize(), year, year + 1]
+	if user_team != null:
+		title.text = "📅 Calendario %s · Temporada %d-%d" % [user_team.name, year, year + 1]
+	else:
+		title.text = "📅 Calendario %s · Temporada %d-%d" % [
+			selected_division.capitalize(), year, year + 1]
 	title.add_theme_font_size_override("font_size", 18)
 	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 	vbox.add_child(title)
 
-	# Por cada jornada: encabezado + 10 partidos
+	# Si hay equipo del usuario: solo sus partidos. Si no: calendario completo.
+	if user_team != null:
+		_render_calendar_user_only(vbox, st, user_team)
+	else:
+		_render_calendar_full(vbox, st)
+
+
+# Calendario filtrado: solo partidos del usuario, una línea por jornada.
+func _render_calendar_user_only(vbox: VBoxContainer, st: DivisionState, user_team: Team) -> void:
 	for j_idx in st.calendar.size():
 		var jornada: Array = st.calendar[j_idx]
 		var played: bool = j_idx < st.current_jornada
-		# Rango de fechas de la jornada (primer y último fixture por fecha)
+		# Buscar el fixture del usuario en esta jornada
+		var user_fixture: Dictionary = {}
+		for fixture: Dictionary in jornada:
+			if fixture["home_id"] == user_team.id or fixture["away_id"] == user_team.id:
+				user_fixture = fixture
+				break
+		if user_fixture.is_empty():
+			continue
+		var home_id: String = String(user_fixture["home_id"])
+		var away_id: String = String(user_fixture["away_id"])
+		var home: Team = _find_team_by_id(home_id)
+		var away: Team = _find_team_by_id(away_id)
+		if home == null or away == null:
+			continue
+		var date_str: String = ""
+		if user_fixture.has("match_date"):
+			date_str = DateUtil.format_short(user_fixture["match_date"])
+		var is_home: bool = home_id == user_team.id
+		var rival_name: String = away.name if is_home else home.name
+		var loc: String = "(L)" if is_home else "(V)"
+		var line := Label.new()
+		var status: String = ""
+		if played:
+			status = " · jugado"
+		elif j_idx == st.current_jornada:
+			status = " · próximo"
+		line.text = "J%-2d  [%s] %s vs %s %s%s" % [
+			j_idx + 1, date_str,
+			user_team.short_name if is_home else rival_name.left(20),
+			rival_name.left(20) if is_home else user_team.short_name,
+			loc, status,
+		]
+		line.add_theme_font_size_override("font_size", 12)
+		var color: Color = Color(0.85, 0.9, 1.0)
+		if j_idx == st.current_jornada:
+			color = Color(1.0, 0.95, 0.5)
+		elif played:
+			color = Color(0.7, 0.7, 0.7)
+		line.add_theme_color_override("font_color", color)
+		vbox.add_child(line)
+
+
+# Calendario completo (todos los partidos de la división) — fallback sin user_team
+func _render_calendar_full(vbox: VBoxContainer, st: DivisionState) -> void:
+	for j_idx in st.calendar.size():
+		var jornada: Array = st.calendar[j_idx]
+		var played: bool = j_idx < st.current_jornada
 		var date_range: String = ""
 		if jornada.size() > 0 and jornada[0].has("match_date"):
 			var first_date: Dictionary = jornada[0]["match_date"]
@@ -2613,13 +2671,11 @@ func _render_calendar_view() -> void:
 		header.text = "── Jornada %d%s %s──" % [j_idx + 1, date_range, "(jugada) " if played else ""]
 		header.add_theme_font_size_override("font_size", 13)
 		var hdr_color: Color = Color(0.85, 0.85, 0.85) if played else Color(0.5, 0.5, 0.5)
-		# Marcar jornada actual
 		if j_idx == st.current_jornada:
 			hdr_color = Color(1.0, 0.85, 0.2)
 			header.text = "── Jornada %d%s (próxima) ──" % [j_idx + 1, date_range]
 		header.add_theme_color_override("font_color", hdr_color)
 		vbox.add_child(header)
-
 		for fixture: Dictionary in jornada:
 			var home_id: String = String(fixture["home_id"])
 			var away_id: String = String(fixture["away_id"])
@@ -2628,17 +2684,12 @@ func _render_calendar_view() -> void:
 			if home == null or away == null:
 				continue
 			var line := Label.new()
-			var is_user: bool = home_id == user_team_id or away_id == user_team_id
-			var prefix: String = "▶ " if is_user else "  "
-			# Fecha real del partido
 			var date_str: String = ""
 			if fixture.has("match_date"):
 				date_str = "[%s] " % DateUtil.format_short(fixture["match_date"])
-			line.text = "%s%s%-28s vs %-28s" % [prefix, date_str, home.name.left(28), away.name.left(28)]
+			line.text = "  %s%-28s vs %-28s" % [date_str, home.name.left(28), away.name.left(28)]
 			line.add_theme_font_size_override("font_size", 11)
-			if is_user:
-				line.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
-			elif played:
+			if played:
 				line.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 			vbox.add_child(line)
 
