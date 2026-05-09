@@ -966,7 +966,10 @@ func _show_coach_award_modal(verdict: String, points: int, prize: int) -> void:
 
 func _init_division(state: DivisionState, seed_offset: int) -> void:
 	var ids: Array = state.teams.map(func(t: Team) -> String: return t.id)
-	state.calendar = CalendarGenerator.generate(ids, SEED_BASE + seed_offset)
+	# Calendario con fechas reales (temporada año-año+1, agosto a mayo).
+	# european_team_ids: top 4 año anterior — pero la primera vez no tenemos
+	# tabla previa, así que pasamos vacío. Próximas iteraciones lo calculan.
+	state.calendar = CalendarGenerator.generate_with_dates(ids, year, SEED_BASE + seed_offset, [])
 	state.current_jornada = 0
 	state.league_table = LeagueTable.new()
 	state.league_table.init_with_teams(state.teams)
@@ -2511,14 +2514,26 @@ func _render_calendar_view() -> void:
 	for j_idx in st.calendar.size():
 		var jornada: Array = st.calendar[j_idx]
 		var played: bool = j_idx < st.current_jornada
+		# Rango de fechas de la jornada (primer y último fixture por fecha)
+		var date_range: String = ""
+		if jornada.size() > 0 and jornada[0].has("match_date"):
+			var first_date: Dictionary = jornada[0]["match_date"]
+			var last_date: Dictionary = jornada[-1]["match_date"]
+			if DateUtil.compare(first_date, last_date) == 0:
+				date_range = " · %s" % DateUtil.format_short(first_date)
+			else:
+				date_range = " · %s — %s" % [
+					DateUtil.format_short(first_date),
+					DateUtil.format_short(last_date),
+				]
 		var header := Label.new()
-		header.text = "── Jornada %d %s──" % [j_idx + 1, "(jugada) " if played else ""]
+		header.text = "── Jornada %d%s %s──" % [j_idx + 1, date_range, "(jugada) " if played else ""]
 		header.add_theme_font_size_override("font_size", 13)
 		var hdr_color: Color = Color(0.85, 0.85, 0.85) if played else Color(0.5, 0.5, 0.5)
 		# Marcar jornada actual
 		if j_idx == st.current_jornada:
 			hdr_color = Color(1.0, 0.85, 0.2)
-			header.text = "── Jornada %d (próxima) ──" % (j_idx + 1)
+			header.text = "── Jornada %d%s (próxima) ──" % [j_idx + 1, date_range]
 		header.add_theme_color_override("font_color", hdr_color)
 		vbox.add_child(header)
 
@@ -2532,9 +2547,11 @@ func _render_calendar_view() -> void:
 			var line := Label.new()
 			var is_user: bool = home_id == user_team_id or away_id == user_team_id
 			var prefix: String = "▶ " if is_user else "  "
-			# Si la jornada se jugó, intentar encontrar el resultado en season history
-			# (no lo persistimos por jornada, así que solo mostramos resultado para "última jornada")
-			line.text = "%s%-30s vs %30s" % [prefix, home.name.left(30), away.name.left(30)]
+			# Fecha real del partido
+			var date_str: String = ""
+			if fixture.has("match_date"):
+				date_str = "[%s] " % DateUtil.format_short(fixture["match_date"])
+			line.text = "%s%s%-28s vs %-28s" % [prefix, date_str, home.name.left(28), away.name.left(28)]
 			line.add_theme_font_size_override("font_size", 11)
 			if is_user:
 				line.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
@@ -2782,8 +2799,8 @@ func _load_from_slot(slot: String) -> void:
 	# Regenerar calendarios desde el seed (deterministas)
 	var primera_ids: Array = primera_state.teams.map(func(t: Team) -> String: return t.id)
 	var segunda_ids: Array = segunda_state.teams.map(func(t: Team) -> String: return t.id)
-	primera_state.calendar = CalendarGenerator.generate(primera_ids, SEED_BASE)
-	segunda_state.calendar = CalendarGenerator.generate(segunda_ids, SEED_BASE + 1)
+	primera_state.calendar = CalendarGenerator.generate_with_dates(primera_ids, year, SEED_BASE, [])
+	segunda_state.calendar = CalendarGenerator.generate_with_dates(segunda_ids, year, SEED_BASE + 1, [])
 	primera_state.current_jornada = save_data.primera_jornada
 	segunda_state.current_jornada = save_data.segunda_jornada
 	primera_state.league_table = SaveSystem.restore_table(save_data.primera_table_snapshot, primera_state.teams)
@@ -3049,8 +3066,10 @@ func _render_hub_view() -> void:
 		# Próximo rival
 		var rival: Team = _find_next_rival(team)
 		if rival != null:
+			# Fecha del próximo partido del usuario
+			var next_date_str: String = _user_next_match_date_str(team)
 			var vs_label := Label.new()
-			vs_label.text = "── próximo rival ──"
+			vs_label.text = "── próximo rival%s ──" % (" · " + next_date_str if next_date_str != "" else "")
 			vs_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			vs_label.add_theme_font_size_override("font_size", 11)
 			vs_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
@@ -3235,6 +3254,19 @@ func _make_team_logo(team: Team, size: int) -> Control:
 	l.add_theme_color_override("font_color", Color.from_string(String(team.colors.get("secondary", "#FFFFFF")), Color.WHITE))
 	p.add_child(l)
 	return p
+
+
+func _user_next_match_date_str(team: Team) -> String:
+	var st: DivisionState = primera_state if team.division == "primera" else segunda_state
+	if st.calendar.is_empty() or st.current_jornada >= st.calendar.size():
+		return ""
+	var jornada: Array = st.calendar[st.current_jornada]
+	for fixture: Dictionary in jornada:
+		if fixture["home_id"] == team.id or fixture["away_id"] == team.id:
+			if fixture.has("match_date"):
+				return DateUtil.format_short(fixture["match_date"])
+			return ""
+	return ""
 
 
 func _find_next_rival(team: Team) -> Team:
