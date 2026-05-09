@@ -46,7 +46,31 @@ static func age_team(team: Team, new_season_year: int, seed_base: int) -> Array[
 			# Restaurar condition al inicio de temporada
 			p.condition = 100.0
 	team.players = still_active
+	# v0.3.2: aplicar bonus de training_focus a los jugadores que se quedaron
+	_apply_training_focus_bonus(team)
 	return retired
+
+
+# Aplica +1 al atributo correspondiente al focus de entrenamiento del equipo.
+# Solo a jugadores ≤30 años (jóvenes mejoran más con entrenamiento).
+static func _apply_training_focus_bonus(team: Team) -> void:
+	if team.training_focus == "" or team.training_focus == "general":
+		return
+	var attr_key: String = ""
+	match team.training_focus:
+		"ataque": attr_key = "ataque"
+		"defensa": attr_key = "defensa"
+		"fisico": attr_key = "fisico"
+		"porteria": attr_key = "porteria"
+		_: return
+	for p: Player in team.players:
+		# Solo jugadores jóvenes mejoran significativamente con training
+		if attr_key == "porteria" and p.primary_position() != "GK":
+			continue
+		if p.attributes.has(attr_key):
+			var current: int = int(p.attributes[attr_key])
+			# +1 absoluto, capado a 99
+			p.attributes[attr_key] = mini(99, current + 1)
 
 
 # Aplica aging a TODOS los equipos. Devuelve un dict { team_id: Array[Player retirados] }.

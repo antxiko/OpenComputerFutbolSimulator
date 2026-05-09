@@ -47,15 +47,28 @@ static func acceptable_years(player: Player, season_year: int) -> Array:
 #     "counter_salary": int,    # propuesta de contraoferta (0 si no aplica)
 #     "counter_years": int,     # propuesta de contraoferta (0 si no aplica)
 #   }
-static func evaluate_offer(player: Player, season_year: int, salary_offer: int, years_offer: int) -> Dictionary:
+# `agent` (opcional): si el jugador tiene agente, su personalidad y la relación
+# con `team_id` modifican la negociación. Sin agente → se usa heurística base.
+static func evaluate_offer(player: Player, season_year: int, salary_offer: int, years_offer: int,
+		agent: Agent = null, team_id: String = "") -> Dictionary:
 	var fair: int = fair_salary(player, season_year)
 	var demand: float = _tier_demand_multiplier(player.tier)
+	# Agente influye: greedy/tough piden más sobre el justo
+	if agent != null:
+		demand *= agent.salary_demand_multiplier()
 	var target: int = int(float(fair) * demand)
 
 	var ratio: float = float(salary_offer) / float(maxi(1, target))
 	var year_range: Array = acceptable_years(player, season_year)
 	var min_years: int = year_range[0]
 	var max_years: int = year_range[1]
+
+	# Modificador del agente sobre accept_prob (puede ser negativo)
+	var agent_mod: float = 0.0
+	var agent_label: String = ""
+	if agent != null:
+		agent_mod = agent.accept_prob_modifier(team_id)
+		agent_label = " (agente: %s)" % agent.name
 
 	# Caso 1: años fuera de rango → contraoferta de años (al borde aceptable)
 	if years_offer < min_years or years_offer > max_years:
@@ -64,7 +77,7 @@ static func evaluate_offer(player: Player, season_year: int, salary_offer: int, 
 		var counter_salary: int = maxi(salary_offer, target)
 		return {
 			"accepted": false,
-			"message": "%s prefiere un contrato de %d años en vez de %d." % [player.name, fixed_years, years_offer],
+			"message": "%s prefiere un contrato de %d años en vez de %d.%s" % [player.name, fixed_years, years_offer, agent_label],
 			"counter_salary": counter_salary,
 			"counter_years": fixed_years,
 		}
@@ -73,7 +86,7 @@ static func evaluate_offer(player: Player, season_year: int, salary_offer: int, 
 	if ratio < 0.80:
 		return {
 			"accepted": false,
-			"message": "%s rechaza la oferta. Pide al menos %s€/año." % [player.name, _format_eur(target)],
+			"message": "%s rechaza la oferta. Pide al menos %s€/año.%s" % [player.name, _format_eur(target), agent_label],
 			"counter_salary": target,
 			"counter_years": years_offer,
 		}
@@ -86,26 +99,34 @@ static func evaluate_offer(player: Player, season_year: int, salary_offer: int, 
 		if player.tier == "S": accept_prob -= 0.20
 		elif player.tier == "C": accept_prob += 0.15
 		if age >= 33: accept_prob += 0.20  # veterano agradece la oferta
-		accept_prob = clampf(accept_prob, 0.05, 0.95)
+		accept_prob += agent_mod  # influencia del agente
+		accept_prob = clampf(accept_prob, 0.02, 0.95)
 
 		if randf() < accept_prob:
 			return {
 				"accepted": true,
-				"message": "%s acepta la renovación: %d años, %s€/año." % [player.name, years_offer, _format_eur(salary_offer)],
+				"message": "%s acepta la renovación: %d años, %s€/año.%s" % [player.name, years_offer, _format_eur(salary_offer), agent_label],
 				"counter_salary": 0,
 				"counter_years": 0,
 			}
 		return {
 			"accepted": false,
-			"message": "%s pide algo más: %s€/año." % [player.name, _format_eur(target)],
+			"message": "%s pide algo más: %s€/año.%s" % [player.name, _format_eur(target), agent_label],
 			"counter_salary": target,
 			"counter_years": years_offer,
 		}
 
-	# Caso 4: salario aceptable o por encima → casi siempre acepta
+	# Caso 4: salario aceptable o por encima — agentes tough/greedy aún pueden rechazar
+	if agent_mod < -0.10 and randf() < 0.20:
+		return {
+			"accepted": false,
+			"message": "%s rechaza pese a la oferta competitiva. El agente exige más.%s" % [player.name, agent_label],
+			"counter_salary": int(salary_offer * 1.15),
+			"counter_years": years_offer,
+		}
 	return {
 		"accepted": true,
-		"message": "%s acepta la renovación: %d años, %s€/año." % [player.name, years_offer, _format_eur(salary_offer)],
+		"message": "%s acepta la renovación: %d años, %s€/año.%s" % [player.name, years_offer, _format_eur(salary_offer), agent_label],
 		"counter_salary": 0,
 		"counter_years": 0,
 	}

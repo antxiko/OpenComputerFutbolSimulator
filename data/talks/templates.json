@@ -1,0 +1,131 @@
+{
+  "_doc": "Plantillas de 'discurso persuasivo' que el mánager puede dirigir al jugador antes de un fichaje (o para retenerlo). Cada plantilla tiene un topic y 3 opciones — UNA es buena (+0.10 a accept_prob), UNA neutra (0), UNA mala (-0.08). El orden de las opciones se aleatoriza al mostrarlo para que el usuario no memorice.",
+  "templates": [
+    {
+      "id": "project",
+      "topic": "Le hablas del proyecto deportivo del club",
+      "options": [
+        {
+          "label": "\"Te ofrecemos liderar la reconstrucción de un grande, con calma y paciencia\"",
+          "tone": "good",
+          "feedback": "El jugador asiente: le motiva ser piedra angular del proyecto."
+        },
+        {
+          "label": "\"Vamos por buen camino, queremos jugadores como tú\"",
+          "tone": "neutral",
+          "feedback": "Mensaje correcto, sin más."
+        },
+        {
+          "label": "\"Eres una pieza más, harás lo que diga el míster\"",
+          "tone": "bad",
+          "feedback": "El jugador frunce el ceño: no le gusta sentirse desvalorizado."
+        }
+      ]
+    },
+    {
+      "id": "role",
+      "topic": "Le hablas del rol que tendrá en el equipo",
+      "options": [
+        {
+          "label": "\"Serás titular indiscutible desde el día uno\"",
+          "tone": "good",
+          "feedback": "Le encanta la garantía de minutos."
+        },
+        {
+          "label": "\"Competirás con otros para el puesto\"",
+          "tone": "neutral",
+          "feedback": "Se lo toma con realismo: nada nuevo."
+        },
+        {
+          "label": "\"Tendrás que ganarte tu sitio cada partido\"",
+          "tone": "bad",
+          "feedback": "Sus ojos se enfrían: esperaba más confianza."
+        }
+      ]
+    },
+    {
+      "id": "salary",
+      "topic": "Le hablas del aspecto económico",
+      "options": [
+        {
+          "label": "\"Te ofreceremos el mejor contrato dentro de nuestras posibilidades\"",
+          "tone": "good",
+          "feedback": "Aprecia la transparencia y el esfuerzo."
+        },
+        {
+          "label": "\"El salario será competitivo en el mercado\"",
+          "tone": "neutral",
+          "feedback": "Asiente — mensaje estándar."
+        },
+        {
+          "label": "\"El dinero no es lo importante en este reto\"",
+          "tone": "bad",
+          "feedback": "Le molesta: si no es importante, ¿por qué lo dices?"
+        }
+      ]
+    },
+    {
+      "id": "europe",
+      "topic": "Le hablas de los objetivos europeos del club",
+      "options": [
+        {
+          "label": "\"Vamos a ganar la Champions League contigo en el equipo\"",
+          "tone": "good",
+          "feedback": "Le impresiona la ambición — quiere ser parte de la historia."
+        },
+        {
+          "label": "\"Queremos volver a Europa pronto y necesitamos jugadores como tú\"",
+          "tone": "neutral",
+          "feedback": "Mensaje aceptable."
+        },
+        {
+          "label": "\"Ya veremos si Europa es realista para nosotros\"",
+          "tone": "bad",
+          "feedback": "Le decepciona la falta de ambición."
+        }
+      ]
+    },
+    {
+      "id": "fans",
+      "topic": "Le hablas de la afición y la ciudad",
+      "options": [
+        {
+          "label": "\"La afición está esperándote como un ídolo\"",
+          "tone": "good",
+          "feedback": "Sonríe — visualiza el estadio coreando su nombre."
+        },
+        {
+          "label": "\"Es una ciudad agradable donde tu familia estará bien\"",
+          "tone": "neutral",
+          "feedback": "Lo valora pero sin emoción."
+        },
+        {
+          "label": "\"La afición es exigente y puede pasar factura\"",
+          "tone": "bad",
+          "feedback": "El aviso de presión le repele."
+        }
+      ]
+    },
+    {
+      "id": "personal",
+      "topic": "Le hablas a corazón abierto, sin protocolo",
+      "options": [
+        {
+          "label": "\"Yo creo en ti como nadie. Esto es personal\"",
+          "tone": "good",
+          "feedback": "Le toca la fibra. Tu confianza pesa."
+        },
+        {
+          "label": "\"Tu calidad merece este reto\"",
+          "tone": "neutral",
+          "feedback": "Cumplido sincero pero no decisivo."
+        },
+        {
+          "label": "\"No tendrás otra oportunidad como ésta\"",
+          "tone": "bad",
+          "feedback": "Le suena a chantaje. Mal mensaje."
+        }
+      ]
+    }
+  ]
+}

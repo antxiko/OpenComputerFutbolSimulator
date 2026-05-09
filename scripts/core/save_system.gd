@@ -34,6 +34,8 @@ class SaveData:
 	var inbox_messages: Array = []  # Array[InboxMessage] (deserializados)
 	var manager_reputation: int = 0
 	var board_expectations_dict: Dictionary = {}  # serialized BoardExpectations o {}
+	# v0.3.2 — agentes (pool persistido para mantener relations + asignaciones)
+	var agents_pool: Array = []  # Array[Agent] (deserializados)
 
 
 # ============================================================================
@@ -45,7 +47,8 @@ static func save_game(slot_name: String, year: int, all_teams: Array,
 		user_team_id: String = "", user_lineup_template: Dictionary = {},
 		user_career_history: Array = [], user_protagonist_id: String = "",
 		inbox_messages: Array = [], manager_reputation: int = 0,
-		board_expectations: BoardExpectations = null) -> Dictionary:
+		board_expectations: BoardExpectations = null,
+		agents_pool: Array = []) -> Dictionary:
 	# Crear directorio
 	if not DirAccess.dir_exists_absolute(SAVE_DIR):
 		var err: int = DirAccess.make_dir_recursive_absolute(SAVE_DIR)
@@ -67,6 +70,7 @@ static func save_game(slot_name: String, year: int, all_teams: Array,
 		"inbox_messages": inbox_messages.map(func(m: InboxMessage) -> Dictionary: return m.to_dict()),
 		"manager_reputation": manager_reputation,
 		"board_expectations": board_expectations.to_dict() if board_expectations != null else {},
+		"agents_pool": agents_pool.map(func(a: Agent) -> Dictionary: return a.to_dict()),
 		"teams": all_teams.map(func(t: Team) -> Dictionary: return _team_to_dict(t)),
 	}
 
@@ -114,6 +118,11 @@ static func load_game(slot_name: String) -> SaveData:
 			save_data.inbox_messages.append(InboxMessage.from_dict(m_dict))
 	save_data.manager_reputation = int(parsed.get("manager_reputation", 0))
 	save_data.board_expectations_dict = parsed.get("board_expectations", {}).duplicate(true)
+	# v0.3.2 — pool de agentes
+	save_data.agents_pool = []
+	for a_dict in parsed.get("agents_pool", []):
+		if typeof(a_dict) == TYPE_DICTIONARY:
+			save_data.agents_pool.append(Agent.from_dict(a_dict))
 	# Reconstruir equipos desde el dict
 	save_data.teams = []
 	for team_dict in parsed.get("teams", []):

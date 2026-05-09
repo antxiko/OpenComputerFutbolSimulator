@@ -16,6 +16,10 @@ class_name Team extends Resource
 @export var staff: StaffInfo = null
 @export var organigrama: Organigrama = null
 @export var players: Array[Player] = []
+# v0.3.2 — focus de entrenamiento semanal. Aplica bonus +1 al atributo
+# correspondiente en titulares cada vez que aging procesa al equipo.
+# Valores: "general" (default), "ataque", "defensa", "fisico", "porteria"
+@export var training_focus: String = "general"
 
 
 func find_player(player_id: String) -> Player:
@@ -47,4 +51,5 @@ static func from_dict(d: Dictionary) -> Team:
 	var players_in: Array = d.get("players", [])
 	for pd in players_in:
 		t.players.append(Player.from_dict(pd))
+	t.training_focus = String(d.get("training_focus", "general"))
 	return t

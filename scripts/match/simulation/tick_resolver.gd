@@ -405,6 +405,10 @@ static func _pick_actor(lineup: Lineup, role: String, zone: String, rng: RandomN
 		var slot: String = lineup.slot_assignments[i]
 		var w: float = PositionContribution.actor_weight(p, slot, role, zone)
 		if w > 0.0:
+			# v0.3.2: forma del jugador modula el peso (0.70-1.30)
+			# Solo en "attack" para no afectar a la calibración defensiva.
+			if role == "attack":
+				w *= p.form
 			if role == "attack" and protag_id != "" and p.id == protag_id:
 				w *= 1.30
 			weights.append(w)

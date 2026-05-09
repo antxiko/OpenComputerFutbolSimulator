@@ -1,0 +1,145 @@
+{
+  "_doc": "Templates de 'momento Ted Lasso' — charlas de vestuario en momentos clave. Cada plantilla está asociada a un trigger (mala_racha, humillacion, vs_top, vestuario_tenso). Cada opción tiene tone (good/neutral/bad) y effects sobre morale plantilla y form_bonus para el próximo partido.",
+  "templates": [
+    {
+      "id": "mala_racha",
+      "trigger": "3_derrotas_seguidas",
+      "intro": "Tras tres derrotas seguidas, el vestuario está hundido. Te toca hablar.",
+      "options": [
+        {
+          "label": "\"No estamos jugando mal. Yo lo veo. Y vosotros sabéis que no estáis solos. Mañana entrenamos como siempre. Os quiero.\"",
+          "tone": "good",
+          "feedback": "Los jugadores se miran. Algunos asienten despacio. Algo cambia.",
+          "morale_delta": 8,
+          "form_bonus": 0.05
+        },
+        {
+          "label": "\"Hay que mejorar. Esto no se puede tolerar más. A trabajar.\"",
+          "tone": "neutral",
+          "feedback": "El mensaje es correcto pero genérico. Los jugadores asienten por respeto.",
+          "morale_delta": 0,
+          "form_bonus": 0.0
+        },
+        {
+          "label": "\"Algunos vais a tener que pelear vuestro puesto. Estoy decepcionado.\"",
+          "tone": "bad",
+          "feedback": "Las miradas se enfrían. Algunos jugadores se cierran en banda.",
+          "morale_delta": -6,
+          "form_bonus": -0.03
+        }
+      ]
+    },
+    {
+      "id": "humillacion",
+      "trigger": "derrota_4_o_mas_diferencia",
+      "intro": "Has perdido por 4 o más goles de diferencia. La prensa pide tu cabeza. El vestuario está roto.",
+      "options": [
+        {
+          "label": "\"Lo que pasó pasó. Hoy nos vamos a casa, mañana entrenamos. Os necesito enteros, no avergonzados. Esto no os define.\"",
+          "tone": "good",
+          "feedback": "Algunos jugadores se levantan con la espalda más recta. La culpa empieza a transformarse en determinación.",
+          "morale_delta": 10,
+          "form_bonus": 0.06
+        },
+        {
+          "label": "\"Hay que olvidar y mirar al siguiente partido.\"",
+          "tone": "neutral",
+          "feedback": "Mensaje aceptable. Los jugadores se levantan, todavía cabizbajos.",
+          "morale_delta": -2,
+          "form_bonus": 0.0
+        },
+        {
+          "label": "\"¡Esto es vergonzoso! ¡No quiero ver caras así nunca más!\"",
+          "tone": "bad",
+          "feedback": "El silencio se vuelve gélido. Alguno te mira con resentimiento.",
+          "morale_delta": -10,
+          "form_bonus": -0.05
+        }
+      ]
+    },
+    {
+      "id": "vs_top",
+      "trigger": "antes_partido_vs_top4",
+      "intro": "Mañana visitáis a uno de los grandes de la liga. El vestuario está nervioso.",
+      "options": [
+        {
+          "label": "\"Sin presión. Disfrutad del partido. Solo estar aquí ya es ganar. Salid sin miedo.\"",
+          "tone": "good",
+          "feedback": "Las sonrisas vuelven. Los nervios se relajan. Listos para jugar libres.",
+          "morale_delta": 6,
+          "form_bonus": 0.07
+        },
+        {
+          "label": "\"Hay que ganar. Esto es una final. Concentración.\"",
+          "tone": "neutral",
+          "feedback": "Asienten serios. Mensaje estándar pre-partido.",
+          "morale_delta": 0,
+          "form_bonus": 0.0
+        },
+        {
+          "label": "\"Si perdemos, habrá broncas. Quiero ver compromiso máximo.\"",
+          "tone": "bad",
+          "feedback": "La tensión sube. Los jugadores se bloquean por la presión.",
+          "morale_delta": -4,
+          "form_bonus": -0.05
+        }
+      ]
+    },
+    {
+      "id": "vestuario_tenso",
+      "trigger": "morale_promedio_bajo",
+      "intro": "El morale del vestuario está por debajo del 50%. Hay que hacer algo, y rápido.",
+      "options": [
+        {
+          "label": "\"He visto vuestras caras estos días. Sé que no es fácil. Pero estoy aquí. Hablad conmigo, uno a uno si hace falta. Os escucho.\"",
+          "tone": "good",
+          "feedback": "Algo se rompe en el ambiente. Por primera vez en semanas, hablan con honestidad.",
+          "morale_delta": 12,
+          "form_bonus": 0.04
+        },
+        {
+          "label": "\"Vamos a centrarnos en el trabajo. Lo demás vendrá solo.\"",
+          "tone": "neutral",
+          "feedback": "Asienten sin convicción. El ambiente sigue igual de pesado.",
+          "morale_delta": -1,
+          "form_bonus": 0.0
+        },
+        {
+          "label": "\"Os pago para que estéis profesionales. Las quejas en privado, no en el vestuario.\"",
+          "tone": "bad",
+          "feedback": "El silencio se hace plomo. Los líderes te miran fijamente sin decir nada.",
+          "morale_delta": -8,
+          "form_bonus": -0.04
+        }
+      ]
+    },
+    {
+      "id": "victoria_grande",
+      "trigger": "victoria_vs_top4",
+      "intro": "Habéis ganado a uno de los grandes. El vestuario celebra. Pero también este es un momento clave.",
+      "options": [
+        {
+          "label": "\"¡Esto es vuestro! Mirad lo que sois capaces. Disfrutadlo. Mañana ya pensaremos en el siguiente.\"",
+          "tone": "good",
+          "feedback": "El vestuario explota de alegría — y de fe en sí mismos.",
+          "morale_delta": 10,
+          "form_bonus": 0.05
+        },
+        {
+          "label": "\"Bien hecho. A seguir así. El siguiente partido es lo importante.\"",
+          "tone": "neutral",
+          "feedback": "Mensaje correcto, sin más.",
+          "morale_delta": 2,
+          "form_bonus": 0.0
+        },
+        {
+          "label": "\"No nos relajemos. Esto es solo una victoria. Aún queda mucho.\"",
+          "tone": "bad",
+          "feedback": "El momento mágico se enfría. Algunos pierden el brillo.",
+          "morale_delta": -3,
+          "form_bonus": -0.02
+        }
+      ]
+    }
+  ]
+}

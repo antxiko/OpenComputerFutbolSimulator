@@ -53,6 +53,18 @@ class_name Player extends Resource
 # Datos de contrato
 @export var contract: ContractInfo = null
 
+# v0.3.2 — profundidad jugadores
+# Forma: multiplicador 0.70-1.30 sobre rendimiento (oscila con resultados).
+@export var form: float = 1.0
+# Personalidad: lider / equilibrado / temperamental / flojo. Afecta morale
+# recovery, riesgo lesión, capacidad de subir form.
+# Default "" = no asignada todavía (se rellena en game_hub al cargar datos).
+@export var personality: String = ""
+# Agente que representa al jugador. Vacío = sin representación. Apunta al
+# id de un Agent generado en AgentFactory. Múltiples jugadores pueden
+# compartir el mismo agent_id.
+@export var agent_id: String = ""
+
 
 func age_at(year: int, month: int, day: int) -> int:
 	var by: int = int(birth_date.get("year", 0))
@@ -101,4 +113,8 @@ static func from_dict(d: Dictionary) -> Player:
 	p.basque_eligible = bool(d.get("basque_eligible", false))
 	p.loan_origin_team_id = String(d.get("loan_origin_team_id", ""))
 	p.loan_until_year = int(d.get("loan_until_year", 0))
+	# v0.3.2 — defaults tolerantes para JSON antiguos
+	p.form = float(d.get("form", 1.0))
+	p.personality = String(d.get("personality", ""))
+	p.agent_id = String(d.get("agent_id", ""))
 	return p

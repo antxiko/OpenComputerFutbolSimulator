@@ -39,6 +39,7 @@ const VIEW_RIVAL := "rival"
 const VIEW_DECISIONS := "decisions"
 const VIEW_EMPLOYEES := "employees"
 const VIEW_INBOX := "inbox"
+const VIEW_AGENTS := "agents"
 
 
 # --------------------------------------------------------------------------- #
@@ -85,6 +86,19 @@ var board_expectations: BoardExpectations = null
 var press_templates: Array = []
 # Última jornada en que se mostró press conference (para evitar duplicados)
 var last_press_jornada: int = 0
+# v0.3.2 — pool de agentes que representan a los jugadores de la liga
+var agents_pool: Array = []  # Array[Agent]
+# v0.3.2 — plantillas de speech persuasivo (cargadas de data/talks/templates.json)
+var talk_templates: Array = []
+# Modifier transitorio: si el usuario hizo speech persuasivo, este número se
+# aplica a la siguiente acceptance (y se resetea). Solo aplica a una operación.
+var pending_persuasion_modifier: float = 0.0
+# v0.3.2 — Ted Lasso: team talks en momentos de crisis
+var team_talk_templates: Array = []  # cargadas de data/talks/team_talks.json
+var last_team_talk_jornada: int = -10  # cooldown — no team talks consecutivas
+# Bonus temporal para el próximo partido del usuario tras team talk exitosa.
+# Se consume al simular el partido y se resetea.
+var team_talk_form_bonus: float = 0.0
 # Alineación personalizada del usuario, dict con keys:
 #   formation, eleven_ids (Array[String]), slot_assignments (Array[String]),
 #   tactics: { mentality, tempo, pressing, width }
@@ -144,6 +158,8 @@ func _ready() -> void:
 	_build_ui()
 	_load_data()
 	_load_press_templates()
+	_load_talk_templates()
+	_load_team_talk_templates()
 	# Aplicar configuración de GameSession (si venimos del menú principal)
 	if GameSession.start_mode == "new_game":
 		user_team_id = GameSession.pending_user_team_id
@@ -366,8 +382,12 @@ func _load_data() -> void:
 		if t.organigrama == null:
 			t.organigrama = OrganigramaFactory.generate(t, year)
 			OrganigramaFactory.sync_staff_info(t)
-	status_label.text = "Cargados %d equipos, %d jugadores." % [
-		all_teams.size(), loaded.player_id_index.size()]
+	# v0.3.2: generar pool de agentes y asignarlos a jugadores si no están ya asignados
+	_ensure_agents_initialized()
+	# v0.3.2: asignar personality a jugadores que no la tengan (defaults "")
+	_ensure_personalities_initialized()
+	status_label.text = "Cargados %d equipos, %d jugadores, %d agentes." % [
+		all_teams.size(), loaded.player_id_index.size(), agents_pool.size()]
 
 
 func _start_season() -> void:
@@ -922,10 +942,14 @@ func _on_release_player_pressed(player_id: String, decisions: Dictionary, status
 func _on_send_renewal_offer(player: Player, season_year: int, sal_spin: SpinBox, years_spin: SpinBox, feedback: Label, status_label: Label, decisions: Dictionary, popup: AcceptDialog) -> void:
 	var salary: int = int(sal_spin.value)
 	var years: int = int(years_spin.value)
-	var eval: Dictionary = ContractNegotiation.evaluate_offer(player, season_year, salary, years)
+	var agent: Agent = _agent_of(player)
+	var eval: Dictionary = ContractNegotiation.evaluate_offer(player, season_year, salary, years, agent, user_team_id)
 	if bool(eval.get("accepted", false)):
 		ContractNegotiation.apply_renewal(player, season_year, salary, years)
 		decisions[player.id] = "renewed"
+		# v0.3.2: relación del agente +5 con el club al cerrar trato
+		if agent != null:
+			agent.adjust_relation(user_team_id, 5)
 		status_label.text = "✅ Renovado (%d años, %s€/año)" % [years, _fmt_eur(salary)]
 		status_label.add_theme_color_override("font_color", Color(0.4, 0.9, 0.5))
 		popup.queue_free()
@@ -1270,6 +1294,8 @@ func _do_advance_jornada() -> void:
 			_on_open_2d_viewer(user_result)
 		else:
 			_show_post_match_modal(user_result)
+	# v0.3.2 Ted Lasso: detectar momentos de crisis y disparar team talk
+	await _maybe_trigger_team_talk(true)
 	_refresh_ui()
 
 
@@ -3211,6 +3237,14 @@ func _simulate_jornada(state: DivisionState) -> void:
 			home_lineup = AutoLineup.pick(home, home.tactics_default.formation)
 		if away_lineup == null:
 			away_lineup = AutoLineup.pick(away, away.tactics_default.formation)
+		# v0.3.2 Ted Lasso: aplicar form_bonus temporal a los titulares del usuario
+		# si hubo team talk con efecto. Se consume al simular.
+		if team_talk_form_bonus != 0.0:
+			var user_lineup: Lineup = home_lineup if home.id == user_team_id else (away_lineup if away.id == user_team_id else null)
+			if user_lineup != null:
+				for p: Player in user_lineup.starting_eleven:
+					p.form = clampf(p.form + team_talk_form_bonus, FormTracker.FORM_MIN, FormTracker.FORM_MAX)
+				team_talk_form_bonus = 0.0  # consumido
 		state.seed_counter += 1
 		var result: MatchResult = MatchEngine.simulate(home_lineup, away_lineup, state.seed_counter)
 		if result != null:
@@ -3272,6 +3306,8 @@ func _simulate_jornada(state: DivisionState) -> void:
 					var passist: Player = _find_player_globally(ev.secondary_player_id)
 					if passist != null:
 						passist.season_assists += 1
+			# v0.3.2: actualizar FORM de los jugadores que jugaron este partido
+			_update_form_for_match(home_lineup, away_lineup, result)
 	state.current_jornada += 1
 	# Modal de lesiones graves del usuario en esta jornada
 	if user_grave_injuries.size() > 0:
@@ -3339,7 +3375,7 @@ func _save_to_slot(slot: String) -> void:
 		primera_state.current_jornada, segunda_state.current_jornada,
 		primera_state.league_table, segunda_state.league_table,
 		user_team_id, user_lineup_template, user_career_history, user_protagonist_id,
-		user_inbox, manager_reputation, board_expectations)
+		user_inbox, manager_reputation, board_expectations, agents_pool)
 	if result.get("ok", false):
 		status_label.text = "Partida guardada en '%s' — %s" % [slot, result["saved_at"]]
 	else:
@@ -3394,6 +3430,9 @@ func _load_from_slot(slot: String) -> void:
 		board_expectations = BoardExpectations.from_dict(save_data.board_expectations_dict)
 	else:
 		board_expectations = null
+	# v0.3.2: pool de agentes (si no hay en save, dejar vacío y _ensure_agents_initialized
+	# lo regenerará al volver a _load_data)
+	agents_pool = save_data.agents_pool.duplicate()
 	# Si la save está mid-season tras la jornada 19, asumimos que el winter
 	# market ya se ejecutó. Evita disparo duplicado al avanzar jornadas.
 	winter_market_done = (save_data.primera_jornada >= 19)
@@ -3499,6 +3538,7 @@ func _refresh_ui() -> void:
 		VIEW_DECISIONS: _render_decisions_view()
 		VIEW_EMPLOYEES: _render_employees_view()
 		VIEW_INBOX: _render_inbox_view()
+		VIEW_AGENTS: _render_agents_view()
 
 
 # --------------------------------------------------------------------------- #
@@ -3625,7 +3665,8 @@ func _render_hub_view() -> void:
 	# Cuadrante: MERCADO (rojo)
 	left_col.add_child(_make_quadrant("MERCADO", Color(0.75, 0.25, 0.25), [
 		["💸", "FICHAR", "Mercado de fichajes", _on_select_view.bind(VIEW_MARKET)],
-		["👥", "PLANTILLA", "Tu plantilla con stats", _on_select_view.bind(VIEW_TEAM)],
+		["👥", "PLANTILLA", "Tu plantilla con stats", _on_select_view.bind(VIEW_TEAM),],
+		["🤝", "AGENTES", "Agentes que representan a los jugadores de la liga", _on_select_view.bind(VIEW_AGENTS)],
 		["👔", "EMPLEADOS", "Organigrama del club (cuerpo técnico, ojeo, médico, cantera, dirección)", _on_select_view.bind(VIEW_EMPLOYEES)],
 	]))
 
@@ -4027,6 +4068,7 @@ func _view_title_for(view: String) -> String:
 		VIEW_DECISIONS: return "⚖ Decisiones"
 		VIEW_EMPLOYEES: return "👔 Empleados"
 		VIEW_INBOX: return "📬 Inbox"
+		VIEW_AGENTS: return "🤝 Agentes"
 		VIEW_MATCH:     return "📺 Detalle de partido"
 		_: return ""
 
@@ -4527,12 +4569,12 @@ func _render_team_view() -> void:
 
 	# Tabla de plantilla
 	var grid := GridContainer.new()
-	grid.columns = 13
+	grid.columns = 14
 	grid.add_theme_constant_override("h_separation", 12)
 	grid.add_theme_constant_override("v_separation", 3)
 	content_area.add_child(grid)
 
-	var headers: Array[String] = ["#", "Nombre", "Pos", "Edad", "Nac", "Tier", "Pot", "Ovr", "PJ", "G", "A", "Estado", "Cont"]
+	var headers: Array[String] = ["#", "Nombre", "Pos", "Edad", "Nac", "Tier", "Pot", "Ovr", "Form", "PJ", "G", "A", "Estado", "Cont"]
 	for h in headers:
 		var l := Label.new()
 		l.text = h
@@ -4562,6 +4604,7 @@ func _render_team_view() -> void:
 			status_str = "🟨×%d (riesgo)" % p.yellow_cards_season
 		elif p.yellow_cards_season > 0:
 			status_str = "🟨×%d" % p.yellow_cards_season
+		var form_data: Dictionary = FormTracker.icon_for(p.form)
 		var cells: Array[String] = [
 			str(p.shirt_number),
 			p.name,
@@ -4571,6 +4614,7 @@ func _render_team_view() -> void:
 			p.tier,
 			p.potential_tier,
 			str(ovr),
+			String(form_data["icon"]),
 			str(p.season_matches),
 			str(p.season_goals),
 			str(p.season_assists),
@@ -4875,6 +4919,17 @@ func _render_tactics_view() -> void:
 	_add_option_row(grid_top, "Presión:", ["bajo","medio","alto"], tactics["pressing"], func(v: String) -> void: user_lineup_template["tactics"]["pressing"] = v)
 	_add_option_row(grid_top, "Anchura:", ["estrecho","normal","ancho"], tactics["width"], func(v: String) -> void: user_lineup_template["tactics"]["width"] = v)
 
+	# v0.3.2: focus de entrenamiento semanal — bonus al atributo en aging
+	var focus_options: Array[String] = ["general", "ataque", "defensa", "fisico", "porteria"]
+	_add_option_row(grid_top, "Entrenamiento:", focus_options, team.training_focus, func(v: String) -> void:
+		team.training_focus = v)
+	var focus_hint := Label.new()
+	focus_hint.text = "Entrenamiento aplica +1 al atributo focus de cada jugador (titulares y suplentes) al avanzar de temporada."
+	focus_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	focus_hint.add_theme_font_size_override("font_size", 10)
+	focus_hint.add_theme_color_override("font_color", Color(0.65, 0.65, 0.65))
+	content_area.add_child(focus_hint)
+
 	content_area.add_child(HSeparator.new())
 
 	# Once inicial
@@ -5098,19 +5153,60 @@ func _on_attempt_buy(player: Player, seller_team: Team, fee: int) -> void:
 		int(accept_p * 100),
 	]
 	box.add_child(info)
+	# v0.3.2: info del agente
+	var ag: Agent = _agent_of(player)
+	if ag != null:
+		var ag_info := Label.new()
+		var rel: int = int(ag.relations.get(user_team_id, 0))
+		ag_info.text = "🤝 Agente: %s ★%d (%s) — Relación: %+d  ·  Comisión: %d%%" % [
+			ag.name, ag.reputation, ag.personality, rel, int(ag.commission_percentage() * 100)]
+		ag_info.add_theme_font_size_override("font_size", 11)
+		ag_info.add_theme_color_override("font_color", _agent_personality_color(ag.personality))
+		box.add_child(ag_info)
+	# v0.3.2: persuasion modifier visible si está activo
+	if pending_persuasion_modifier != 0.0:
+		var mod_info := Label.new()
+		mod_info.text = "💬 Charla previa aplicará: %+.0f%% accept" % (pending_persuasion_modifier * 100)
+		mod_info.add_theme_color_override("font_color",
+			Color(0.5, 0.95, 0.6) if pending_persuasion_modifier > 0 else Color(1.0, 0.5, 0.5))
+		mod_info.add_theme_font_size_override("font_size", 11)
+		box.add_child(mod_info)
 	popup.ok_button_text = "Hacer oferta"
 	popup.cancel_button_text = "Cancelar"
+	# Botón extra: hablar con el jugador antes de ofertar
+	popup.add_button("💬 Convencer primero", true, "talk_first")
 	popup.confirmed.connect(func() -> void:
 		popup.queue_free()
 		_resolve_buy(player, seller_team, fee, accept_p, rng))
-	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void:
+		popup.queue_free()
+		# Reset persuasion si cancela sin ofertar
+		pending_persuasion_modifier = 0.0)
+	popup.custom_action.connect(func(action: StringName) -> void:
+		if String(action) == "talk_first":
+			popup.queue_free()
+			_run_persuasion_then_retry_buy(player, seller_team, fee))
 	popup.popup_centered()
+
+
+func _run_persuasion_then_retry_buy(player: Player, seller_team: Team, fee: int) -> void:
+	await _show_persuasion_modal(player)
+	# Tras hablar, volver a abrir el modal de oferta (pending_persuasion_modifier
+	# está seteado y se aplicará al accept_p)
+	_on_attempt_buy(player, seller_team, fee)
 
 
 func _resolve_buy(player: Player, seller_team: Team, fee: int, accept_p: float, rng: RandomNumberGenerator) -> void:
 	var user_team := _find_team_by_id(user_team_id)
 	if user_team == null:
 		return
+	# v0.3.2: aplicar modifier de persuasion (charla previa) y de agente
+	accept_p += pending_persuasion_modifier
+	pending_persuasion_modifier = 0.0  # se consume
+	var ag_eff: Agent = _agent_of(player)
+	if ag_eff != null:
+		accept_p += ag_eff.accept_prob_modifier(user_team_id)
+	accept_p = clampf(accept_p, 0.02, 0.98)
 	if rng.randf() > accept_p:
 		# Rechazo inicial. Si la oferta estaba en zona "seria" (≥70% MV),
 		# el vendedor emite contraoferta pidiendo +15-25%.
@@ -5132,6 +5228,19 @@ func _resolve_buy(player: Player, seller_team: Team, fee: int, accept_p: float, 
 	user_team.finances.budget_transfers_eur -= fee
 	if seller_team.finances:
 		seller_team.finances.budget_transfers_eur += fee
+	# v0.3.2: agente del jugador gana relación con el club comprador (+8) y
+	# pierde con el vendedor (-3). También cobra comisión sobre el fee.
+	var ag_buy: Agent = _agent_of(player)
+	if ag_buy != null:
+		ag_buy.adjust_relation(user_team_id, 8)
+		ag_buy.adjust_relation(seller_team.id, -3)
+		var commission: int = int(float(fee) * ag_buy.commission_percentage())
+		if commission > 0 and user_team.finances != null:
+			user_team.finances.cash_balance -= commission
+		_inbox_add("agent_offer", "Comisión del agente",
+			"%s (★%d %s) cobra %s€ de comisión por el fichaje de %s." % [
+				ag_buy.name, ag_buy.reputation, ag_buy.personality,
+				TransferMarket._fmt_eur(commission), player.name])
 	status_label.text = "✓ %s fichado por %s. Coste: %s" % [player.name, user_team.short_name, TransferMarket._fmt_eur(fee)]
 	_refresh_ui()
 
@@ -5181,6 +5290,16 @@ func _on_accept_counter_offer(player: Player, seller_team: Team, counter_fee: in
 	user_team.finances.budget_transfers_eur -= counter_fee
 	if seller_team.finances:
 		seller_team.finances.budget_transfers_eur += counter_fee
+	# v0.3.2: agente
+	var ag_acc: Agent = _agent_of(player)
+	if ag_acc != null:
+		ag_acc.adjust_relation(user_team_id, 12)  # más relación que oferta normal
+		var commission: int = int(float(counter_fee) * ag_acc.commission_percentage())
+		if commission > 0 and user_team.finances != null:
+			user_team.finances.cash_balance -= commission
+		_inbox_add("agent_offer", "Comisión del agente",
+			"%s cobra %s€ por el fichaje de %s tras contraoferta." % [
+				ag_acc.name, TransferMarket._fmt_eur(commission), player.name])
 	status_label.text = "✓ %s fichado por %s tras contraoferta. Coste: %s" % [
 		player.name, user_team.short_name, TransferMarket._fmt_eur(counter_fee),
 	]
@@ -5189,6 +5308,15 @@ func _on_accept_counter_offer(player: Player, seller_team: Team, counter_fee: in
 
 func _on_reject_counter_offer(player: Player, seller_team: Team, popup: ConfirmationDialog) -> void:
 	popup.queue_free()
+	# v0.3.2: rechazar contraoferta enfada al agente. Y todos sus otros clientes
+	# son más reticentes a fichar contigo.
+	var ag_rej: Agent = _agent_of(player)
+	if ag_rej != null:
+		ag_rej.adjust_relation(user_team_id, -10)
+		_inbox_add("agent_offer", "Agente molesto",
+			"%s (representa a %d jugadores) está molesto contigo tras rechazar la contraoferta por %s. Su relación: %d." % [
+				ag_rej.name, ag_rej.client_ids.size(), player.name,
+				int(ag_rej.relations.get(user_team_id, 0))])
 	status_label.text = "❌ Rechazaste la contraoferta de %s por %s." % [seller_team.short_name, player.name]
 
 
@@ -5641,3 +5769,497 @@ func _initialize_manager_reputation_from_team() -> void:
 	var team := _find_team_by_id(user_team_id)
 	if team != null and manager_reputation == 0:
 		manager_reputation = team.reputation
+
+
+# =========================================================================== #
+# v0.3.2 — Profundidad jugadores: agentes, form, personality, training focus
+# =========================================================================== #
+
+# Genera el pool de agentes la primera vez que se cargan datos. Si ya hay
+# agentes (porque viene de un save), respeta esos.
+func _ensure_agents_initialized() -> void:
+	if agents_pool.size() > 0:
+		return
+	agents_pool = AgentFactory.generate_and_assign(all_teams, SEED_BASE * 9)
+
+
+# Lookup helper: agente de un jugador
+func _agent_of(player: Player) -> Agent:
+	if player == null or player.agent_id == "":
+		return null
+	return AgentFactory.find_by_player(agents_pool, player)
+
+
+# Lookup helper: agente por id
+func _find_agent(agent_id: String) -> Agent:
+	if agent_id == "":
+		return null
+	return AgentFactory.find_by_id(agents_pool, agent_id)
+
+
+# --------------------------------------------------------------------------- #
+# Vista: Agentes
+# --------------------------------------------------------------------------- #
+func _render_agents_view() -> void:
+	if agents_pool.is_empty():
+		var l := Label.new()
+		l.text = "Aún no hay agentes generados. Empieza una partida para inicializarlos."
+		content_area.add_child(l)
+		return
+
+	var header := Label.new()
+	header.text = "🤝 Agentes de la liga · %d agentes representan a %d jugadores" % [
+		agents_pool.size(), _count_represented_players()]
+	header.add_theme_font_size_override("font_size", 16)
+	content_area.add_child(header)
+
+	var hint := Label.new()
+	hint.text = "Ordenados por reputación (★) y número de clientes. Si tienes mala relación con un agente, sus jugadores son más caros/difíciles de fichar para ti."
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint.add_theme_font_size_override("font_size", 11)
+	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	content_area.add_child(hint)
+
+	content_area.add_child(HSeparator.new())
+
+	# Ordenar agentes: rep desc, luego nº clientes desc
+	var sorted: Array = agents_pool.duplicate()
+	sorted.sort_custom(func(a: Agent, b: Agent) -> bool:
+		if a.reputation != b.reputation:
+			return a.reputation > b.reputation
+		return a.client_ids.size() > b.client_ids.size())
+
+	for a: Agent in sorted:
+		content_area.add_child(_make_agent_row(a))
+
+
+func _count_represented_players() -> int:
+	var c: int = 0
+	for a: Agent in agents_pool:
+		c += a.client_ids.size()
+	return c
+
+
+func _make_agent_row(a: Agent) -> Control:
+	var panel := PanelContainer.new()
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	panel.add_child(box)
+
+	var hdr := HBoxContainer.new()
+	hdr.add_theme_constant_override("separation", 12)
+	box.add_child(hdr)
+
+	var name_l := Label.new()
+	name_l.text = "%s %s" % ["★".repeat(a.reputation), a.name]
+	name_l.add_theme_font_size_override("font_size", 14)
+	name_l.add_theme_color_override("font_color", _agent_personality_color(a.personality))
+	hdr.add_child(name_l)
+
+	var personality_l := Label.new()
+	personality_l.text = "[%s]" % a.personality
+	personality_l.add_theme_font_size_override("font_size", 11)
+	personality_l.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	hdr.add_child(personality_l)
+
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hdr.add_child(spacer)
+
+	var clients_l := Label.new()
+	clients_l.text = "%d clientes" % a.client_ids.size()
+	clients_l.add_theme_font_size_override("font_size", 12)
+	clients_l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
+	hdr.add_child(clients_l)
+
+	# Relación con el club del usuario
+	if user_team_id != "":
+		var rel: int = int(a.relations.get(user_team_id, 0))
+		var rel_l := Label.new()
+		var rel_color: Color = Color(0.7, 0.7, 0.7)
+		var rel_text: String = "neutro"
+		if rel >= 30:
+			rel_color = Color(0.4, 0.9, 0.5)
+			rel_text = "amistoso (%+d)" % rel
+		elif rel >= 5:
+			rel_color = Color(0.6, 0.85, 0.6)
+			rel_text = "cordial (%+d)" % rel
+		elif rel <= -30:
+			rel_color = Color(0.95, 0.5, 0.4)
+			rel_text = "hostil (%d)" % rel
+		elif rel <= -5:
+			rel_color = Color(0.95, 0.7, 0.5)
+			rel_text = "frío (%d)" % rel
+		rel_l.text = rel_text
+		rel_l.add_theme_color_override("font_color", rel_color)
+		rel_l.add_theme_font_size_override("font_size", 11)
+		hdr.add_child(rel_l)
+
+	# Lista compacta de clientes (máx 8 visibles)
+	if a.client_ids.size() > 0:
+		var clients_text: Array[String] = []
+		var shown: int = 0
+		for cid in a.client_ids:
+			if shown >= 8:
+				clients_text.append("... y %d más" % (a.client_ids.size() - 8))
+				break
+			var p: Player = _find_player_globally(cid)
+			if p != null:
+				var team_short: String = ""
+				for t: Team in all_teams:
+					if t.find_player(cid) != null:
+						team_short = t.short_name
+						break
+				clients_text.append("%s (%s)" % [p.name, team_short])
+				shown += 1
+		var clients_label := Label.new()
+		clients_label.text = "Representa a: " + ", ".join(clients_text)
+		clients_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		clients_label.add_theme_font_size_override("font_size", 11)
+		clients_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+		box.add_child(clients_label)
+
+	return panel
+
+
+func _agent_personality_color(personality: String) -> Color:
+	match personality:
+		"tough": return Color(1.0, 0.5, 0.5)
+		"greedy": return Color(1.0, 0.85, 0.4)
+		"flexible": return Color(0.5, 0.9, 0.6)
+		_: return Color(0.85, 0.85, 0.85)
+
+
+# --------------------------------------------------------------------------- #
+# Talks: speech persuasivo (pre-fichaje) + team talks Ted Lasso (crisis)
+# --------------------------------------------------------------------------- #
+func _load_talk_templates() -> void:
+	var path := "res://data/talks/templates.json"
+	if not FileAccess.file_exists(path):
+		talk_templates = []
+		return
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		talk_templates = []
+		return
+	var content := file.get_as_text()
+	file.close()
+	var parsed: Variant = JSON.parse_string(content)
+	if typeof(parsed) != TYPE_DICTIONARY:
+		talk_templates = []
+		return
+	talk_templates = parsed.get("templates", [])
+
+
+func _load_team_talk_templates() -> void:
+	var path := "res://data/talks/team_talks.json"
+	if not FileAccess.file_exists(path):
+		team_talk_templates = []
+		return
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		team_talk_templates = []
+		return
+	var content := file.get_as_text()
+	file.close()
+	var parsed: Variant = JSON.parse_string(content)
+	if typeof(parsed) != TYPE_DICTIONARY:
+		team_talk_templates = []
+		return
+	team_talk_templates = parsed.get("templates", [])
+
+
+# Speech persuasivo pre-fichaje. Setea pending_persuasion_modifier que se
+# aplica a la siguiente acceptance check y luego se resetea.
+func _show_persuasion_modal(player: Player) -> void:
+	if talk_templates.is_empty():
+		return
+	var template: Dictionary = talk_templates[randi() % talk_templates.size()]
+	var topic: String = String(template.get("topic", ""))
+	var options: Array = (template.get("options", []) as Array).duplicate()
+	options.shuffle()
+	if options.is_empty():
+		return
+
+	var popup := AcceptDialog.new()
+	popup.title = "💬 Convencer a %s" % player.name
+	popup.dialog_close_on_escape = false
+	popup.min_size = Vector2(560, 400)
+	add_child(popup)
+
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	popup.add_child(box)
+
+	var topic_l := Label.new()
+	topic_l.text = topic
+	topic_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	topic_l.add_theme_font_size_override("font_size", 14)
+	box.add_child(topic_l)
+
+	box.add_child(HSeparator.new())
+
+	var feedback_label := Label.new()
+	feedback_label.text = ""
+	feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	feedback_label.add_theme_font_size_override("font_size", 12)
+
+	var picked: Array = [-1]
+	for i in options.size():
+		var opt: Dictionary = options[i]
+		var btn := Button.new()
+		btn.text = "%d. %s" % [i + 1, String(opt.get("label", ""))]
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		btn.pressed.connect(_on_persuasion_picked.bind(i, options, feedback_label, picked))
+		box.add_child(btn)
+
+	box.add_child(HSeparator.new())
+	box.add_child(feedback_label)
+
+	popup.ok_button_text = "Continuar"
+	popup.popup_centered()
+	await popup.confirmed
+	popup.queue_free()
+
+
+func _on_persuasion_picked(idx: int, options: Array, feedback_label: Label, picked: Array) -> void:
+	if int(picked[0]) >= 0:
+		feedback_label.text = "(Solo cuenta la primera elección.)"
+		return
+	picked[0] = idx
+	var opt: Dictionary = options[idx]
+	var tone: String = String(opt.get("tone", "neutral"))
+	match tone:
+		"good": pending_persuasion_modifier = 0.10
+		"bad": pending_persuasion_modifier = -0.08
+		_: pending_persuasion_modifier = 0.0
+	feedback_label.text = String(opt.get("feedback", ""))
+	if tone == "good":
+		feedback_label.add_theme_color_override("font_color", Color(0.5, 0.9, 0.6))
+	elif tone == "bad":
+		feedback_label.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
+
+
+# Team talks (Ted Lasso): detecta momentos de crisis y dispara modal.
+# Se llama tras cada jornada con post_match=true.
+func _maybe_trigger_team_talk(post_match: bool = true) -> void:
+	if user_team_id == "" or team_talk_templates.is_empty():
+		return
+	var current_j: int = primera_state.current_jornada
+	if current_j - last_team_talk_jornada < 4:
+		return
+	var trigger: String = _detect_team_talk_trigger(post_match)
+	if trigger == "":
+		return
+	var template: Dictionary = _find_team_talk_template(trigger)
+	if template.is_empty():
+		return
+	last_team_talk_jornada = current_j
+	await _show_team_talk_modal(template)
+
+
+func _detect_team_talk_trigger(post_match: bool) -> String:
+	# Solo en crisis (la "concha azul"): humillación o vestuario hundido.
+	# No dispara en buenos momentos — es una OPORTUNIDAD para el mánager Ted
+	# Lasso que va mal. Le permite levantar al equipo si elige bien.
+	var user_team := _find_team_by_id(user_team_id)
+	if user_team == null:
+		return ""
+	if post_match:
+		var last_result: MatchResult = _find_user_result_in_last_jornada()
+		if last_result != null:
+			var is_user_home: bool = last_result.home_team_id == user_team_id
+			var user_score: int = last_result.score_home if is_user_home else last_result.score_away
+			var rival_score: int = last_result.score_away if is_user_home else last_result.score_home
+			# Humillación: derrota por ≥4 goles de diferencia
+			if rival_score - user_score >= 4:
+				return "derrota_4_o_mas_diferencia"
+		# Morale promedio bajo (vestuario tenso) — concha azul cuando vas mal
+		var morale_sum: float = 0.0
+		var morale_count: int = 0
+		for p: Player in user_team.players:
+			morale_sum += p.morale
+			morale_count += 1
+		if morale_count > 0 and (morale_sum / morale_count) < 50.0:
+			return "morale_promedio_bajo"
+	return ""
+
+
+func _is_top4_team(team_id: String) -> bool:
+	if primera_state.league_table == null:
+		return false
+	var sorted: Array = primera_state.league_table.sorted_rows()
+	for i in mini(4, sorted.size()):
+		if (sorted[i] as LeagueTable.TeamRow).team_id == team_id:
+			return true
+	return false
+
+
+func _find_team_talk_template(trigger: String) -> Dictionary:
+	for t in team_talk_templates:
+		if String((t as Dictionary).get("trigger", "")) == trigger:
+			return t
+	return {}
+
+
+func _show_team_talk_modal(template: Dictionary) -> void:
+	var popup := AcceptDialog.new()
+	popup.title = "💚 MOMENTO TED LASSO — charla de vestuario"
+	popup.dialog_close_on_escape = false
+	popup.min_size = Vector2(640, 480)
+	add_child(popup)
+
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	popup.add_child(box)
+
+	var note := Label.new()
+	note.text = "Estás en un momento difícil. Tienes una oportunidad. Elige tus palabras: una de las opciones es lo que haría Ted Lasso — sincero, humilde, abierto de corazón."
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.add_theme_font_size_override("font_size", 11)
+	note.add_theme_color_override("font_color", Color(0.6, 0.95, 0.7))
+	box.add_child(note)
+
+	var intro_l := Label.new()
+	intro_l.text = String(template.get("intro", ""))
+	intro_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	intro_l.add_theme_font_size_override("font_size", 14)
+	intro_l.add_theme_color_override("font_color", Color(0.85, 0.85, 1.0))
+	box.add_child(intro_l)
+
+	box.add_child(HSeparator.new())
+
+	var feedback_label := Label.new()
+	feedback_label.text = ""
+	feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	feedback_label.add_theme_font_size_override("font_size", 12)
+
+	var options: Array = (template.get("options", []) as Array).duplicate()
+	options.shuffle()
+	var picked: Array = [-1]
+	for i in options.size():
+		var opt: Dictionary = options[i]
+		var btn := Button.new()
+		btn.text = "%d. %s" % [i + 1, String(opt.get("label", ""))]
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		btn.pressed.connect(_on_team_talk_picked.bind(i, options, feedback_label, picked))
+		box.add_child(btn)
+
+	box.add_child(HSeparator.new())
+	box.add_child(feedback_label)
+
+	popup.ok_button_text = "Cerrar"
+	popup.popup_centered()
+	await popup.confirmed
+	popup.queue_free()
+
+
+func _on_team_talk_picked(idx: int, options: Array, feedback_label: Label, picked: Array) -> void:
+	if int(picked[0]) >= 0:
+		feedback_label.text = "(Solo cuenta la primera elección.)"
+		return
+	picked[0] = idx
+	var opt: Dictionary = options[idx]
+	var tone: String = String(opt.get("tone", "neutral"))
+	var morale_delta: int = int(opt.get("morale_delta", 0))
+	var form_bonus: float = float(opt.get("form_bonus", 0.0))
+	var team := _find_team_by_id(user_team_id)
+	if team != null and morale_delta != 0:
+		for p: Player in team.players:
+			# Personality amplifica/amortigua el impacto
+			var personal_mod: float = 1.0
+			if p.personality == "lider":
+				personal_mod = 1.20
+			elif p.personality == "flojo":
+				personal_mod = 0.70
+			elif p.personality == "temperamental":
+				personal_mod = 1.40
+			p.morale = clampf(p.morale + float(morale_delta) * personal_mod, 0.0, 100.0)
+	team_talk_form_bonus = form_bonus
+	_inbox_add("press", "Charla de vestuario",
+		"%s\nMorale plantilla %+d, form bonus %+.2f para próximo partido." % [
+			String(opt.get("feedback", "")), morale_delta, form_bonus])
+	feedback_label.text = String(opt.get("feedback", ""))
+	if tone == "good":
+		feedback_label.add_theme_color_override("font_color", Color(0.5, 0.95, 0.6))
+	elif tone == "bad":
+		feedback_label.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
+
+
+# Asigna personality a los jugadores que la tienen vacía (carga inicial).
+# Distribución: 20% líder, 55% equilibrado, 15% temperamental, 10% flojo.
+# Líderes son más probables en tier S/A; flojos más en C/Y.
+func _ensure_personalities_initialized() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = SEED_BASE * 11
+	for t: Team in all_teams:
+		for p: Player in t.players:
+			if p.personality != "":
+				continue
+			var roll: float = rng.randf()
+			# Bias por tier
+			var lider_thr: float = 0.20
+			var temp_thr: float = 0.85  # 0.20+0.55=0.75 base, +0.10 = temp
+			var flojo_thr: float = 0.95  # +0.10 = flojo last
+			if p.tier == "S":
+				lider_thr = 0.40
+			elif p.tier == "A":
+				lider_thr = 0.30
+			elif p.tier == "C" or p.tier == "Y":
+				lider_thr = 0.10
+				flojo_thr = 0.90  # más flojos en bottom tiers
+			if roll < lider_thr:
+				p.personality = "lider"
+			elif roll < 0.75:
+				p.personality = "equilibrado"
+			elif roll < flojo_thr:
+				p.personality = "temperamental"
+			else:
+				p.personality = "flojo"
+
+
+# Tras un partido: actualiza form de los 22 titulares según rating individual.
+func _update_form_for_match(home_lineup: Lineup, away_lineup: Lineup, result: MatchResult) -> void:
+	var home_won: bool = result.score_home > result.score_away
+	var home_lost: bool = result.score_home < result.score_away
+	# Mapas de stats por player_id en este partido
+	var goals_by_id: Dictionary = {}  # pid -> int
+	var assists_by_id: Dictionary = {}
+	for pid in result.scorers.keys():
+		goals_by_id[pid] = int(result.scorers[pid])
+	for ev: MatchEvent in result.events:
+		if ev.type == MatchEvent.T_GOAL and ev.secondary_player_id != "":
+			assists_by_id[ev.secondary_player_id] = int(assists_by_id.get(ev.secondary_player_id, 0)) + 1
+	# Tarjetas
+	var yellows_by_id: Dictionary = {}
+	var reds_by_id: Dictionary = {}
+	for pid in result.cards.keys():
+		var c: Dictionary = result.cards[pid]
+		yellows_by_id[pid] = int(c.get("yellows", 0))
+		if bool(c.get("red", false)):
+			reds_by_id[pid] = 1
+	var away_won: bool = result.score_away > result.score_home
+	var away_lost: bool = result.score_away < result.score_home
+	var team_data: Array = [
+		{"lineup": home_lineup, "won": home_won, "lost": home_lost},
+		{"lineup": away_lineup, "won": away_won, "lost": away_lost},
+	]
+	for td: Dictionary in team_data:
+		var lineup: Lineup = td["lineup"]
+		if lineup == null:
+			continue
+		var won: bool = bool(td["won"])
+		var lost: bool = bool(td["lost"])
+		for p: Player in lineup.starting_eleven:
+			var rating: float = FormTracker.compute_rating(
+				int(goals_by_id.get(p.id, 0)),
+				int(assists_by_id.get(p.id, 0)),
+				int(yellows_by_id.get(p.id, 0)),
+				int(reds_by_id.get(p.id, 0)),
+				won, lost)
+			FormTracker.update_after_match(p, rating)
+		# Suplentes que NO entraron: leve regresión a la media
+		for p2: Player in lineup.subs_available:
+			FormTracker.update_no_play(p2)
