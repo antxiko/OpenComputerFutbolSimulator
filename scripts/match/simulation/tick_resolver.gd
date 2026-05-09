@@ -180,8 +180,12 @@ static func _resolve_shot(
 		var vrng: RandomNumberGenerator = state.visual_rng
 		var creator: Player = _pick_actor(poss, "attack", state.zone, vrng)
 		if creator != null and creator.id != shooter.id:
-			events.append(_make_decorative(state, MatchEvent.T_PASS, poss.team.id, creator.id, shooter.id, state.zone,
-				"Pase de %s a %s" % [creator.name, shooter.name]))
+			var creator_slot: String = _slot_of(poss, creator.id)
+			var pass_type: String = MatchEvent.T_PASS
+			if creator_slot in ["LB", "RB", "LWB", "RWB", "LM", "RM", "LW", "RW"]:
+				pass_type = MatchEvent.T_CROSS
+			events.append(_make_decorative(state, pass_type, poss.team.id, creator.id, shooter.id, state.zone,
+				"%s de %s a %s" % ["Centro" if pass_type == MatchEvent.T_CROSS else "Pase", creator.name, shooter.name]))
 
 	# Atributos relevantes
 	var tiro: int = int(shooter.attributes.get("tiro", 50))
@@ -494,13 +498,22 @@ static func _emit_decorative_chain(state: MatchState, poss: Lineup, defense: Lin
 			# Posible regate antes (35% prob)
 			var carrier: Player = _pick_actor(poss, "attack", zone, vrng)
 			if carrier != null and vrng.randf() < 0.35:
-				events.append(_make_decorative(state, MatchEvent.T_DRIBBLE, poss.team.id, carrier.id, "", zone,
-					"%s recorta" % carrier.name))
-			# Pase a un jugador en la siguiente zona
+				# 25% de los regates salen mal (cae sin falta — turnover visual)
+				if vrng.randf() < 0.25:
+					events.append(_make_decorative(state, MatchEvent.T_TACKLE_FAIL, poss.team.id, carrier.id, "", zone,
+						"%s pierde el balón al recortar" % carrier.name))
+				else:
+					events.append(_make_decorative(state, MatchEvent.T_DRIBBLE, poss.team.id, carrier.id, "", zone,
+						"%s recorta" % carrier.name))
+			# Pase a un jugador en la siguiente zona — tipo CROSS si carrier es de banda
 			var receiver: Player = _pick_actor(poss, "attack", next_zone, vrng)
 			if carrier != null and receiver != null and carrier.id != receiver.id:
-				var is_long: bool = (zone == "def" and next_zone == "atk")
-				var ev_type: String = MatchEvent.T_LONG_BALL if is_long else MatchEvent.T_PASS
+				var carrier_slot: String = _slot_of(poss, carrier.id)
+				var ev_type: String = MatchEvent.T_PASS
+				if zone == "def" and next_zone == "atk":
+					ev_type = MatchEvent.T_LONG_BALL
+				elif next_zone == "atk" and carrier_slot in ["LB", "RB", "LWB", "RWB", "LM", "RM", "LW", "RW"]:
+					ev_type = MatchEvent.T_CROSS
 				events.append(_make_decorative(state, ev_type, poss.team.id, carrier.id, receiver.id, zone,
 					"Pase de %s a %s" % [carrier.name, receiver.name],
 					{"target_zone": next_zone}))
@@ -512,18 +525,26 @@ static func _emit_decorative_chain(state: MatchState, poss: Lineup, defense: Lin
 				events.append(_make_decorative(state, MatchEvent.T_PASS, poss.team.id, p1.id, p2.id, zone,
 					"Pase de %s a %s" % [p1.name, p2.name]))
 		"lose":
-			# Pase fallido → intercepción del rival
+			# Pase fallido → intercepción del rival.
+			# En zona "atk" del atacante (peligrosa), 30% de prob de que la pérdida
+			# sea por falta táctica del defensor en vez de intercept limpio.
 			var passer: Player = _pick_actor(poss, "attack", zone, vrng)
 			var def_zone: String = _inverse_zone(zone)
-			var interceptor: Player = _pick_actor(defense, "defense", def_zone, vrng)
+			var stopper: Player = _pick_actor(defense, "defense", def_zone, vrng)
+			var is_tactical: bool = (zone == "atk" and vrng.randf() < 0.30)
 			if passer != null:
 				events.append(_make_decorative(state, MatchEvent.T_PASS, poss.team.id, passer.id,
-					interceptor.id if interceptor else "", zone,
-					"Pase de %s..." % passer.name))
-			if interceptor != null:
-				events.append(_make_decorative(state, MatchEvent.T_INTERCEPT, defense.team.id, interceptor.id,
-					passer.id if passer else "", zone,
-					"%s intercepta" % interceptor.name))
+					stopper.id if stopper else "", zone,
+					"Avanza %s..." % passer.name))
+			if stopper != null:
+				if is_tactical:
+					events.append(_make_decorative(state, MatchEvent.T_TACTICAL_FOUL, defense.team.id, stopper.id,
+						passer.id if passer else "", zone,
+						"Falta táctica de %s" % stopper.name))
+				else:
+					events.append(_make_decorative(state, MatchEvent.T_INTERCEPT, defense.team.id, stopper.id,
+						passer.id if passer else "", zone,
+						"%s intercepta" % stopper.name))
 		"shot":
 			# El pase previo al tiro se emite DENTRO de _resolve_shot — necesita
 			# saber quién es el shooter exacto (rng principal) para que el
@@ -533,7 +554,7 @@ static func _emit_decorative_chain(state: MatchState, poss: Lineup, defense: Lin
 			# Pase desde el córner — quien saca es uno de los pasadores creativos
 			var server: Player = _pick_assistant(poss, _pick_actor(poss, "attack", "atk", vrng) if vrng.randf() < 1.0 else null, vrng)
 			if server != null:
-				events.append(_make_decorative(state, MatchEvent.T_PASS, poss.team.id, server.id, "", "atk",
+				events.append(_make_decorative(state, MatchEvent.T_CROSS, poss.team.id, server.id, "", "atk",
 					"%s saca el córner" % server.name))
 
 

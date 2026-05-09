@@ -21,9 +21,12 @@ const T_TURNOVER     := "turnover"   # poco interesante, normalmente filtrado de
 # Eventos granulares (visualización detallada — no afectan stats principales)
 const T_PASS         := "pass"          # pase corto entre dos jugadores
 const T_LONG_BALL    := "long_ball"     # pase largo (cambia zona)
+const T_CROSS        := "cross"         # centro desde banda (LB/RB/LW/RW al área)
 const T_DRIBBLE      := "dribble"       # regate de un jugador
 const T_TACKLE       := "tackle"        # entrada limpia de defensor (no falta)
+const T_TACKLE_FAIL  := "tackle_fail"   # regate fallido — el regateador cae sin falta
 const T_INTERCEPT    := "intercept"     # intercepción de pase
+const T_TACTICAL_FOUL := "tactical_foul" # falta táctica para cortar contra (decorativa)
 
 @export var minute: int = 0
 @export var second_in_minute: int = 0

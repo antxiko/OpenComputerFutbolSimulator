@@ -85,6 +85,11 @@ var away_player_targets: Array = []
 var shot_animation_active: bool = false
 var shot_animation_remaining: float = 0.0   # cuenta atrás durante la animación
 var last_event_type: String = ""
+# Animaciones de eventos granulares puntuales
+var fallen_player_id: String = ""           # jugador "tirado" tras T_TACKLE_FAIL
+var fallen_timer: float = 0.0
+var foul_shake_player_id: String = ""       # jugador con shake tras T_TACTICAL_FOUL
+var foul_shake_timer: float = 0.0
 
 # UI refs
 var play_button: Button
@@ -283,6 +288,14 @@ func _process(delta: float) -> void:
 		shot_animation_remaining -= delta
 		if shot_animation_remaining <= 0.0:
 			shot_animation_active = false
+	if fallen_timer > 0.0:
+		fallen_timer -= delta
+		if fallen_timer <= 0.0:
+			fallen_player_id = ""
+	if foul_shake_timer > 0.0:
+		foul_shake_timer -= delta
+		if foul_shake_timer <= 0.0:
+			foul_shake_player_id = ""
 
 	# Animación continua: balón y jugadores se interpolan suavemente cada frame
 	if match_result != null:
@@ -462,7 +475,9 @@ func _advance_one_event() -> void:
 		last_event_type = ev.type
 		# Eventos granulares (pases, regates, intercepciones): el balón viaja al
 		# jugador receptor pero NO se loggea ni cuenta como highlight.
-		if ev.type in [MatchEvent.T_PASS, MatchEvent.T_LONG_BALL, MatchEvent.T_DRIBBLE, MatchEvent.T_INTERCEPT]:
+		if ev.type in [MatchEvent.T_PASS, MatchEvent.T_LONG_BALL, MatchEvent.T_CROSS,
+				MatchEvent.T_DRIBBLE, MatchEvent.T_INTERCEPT,
+				MatchEvent.T_TACKLE_FAIL, MatchEvent.T_TACTICAL_FOUL]:
 			if highlights_only:
 				continue  # skip en modo highlights
 			_set_ball_for_event(ev)
@@ -552,7 +567,7 @@ func _set_ball_for_event(ev: MatchEvent) -> void:
 		_kick_off_ball_animation()
 		return
 	# Eventos granulares: balón hacia el receptor (pase) o actor (regate/intercept)
-	if ev.type == MatchEvent.T_PASS or ev.type == MatchEvent.T_LONG_BALL:
+	if ev.type == MatchEvent.T_PASS or ev.type == MatchEvent.T_LONG_BALL or ev.type == MatchEvent.T_CROSS:
 		var receiver_pos: Vector2 = _get_player_field_pos(ev.secondary_player_id)
 		if receiver_pos != Vector2.ZERO:
 			ball_target = receiver_pos
@@ -569,6 +584,26 @@ func _set_ball_for_event(ev: MatchEvent) -> void:
 		var int_pos: Vector2 = _get_player_field_pos(ev.player_id)
 		if int_pos != Vector2.ZERO:
 			ball_target = int_pos
+			_kick_off_ball_animation()
+			return
+	if ev.type == MatchEvent.T_TACKLE_FAIL:
+		# Regate fallido: balón rebota lejos del regateador. Marcar al jugador como caído.
+		var fallen_pos: Vector2 = _get_player_field_pos(ev.player_id)
+		if fallen_pos != Vector2.ZERO:
+			fallen_player_id = ev.player_id
+			fallen_timer = 0.6  # ~0.6s "tirado" en el suelo
+			# Balón rebota en dirección aleatoria a 0.08-0.12 de distancia
+			var dir: Vector2 = Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)).normalized()
+			ball_target = fallen_pos + dir * 0.10
+			_kick_off_ball_animation()
+			return
+	if ev.type == MatchEvent.T_TACTICAL_FOUL:
+		# Falta táctica: balón se detiene cerca del fouler. Pequeño shake del que comete falta.
+		var foul_pos: Vector2 = _get_player_field_pos(ev.player_id)
+		if foul_pos != Vector2.ZERO:
+			foul_shake_player_id = ev.player_id
+			foul_shake_timer = 0.5
+			ball_target = foul_pos
 			_kick_off_ball_animation()
 			return
 	# Resto de eventos (foul, yellow, red, etc): posición por zona estándar
@@ -750,20 +785,38 @@ func _draw_team(panel: Control, rect: Rect2, lineup: Lineup, color: Color, mirro
 			panel.draw_circle(Vector2(px, py), 12.0, Color(1.0, 1.0, 0.4, 0.18))
 
 		# Camera A2 light: anillo destacado para el protagonista del usuario
-		var is_protagonist: bool = (lineup.protagonist_id != "" and
-			lineup.starting_eleven[i].id == lineup.protagonist_id)
+		var pid: String = lineup.starting_eleven[i].id
+		var is_protagonist: bool = (lineup.protagonist_id != "" and pid == lineup.protagonist_id)
 		if is_protagonist:
 			# Aro exterior pulsante (oscilación con el reloj)
 			var pulse: float = 0.5 + 0.5 * sin(float(Time.get_ticks_msec()) / 250.0)
 			var ring_alpha: float = 0.55 + pulse * 0.30
 			panel.draw_arc(Vector2(px, py), 14.0, 0, TAU, 32, Color(1.0, 0.85, 0.2, ring_alpha), 2.5)
 
-		panel.draw_circle(Vector2(px, py), 9.0, color)
-		panel.draw_circle(Vector2(px, py), 9.0, Color(0, 0, 0, 0.6), false, 1.5)
+		# Efecto T_TACKLE_FAIL: jugador "tirado" — círculo aplastado + spark
+		var is_fallen: bool = (fallen_player_id != "" and pid == fallen_player_id)
+		# Efecto T_TACTICAL_FOUL: shake horizontal del que comete falta
+		var shake_off: Vector2 = Vector2.ZERO
+		if foul_shake_player_id != "" and pid == foul_shake_player_id:
+			var t_shake: float = float(Time.get_ticks_msec()) / 30.0
+			shake_off = Vector2(sin(t_shake) * 2.5, 0)
+
+		var draw_pos: Vector2 = Vector2(px, py) + shake_off
+		if is_fallen:
+			# Elipse aplastada (jugador tirado en el suelo)
+			panel.draw_circle(draw_pos, 9.0, color)  # base
+			panel.draw_arc(draw_pos, 14.0, 0, TAU, 16, Color(1.0, 0.5, 0.5, 0.7), 1.8)
+			# X encima para indicar caída
+			panel.draw_line(draw_pos + Vector2(-5, -5), draw_pos + Vector2(5, 5), Color(1, 0.4, 0.4), 1.5)
+			panel.draw_line(draw_pos + Vector2(5, -5), draw_pos + Vector2(-5, 5), Color(1, 0.4, 0.4), 1.5)
+		else:
+			panel.draw_circle(draw_pos, 9.0, color)
+			panel.draw_circle(draw_pos, 9.0, Color(0, 0, 0, 0.6), false, 1.5)
+
 		# Dorsal
 		var dorsal: int = lineup.starting_eleven[i].shirt_number
 		var label_size: int = 10
-		panel.draw_string(ThemeDB.fallback_font, Vector2(px - 6, py + 4), str(dorsal),
+		panel.draw_string(ThemeDB.fallback_font, draw_pos + Vector2(-6, 4), str(dorsal),
 			HORIZONTAL_ALIGNMENT_CENTER, -1, label_size, Color(1, 1, 1))
 		# Nombre del protagonista visible sobre su jugador
 		if is_protagonist:
