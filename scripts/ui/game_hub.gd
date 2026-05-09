@@ -1341,7 +1341,20 @@ func _on_reset_season() -> void:
 				_show_objective_evaluation_modal(eval)
 		# Reputación dinámica con la temporada que acaba de terminar
 		ReputationUpdate.apply_after_season(primera_state.league_table, segunda_state.league_table, all_teams)
-		PromotionRelegation.apply(primera_state.league_table, segunda_state.league_table, all_teams)
+		var movement: PromotionRelegation.Movement = PromotionRelegation.apply(primera_state.league_table, segunda_state.league_table, all_teams)
+		# Si hubo playoff y el usuario participó, mostrar modal
+		if movement != null and not movement.playoff_results.is_empty():
+			var user_team := _find_team_by_id(user_team_id)
+			var user_name: String = user_team.name if user_team else ""
+			var user_in_playoff: bool = false
+			if user_name != "":
+				for r in movement.playoff_results:
+					if String(r.get("home_name", "")) == user_name \
+							or String(r.get("away_name", "")) == user_name:
+						user_in_playoff = true
+						break
+			if user_in_playoff:
+				_show_playoff_modal(movement)
 	year += 1
 	# Aging + retiros + canteranos
 	Aging.age_all(all_teams, year, SEED_BASE * 100)
@@ -1475,6 +1488,75 @@ func _close_finances_for_all(cup_bracket: CupBracket, summer_result: TransferMar
 
 	if not user_summary.is_empty():
 		_show_finance_balance_modal(user_summary)
+
+
+func _show_playoff_modal(movement: PromotionRelegation.Movement) -> void:
+	var popup := AcceptDialog.new()
+	popup.title = "🎟 Playoff de ascenso a Primera"
+	popup.size = Vector2(540, 360)
+	popup.ok_button_text = "Continuar"
+	add_child(popup)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	popup.add_child(box)
+
+	var user_team := _find_team_by_id(user_team_id)
+	var user_name: String = user_team.name if user_team else ""
+
+	# Resultado del usuario
+	var user_promoted: bool = movement.playoff_winner_name == user_name
+	var user_finalist: bool = false
+	# Si está como home/away en la final pero no ganó
+	for r in movement.playoff_results:
+		if String(r.get("stage", "")) == "Final":
+			if (String(r.get("home_name", "")) == user_name or String(r.get("away_name", "")) == user_name) \
+					and not user_promoted:
+				user_finalist = true
+				break
+	var verdict: String
+	var color: Color
+	if user_promoted:
+		verdict = "🎉 ASCENSO A PRIMERA"
+		color = Color(0.6, 1.0, 0.6)
+	elif user_finalist:
+		verdict = "FINAL PERDIDA — un año más en Segunda"
+		color = Color(1.0, 0.85, 0.4)
+	else:
+		verdict = "ELIMINADO EN SEMIFINALES"
+		color = Color(1.0, 0.6, 0.6)
+	var verdict_lbl := Label.new()
+	verdict_lbl.text = verdict
+	verdict_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	verdict_lbl.add_theme_font_size_override("font_size", 18)
+	verdict_lbl.add_theme_color_override("font_color", color)
+	box.add_child(verdict_lbl)
+
+	box.add_child(HSeparator.new())
+
+	# Lista de partidos
+	for r in movement.playoff_results:
+		var line := Label.new()
+		var rep: String = " (rep)" if bool(r.get("won_by_reputation", false)) else ""
+		line.text = "%s — %s %d-%d %s → %s%s" % [
+			String(r.get("stage", "?")),
+			String(r.get("home_name", "?")),
+			int(r.get("score_home", 0)),
+			int(r.get("score_away", 0)),
+			String(r.get("away_name", "?")),
+			String(r.get("winner_name", "?")),
+			rep,
+		]
+		line.add_theme_font_size_override("font_size", 11)
+		# Marcar partidos del usuario
+		var is_user_match: bool = String(r.get("home_name", "")) == user_name \
+				or String(r.get("away_name", "")) == user_name
+		if is_user_match:
+			line.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+		box.add_child(line)
+
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
 
 
 func _show_supercopa_modal(sc: SupercopaSimulator.SupercopaResult) -> void:
