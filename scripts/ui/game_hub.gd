@@ -99,6 +99,10 @@ var selected_european_comp: String = ""
 var year_label: Label
 var jornada_label: Label
 var status_label: Label
+var div_tabs_box: HBoxContainer
+var view_tabs_box: HBoxContainer
+var top_header_separator: HSeparator
+var top_header_box: HBoxContainer
 var primera_div_button: Button
 var segunda_div_button: Button
 var view_table_button: Button
@@ -171,9 +175,17 @@ func _build_ui() -> void:
 	margin.add_child(vbox)
 
 	# --- Header ---
-	var header := HBoxContainer.new()
-	header.add_theme_constant_override("separation", 24)
-	vbox.add_child(header)
+	top_header_box = HBoxContainer.new()
+	top_header_box.add_theme_constant_override("separation", 24)
+	vbox.add_child(top_header_box)
+	var header := top_header_box
+
+	# Botón "🏠 Hub" para volver al dashboard principal
+	var hub_btn := Button.new()
+	hub_btn.text = "🏠 Hub"
+	hub_btn.tooltip_text = "Volver al menú principal"
+	hub_btn.pressed.connect(_on_select_view.bind(VIEW_HUB))
+	header.add_child(hub_btn)
 
 	var title := Label.new()
 	title.text = "OpenComputerFutbolSimulator"
@@ -195,9 +207,10 @@ func _build_ui() -> void:
 	vbox.add_child(HSeparator.new())
 
 	# --- División tabs ---
-	var div_tabs := HBoxContainer.new()
-	div_tabs.add_theme_constant_override("separation", 4)
-	vbox.add_child(div_tabs)
+	div_tabs_box = HBoxContainer.new()
+	div_tabs_box.add_theme_constant_override("separation", 4)
+	vbox.add_child(div_tabs_box)
+	var div_tabs := div_tabs_box
 
 	primera_div_button = _make_tab_button("Primera", _on_select_division.bind("primera"))
 	div_tabs.add_child(primera_div_button)
@@ -205,9 +218,10 @@ func _build_ui() -> void:
 	div_tabs.add_child(segunda_div_button)
 
 	# --- View tabs ---
-	var view_tabs := HBoxContainer.new()
-	view_tabs.add_theme_constant_override("separation", 4)
-	vbox.add_child(view_tabs)
+	view_tabs_box = HBoxContainer.new()
+	view_tabs_box.add_theme_constant_override("separation", 4)
+	vbox.add_child(view_tabs_box)
+	var view_tabs := view_tabs_box
 
 	view_table_button = _make_tab_button("Clasificación", _on_select_view.bind(VIEW_TABLE))
 	view_tabs.add_child(view_table_button)
@@ -239,7 +253,8 @@ func _build_ui() -> void:
 	user_team_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 	view_tabs.add_child(user_team_label)
 
-	vbox.add_child(HSeparator.new())
+	top_header_separator = HSeparator.new()
+	vbox.add_child(top_header_separator)
 
 	# --- Content area (cambia según la vista) ---
 	var scroll := ScrollContainer.new()
@@ -2822,6 +2837,18 @@ func _refresh_ui() -> void:
 	var st := _current_state()
 	jornada_label.text = "Jornada %d / %d (%s)" % [
 		st.current_jornada, st.calendar.size(), selected_division.capitalize()]
+
+	# En modo HUB, ocultar tabs antiguas y header superior — el hub tiene
+	# su propia cabecera/footer. En sub-vistas, mostrarlas todas.
+	var in_hub: bool = (current_view == VIEW_HUB)
+	if top_header_box != null:
+		top_header_box.visible = not in_hub
+	if div_tabs_box != null:
+		div_tabs_box.visible = not in_hub
+	if view_tabs_box != null:
+		view_tabs_box.visible = not in_hub
+	if top_header_separator != null:
+		top_header_separator.visible = not in_hub
 
 	primera_div_button.disabled = (selected_division == "primera")
 	segunda_div_button.disabled = (selected_division == "segunda")
