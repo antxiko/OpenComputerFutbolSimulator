@@ -2,50 +2,46 @@
 
 Todas las versiones publicadas, qué se hizo y qué queda. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
-## [En desarrollo (sin tag)]
+## [v0.3.0] - 2026-05-09
 
-### Añadido (v0.4.0 candidato)
-- **🎬 Eventos granulares en el motor**: nuevos tipos `T_PASS`, `T_LONG_BALL`, `T_DRIBBLE`, `T_INTERCEPT`, `T_TACKLE`. `TickResolver._emit_decorative_chain` genera cadenas de pases/regates/intercepciones según el outcome (advance/keep/lose/shot/corner). Usan `state.visual_rng` (RNG separado, seed = seed ^ 0x5A5A5A5A) para no contaminar la calibración del motor.
-- **Visor 2D más fluido**: el balón viaja a la posición exacta del receptor del pase (`_get_player_field_pos` por id), oscila junto al regateador, va al interceptor. `PASS_TRANSIT_TIME=0.28s` (más rápido que el normal 0.55s). Delay reducido al 45% entre granulares. Modo highlights_only los salta. Se rellena el tiempo entre eventos clave con movimiento real del balón.
-- **⭐ Camera A2 light — jugador protagonista**: `Lineup.protagonist_id` (solo seteado en el lineup del usuario). En `_pick_actor`/`_pick_assistant` con `role="attack"`, el protagonista recibe +30% peso → más probable que sea shooter/creator. UI: selector encima de la plantilla del equipo del usuario. Visor: anillo amarillo pulsante + nombre sobre el jugador. Persiste en save.
-- Calibración intacta tras los cambios: 2.35 g/p, 25.10 tiros/p, 9.11 córners/p (target ~2.5 / ~25 / ~10).
-
-### Añadido (v0.4.2 candidato)
-- **Set pieces realistas**:
-  - **T_PENALTY** (afecta motor): faltas en zona `atk` del atacante tienen 3.5% de prob de ser señaladas como penalty. Conversión modulada por `porteria` del GK + `tiro` del lanzador, centro en 0.82 (porteria=70). Calibrado a 0.30 penalties/partido y 78% conversión (real La Liga). Tarjeta amarilla automática al fouler. `_pick_penalty_kicker` prioriza atacantes con buen tiro+mentalidad. Visor: balón al punto de penalty + log destacado.
-  - **T_FREE_KICK** (decorativo): tras foul (no penalty) en zona mid/atk, balón al server del equipo atacante.
-  - **T_THROW_IN** (decorativo): 30% de las pérdidas en zona `mid` son saques de banda; el lateral del defensor saca, balón sube a la línea de banda.
-  - **T_GK_DIST** (decorativo): 25% de las pérdidas en zona `atk` son recogidas del portero, que saca el balón.
-  - Bug fix latente: `_maybe_foul` ahora recibe `initial_zone`/`initial_poss_id` capturados al inicio del tick — antes podía elegir fouler en zona equivocada cuando el outcome cambiaba la zona.
-- **Tipos de remate**: en `_resolve_shot`:
-  - **T_HEADER**: si córner (60% prob) o pase previo era T_CROSS (60% prob).
-  - **T_VOLLEY**: 8% de los pases normales acaban en volea.
-- **Defensa granular**:
-  - **T_PRESSURE**: 25% de los intercepts tienen un segundo defensor presionando al pasador (shake 0.3s, sin tocar balón).
-  - **T_CLEARANCE**: 40% de los intercepts en `atk` son despejes contundentes (balón rebota a 0.20 en dirección random).
-  - **T_BACK_PASS**: 15% de los "keep" en zona `def` son pase atrás al portero.
-- **Movimientos sin balón**:
-  - **T_RUN**: 30% de los avances mid→atk tienen un atacante haciendo desmarque al área (extra_offset hacia adelante 1.5s).
-  - **T_OVERLAP**: 20% cuando el carrier es lateral, el extremo del mismo lado sobrepasa por fuera.
-- Sistema de `extra_offsets: Dictionary[player_id, Vector2]` + timers en el visor para movimientos coreografiados temporales sin tocar la formación base.
-- `tools/debug_penalties.gd` para verificar la calibración específica de penalty.
-
-### Añadido (v0.4.1 candidato)
-- **Variedad granular base**: nuevos tipos `T_CROSS` (centro desde banda — laterales/extremos), `T_TACKLE_FAIL` (regate fallido con caída — 25% de los regates ahora salen mal en vez de limpios), `T_TACTICAL_FOUL` (falta táctica del defensor cortando contra en zona peligrosa — 30% de las pérdidas en `atk`). El visor dibuja X roja sobre el jugador caído (timer 0.6s) y shake horizontal sobre el que comete falta táctica (timer 0.5s).
-
-### Pendiente (v0.4.0+)
-- Camera mode A2 full (control directo del jugador con teclado — refactor enorme)
-
-### Añadido (v0.3.0 candidato)
+### Añadido — gestión y mercado
 - **Tracking europeo en histórico de carrera**: cada temporada guarda progreso en Champions, Europa y Conference (Campeón / Subcampeón / Pasó X / Eliminado en X / Fase de grupos). Vista Carrera con 11 columnas.
 - **Recuperación parcial de condition entre partidos**: nueva clase `ConditionRecovery`. Antes reset a 100; ahora según días desde el último partido del jugador (1 día → 55, 3 días → 82, ≥5 → 100). Se beneficia de calendario real.
 - **Lesiones largas con seguimiento**: heal_after_days usa días reales del calendario (antes hardcoded 7). Modal "🏥 Parte médico" tras la jornada con lesiones graves del usuario, mostrando la fecha estimada de regreso.
 - **Reemplazo automático tras vender titular**: si un equipo vende a un jugador con overall ≥75 o que era core de su slot, gana 1 fichaje extra de slot para reemplazarlo en rondas posteriores del mercado.
 - **📝 Renovación manual de contratos**: nueva clase `ContractNegotiation`. Al final de temporada, modal que lista todos los jugadores del usuario con contrato vencido. Por jugador: [Renovar] (sub-modal con SpinBox para salario y años, evalúa oferta con probabilidad de aceptación según ratio salario/justo y rango de años por edad; counter-offer si rechazo) o [Liberar] (va al pool de free agents). Los demás clubes siguen flujo automático.
 - **💸 Pujas múltiples / contraofertas en mercado**: si el club vendedor rechaza pero la oferta estaba en zona seria (≥70% del MV), emite contraoferta pidiendo +15-25% según cuán cerca quedó. CPU acepta la counter si tiene budget y no excede 1.3x. El usuario ve modal "Contraoferta — pide X€ para aceptar la venta" con botones [Pagar X€] [Rechazar].
-- **🔍 Validador automático de plantillas**: nuevo `tools/validate_squads.gd`. Comprueba en los 42 JSON: tamaño de plantilla, cobertura por slot (GK ≥2, DEF ≥6, MID ≥5, ATK ≥4), duplicados de player_id, contratos (until_year, salario), edades en rango, posiciones válidas, tiers conocidos. Encontró y corrigió 3 contratos vencidos (Carlos Albarrán @ Córdoba, Mario Maroto y Chuki @ Valladolid). 34 plantillas con _draft_note genérico marcadas como "validadas estructuralmente"; 8 hand-curadas (Athletic, Atlético, Barça, Betis, R. Sociedad, Sevilla, Villarreal, Las Palmas) conservan su note específico para refinamiento manual posterior.
+- **🔍 Validador automático de plantillas**: nuevo `tools/validate_squads.gd`. Comprueba en los 42 JSON: tamaño de plantilla, cobertura por slot (GK ≥2, DEF ≥6, MID ≥5, ATK ≥4), duplicados de player_id, contratos, edades, posiciones, tiers. Encontró y corrigió 3 contratos vencidos (Carlos Albarrán @ Córdoba, Mario Maroto y Chuki @ Valladolid). 34 plantillas marcadas como "validadas estructuralmente"; 8 hand-curadas conservan su note específico.
+
+### Añadido — motor de partido granular
+- **🎬 Eventos granulares**: nuevos tipos `T_PASS`, `T_LONG_BALL`, `T_DRIBBLE`, `T_INTERCEPT`, `T_TACKLE`. `TickResolver._emit_decorative_chain` genera cadenas de pases/regates/intercepciones según el outcome (advance/keep/lose/shot/corner). Usan `state.visual_rng` (RNG separado, seed = seed ^ 0x5A5A5A5A) para no contaminar la calibración del motor.
+- **Variedad de jugadas**: `T_CROSS` (centro desde banda — laterales/extremos), `T_TACKLE_FAIL` (regate fallido con caída — 25% de los regates ahora salen mal), `T_TACTICAL_FOUL` (falta táctica del defensor cortando contra peligroso — 30% de las pérdidas en `atk`). El visor dibuja X roja sobre el jugador caído (timer 0.6s) y shake horizontal sobre el que comete falta táctica (timer 0.5s).
+- **Set pieces realistas**:
+  - **T_PENALTY** (afecta motor): faltas en zona `atk` tienen 3.5% prob de penalty. Conversión modulada por `porteria` del GK + `tiro` del lanzador, centro en 0.82 (porteria=70). Calibrado a **0.30 penalties/partido y 78% conversión** (real La Liga). Tarjeta amarilla automática al fouler.
+  - **T_FREE_KICK** (decorativo): tras foul (no penalty) en zona mid/atk, balón al server.
+  - **T_THROW_IN** (decorativo): 30% de las pérdidas en `mid` son saques de banda (lateral del defensor saca, balón sube a la línea de banda).
+  - **T_GK_DIST** (decorativo): 25% de las pérdidas en `atk` son recogidas del portero.
+  - Bug fix latente: `_maybe_foul` ahora captura `initial_zone`/`initial_poss_id` al inicio del tick.
+- **Tipos de remate**: `T_HEADER` (60% en córner o tras T_CROSS), `T_VOLLEY` (8% de los pases normales).
+- **Defensa granular**: `T_PRESSURE` (25% de los intercepts con segundo defensor presionando), `T_CLEARANCE` (40% de los intercepts en `atk` son despejes), `T_BACK_PASS` (15% de los "keep" en `def` son pase atrás al GK).
+- **Movimientos sin balón**: `T_RUN` (30% de los avances mid→atk con desmarque al área, extra_offset 1.5s) y `T_OVERLAP` (20% cuando carrier es lateral, el extremo del mismo lado sobrepasa).
+- Sistema de `extra_offsets: Dictionary[player_id, Vector2]` + timers en el visor para movimientos coreografiados temporales sin tocar la formación base.
+
+### Añadido — Camera mode A2 light
+- **⭐ Jugador protagonista**: `Lineup.protagonist_id` (solo seteado en el lineup del usuario). En `_pick_actor`/`_pick_assistant` con `role="attack"`, el protagonista recibe +30% peso → más probable shooter/creator. UI: selector encima de la plantilla del equipo del usuario. Visor: anillo amarillo pulsante + nombre sobre el jugador. Persiste en save.
+
+### Visor 2D más fluido
+- El balón viaja a la posición exacta del receptor del pase (`_get_player_field_pos` por id), oscila junto al regateador, va al interceptor. `PASS_TRANSIT_TIME=0.28s` (más rápido que el normal 0.55s). Delay reducido al 45% entre granulares. Modo highlights_only los salta. Se rellena el tiempo entre eventos clave con movimiento real del balón.
+
+### Calibración del motor
+- Bloqueados al rango real: 26.9% → **20.8%** (real 20-25%). `block_p` base 0.14→0.10.
+- Tiros a portería al rango real: 28.2% → **33.6%** (real 32-38%). `on_target_p` base 0.09→0.14.
+- Conversión ajustada (`save_p` base 0.30→0.40) para mantener goles ~2.5/p tras subir on-target.
+- Stats finales: **2.67 goles/p, 25.5 tiros/p, 8.8 córners/p, 0.30 penalties/p, 78% conversión penalty**.
+- Herramientas: `tools/debug_penalties.gd` para verificación específica de penalty.
 
 ### Pendiente (v0.4.0+)
+- Camera mode A2 full (control directo del jugador con teclado — refactor enorme)
 - Mejoras visuales del visor 2D (sprites, animaciones)
 
 
