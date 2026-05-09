@@ -49,7 +49,9 @@ static func injury_summary(p: Player) -> String:
 
 # Inflinge una lesión a un jugador. Severidad determinada por el RNG dado.
 # Modifica p.injury en sitio.
-static func inflict(p: Player, rng: RandomNumberGenerator) -> Dictionary:
+# Si team se proporciona, aplica el factor del physio (calidad alta = lesiones
+# más cortas) y del upgrade gimnasio_top del estadio.
+static func inflict(p: Player, rng: RandomNumberGenerator, team: Team = null) -> Dictionary:
 	var roll: float = rng.randf()
 	var dias: int
 	var tipo: String
@@ -62,5 +64,13 @@ static func inflict(p: Player, rng: RandomNumberGenerator) -> Dictionary:
 	else:
 		dias = rng.randi_range(30, 90)
 		tipo = "grave"
+	# Modificadores del club
+	if team != null:
+		var factor: float = 1.0
+		if team.staff != null:
+			factor *= team.staff.injury_duration_factor()
+		if team.stadium != null and "gimnasio_top" in team.stadium.upgrades:
+			factor *= 0.85  # gimnasio top reduce 15% adicional
+		dias = maxi(2, int(float(dias) * factor))
 	p.injury = { "tipo": tipo, "dias_restantes": dias }
 	return p.injury

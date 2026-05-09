@@ -195,6 +195,7 @@ static func _team_to_dict(t: Team) -> Dictionary:
 		"manager": _manager_to_dict(t.manager),
 		"tactics_default": _tactics_to_dict(t.tactics_default),
 		"finances": _finances_to_dict(t.finances),
+		"staff": _staff_to_dict(t.staff),
 		"players": t.players.map(func(p: Player) -> Dictionary: return _player_to_dict(p)),
 	}
 
@@ -287,6 +288,13 @@ static func _finances_to_dict(f: FinancesInfo) -> Dictionary:
 			"last_season_summary": f.last_season_summary.duplicate(true),
 			"sponsors": f.sponsors.duplicate(true),
 			"ongoing_projects": f.ongoing_projects.duplicate(true)}
+
+
+static func _staff_to_dict(s: StaffInfo) -> Dictionary:
+	if s == null:
+		return {}
+	return {"fitness_coach": s.fitness_coach, "scout_chief": s.scout_chief,
+			"youth_coach": s.youth_coach, "physio": s.physio}
 
 
 static func _stadium_to_dict(s: StadiumInfo) -> Dictionary:

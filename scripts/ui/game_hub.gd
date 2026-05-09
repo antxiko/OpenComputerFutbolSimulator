@@ -76,6 +76,10 @@ var user_lineup_template: Dictionary = {}
 var user_career_history: Array = []
 # Flag para saber si el mercado de invierno ya se ha ejecutado esta temporada.
 var winter_market_done: bool = false
+# Última jornada en la que se evaluó el premio "entrenador del mes" del usuario
+var last_coach_award_jornada: int = 0
+# Puntos del usuario al final de la última evaluación (para diff de 4 jornadas)
+var user_points_at_last_award: int = 0
 # Objetivo del club para esta temporada (depende de la reputación + posición previa).
 # Estructura: { "type": "liga"/"copa"/"champions", "target_position": int, "description": String }
 var season_objective: Dictionary = {}
@@ -316,6 +320,9 @@ func _load_data() -> void:
 	for t: Team in all_teams:
 		ClubFinances.ensure_initialized(t)
 		ClubFinances.ensure_initial_sponsors(t, year)
+		# Staff por defecto si no viene en el JSON
+		if t.staff == null:
+			t.staff = StaffInfo.new()
 	status_label.text = "Cargados %d equipos, %d jugadores." % [
 		all_teams.size(), loaded.player_id_index.size()]
 
@@ -330,6 +337,8 @@ func _start_season() -> void:
 	selected_team = null
 	selected_match = null
 	winter_market_done = false  # se podrá abrir el mercado invernal otra vez
+	last_coach_award_jornada = 0
+	user_points_at_last_award = 0
 	# Generar objetivo del club para esta temporada
 	if user_team_id != "":
 		_generate_season_objective()
@@ -881,6 +890,58 @@ func _show_objective_evaluation_modal(eval: Dictionary) -> void:
 	popup.popup_centered()
 
 
+# Premio "Entrenador del mes": cada 4 jornadas chequeamos cuántos puntos
+# sumó el usuario en ese tramo. Si >=8 (de 12 posibles), cobra 750K +
+# notificación. >=10 → 1.5M.
+func _evaluate_coach_of_the_month() -> void:
+	if user_team_id == "" or primera_state.league_table == null:
+		return
+	var team := _find_team_by_id(user_team_id)
+	if team == null or team.division != "primera":
+		return
+	var rows: Array = primera_state.league_table.sorted_rows()
+	var current_pts: int = 0
+	for r: LeagueTable.TeamRow in rows:
+		if r.team_id == user_team_id:
+			current_pts = r.points()
+			break
+	var diff: int = current_pts - user_points_at_last_award
+	user_points_at_last_award = current_pts
+	if diff >= 10:
+		# Mes excelente: 4 victorias seguidas o casi
+		team.finances.cash_balance += 1_500_000
+		_show_coach_award_modal("EXCELENTE", diff, 1_500_000)
+	elif diff >= 8:
+		team.finances.cash_balance += 750_000
+		_show_coach_award_modal("MUY BIEN", diff, 750_000)
+	# < 8 puntos: nada
+
+
+func _show_coach_award_modal(verdict: String, points: int, prize: int) -> void:
+	var popup := AcceptDialog.new()
+	popup.title = "🏅 Entrenador del mes"
+	popup.size = Vector2(420, 220)
+	popup.ok_button_text = "Continuar"
+	add_child(popup)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	popup.add_child(box)
+	var v := Label.new()
+	v.text = verdict
+	v.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_theme_font_size_override("font_size", 20)
+	v.add_theme_color_override("font_color", Color(0.7, 1.0, 0.6))
+	box.add_child(v)
+	var detail := Label.new()
+	detail.text = "%d puntos en las últimas 4 jornadas\n+%s € de premio" % [points, TransferMarket._fmt_eur(prize)]
+	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	detail.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	box.add_child(detail)
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
+
+
 func _init_division(state: DivisionState, seed_offset: int) -> void:
 	var ids: Array = state.teams.map(func(t: Team) -> String: return t.id)
 	state.calendar = CalendarGenerator.generate(ids, SEED_BASE + seed_offset)
@@ -919,6 +980,13 @@ func _do_advance_jornada() -> void:
 	if not winter_market_done and primera_state.current_jornada >= 19:
 		_run_winter_market()
 		winter_market_done = true
+
+	# Premio entrenador del mes: cada 4 jornadas, si el usuario sumó >=8 puntos
+	# en sus últimas 4 jornadas de Liga, cobra 750K + reconocimiento.
+	if user_team_id != "" and primera_state.current_jornada > 0 \
+			and primera_state.current_jornada - last_coach_award_jornada >= 4:
+		_evaluate_coach_of_the_month()
+		last_coach_award_jornada = primera_state.current_jornada
 	if not any_advanced:
 		status_label.text = "Temporada completada. Pulsa 'Nueva temporada'."
 		return
@@ -2044,6 +2112,8 @@ func _render_finances_view() -> void:
 			["🌱 Césped híbrido (4M)", "upgrade_pitch", 4_000_000],
 			["🥂 Palcos VIP (10M)", "upgrade_vip", 10_000_000],
 			["🏛 Museo (3M)", "upgrade_museum", 3_000_000],
+			["🎓 Academia premium (50M, 2 temp.)", "academia_premium", 50_000_000],
+			["💪 Gimnasio top (15M)", "gimnasio_top", 15_000_000],
 		]:
 			var b := Button.new()
 			b.text = String(action[0])
@@ -2065,6 +2135,57 @@ func _render_finances_view() -> void:
 				pl.text = "  • %s (termina %d)" % [String(proj.get("type", "?")), int(proj.get("completes_year", 0))]
 				pl.add_theme_font_size_override("font_size", 11)
 				box.add_child(pl)
+
+	# Personal técnico
+	_finances_section_header(box, "👔 Cuerpo técnico")
+	if team.staff != null:
+		var staff_grid := GridContainer.new()
+		staff_grid.columns = 4
+		staff_grid.add_theme_constant_override("h_separation", 12)
+		box.add_child(staff_grid)
+		# Cabecera
+		for h in ["Rol", "Calidad", "Salario", "Mejorar"]:
+			var hl := Label.new()
+			hl.text = h
+			hl.add_theme_font_size_override("font_size", 11)
+			hl.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+			staff_grid.add_child(hl)
+		var roles := [
+			["Preparador físico", "fitness_coach", team.staff.fitness_coach],
+			["Jefe de scouting", "scout_chief", team.staff.scout_chief],
+			["Coach cantera", "youth_coach", team.staff.youth_coach],
+			["Fisioterapeuta", "physio", team.staff.physio],
+		]
+		for r in roles:
+			var role_label: String = String(r[0])
+			var role_key: String = String(r[1])
+			var q: int = int(r[2])
+			var rl := Label.new()
+			rl.text = role_label
+			rl.add_theme_font_size_override("font_size", 11)
+			staff_grid.add_child(rl)
+			var ql := Label.new()
+			ql.text = "★".repeat(q) + "☆".repeat(5 - q) + "  (%d/5)" % q
+			ql.add_theme_font_size_override("font_size", 11)
+			ql.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+			staff_grid.add_child(ql)
+			var sl := Label.new()
+			sl.text = "%s €/año" % TransferMarket._fmt_eur(StaffInfo.salary_for_quality(q))
+			sl.add_theme_font_size_override("font_size", 11)
+			staff_grid.add_child(sl)
+			if q >= 5:
+				var maxed := Label.new()
+				maxed.text = "MAX"
+				maxed.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+				staff_grid.add_child(maxed)
+			else:
+				var cost: int = StaffInfo.upgrade_cost(q)
+				var btn := Button.new()
+				btn.text = "↑ %s €" % TransferMarket._fmt_eur(cost)
+				btn.disabled = team.finances.cash_balance < cost
+				btn.tooltip_text = "Subir a calidad %d" % (q + 1)
+				btn.pressed.connect(func() -> void: _on_upgrade_staff(team, role_key, cost))
+				staff_grid.add_child(btn)
 
 	# Patrocinadores
 	_finances_section_header(box, "💼 Patrocinadores")
@@ -2175,11 +2296,12 @@ func _has_active_project(team: Team, type: String) -> bool:
 func _has_upgrade(team: Team, type: String) -> bool:
 	if team.stadium == null:
 		return false
-	# Para upgrades concretos, comprobar el flag.
 	match type:
 		"upgrade_pitch": return "cesped_hibrido" in team.stadium.upgrades
 		"upgrade_vip":   return "palcos_vip" in team.stadium.upgrades
 		"upgrade_museum": return "museo" in team.stadium.upgrades
+		"academia_premium": return "academia_premium" in team.stadium.upgrades
+		"gimnasio_top": return "gimnasio_top" in team.stadium.upgrades
 		_: return false
 
 
@@ -2189,7 +2311,7 @@ func _on_buy_stadium_upgrade(team: Team, type: String, cost: int) -> void:
 		return
 	team.finances.cash_balance -= cost
 	# Proyectos multi-temporada
-	if type in ["stadium_expansion", "stadium_tier_up"]:
+	if type == "stadium_expansion" or type == "stadium_tier_up":
 		var proj: Dictionary = {
 			"type": type,
 			"completes_year": year + 1,
@@ -2197,10 +2319,33 @@ func _on_buy_stadium_upgrade(team: Team, type: String, cost: int) -> void:
 		}
 		team.finances.ongoing_projects.append(proj)
 		status_label.text = "🏗 Proyecto iniciado: termina la próxima temporada."
+	elif type == "academia_premium":
+		var proj: Dictionary = {
+			"type": type,
+			"completes_year": year + 2,
+		}
+		team.finances.ongoing_projects.append(proj)
+		status_label.text = "🎓 Academia premium en construcción (2 temporadas)."
 	else:
-		# Mejoras inmediatas (cesped/palcos/museo): aplicar ya
+		# Mejoras inmediatas (cesped/palcos/museo/gimnasio): aplicar ya
 		ClubFinances._apply_project_effect(team, { "type": type })
 		status_label.text = "✅ Mejora aplicada al estadio."
+	_refresh_ui()
+
+
+func _on_upgrade_staff(team: Team, role: String, cost: int) -> void:
+	if team.staff == null or team.finances == null:
+		return
+	if team.finances.cash_balance < cost:
+		status_label.text = "❌ Sin caja para mejorar el staff."
+		return
+	team.finances.cash_balance -= cost
+	match role:
+		"fitness_coach": team.staff.fitness_coach += 1
+		"scout_chief":   team.staff.scout_chief += 1
+		"youth_coach":   team.staff.youth_coach += 1
+		"physio":        team.staff.physio += 1
+	status_label.text = "✅ Staff mejorado."
 	_refresh_ui()
 
 

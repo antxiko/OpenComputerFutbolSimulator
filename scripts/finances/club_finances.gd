@@ -176,9 +176,16 @@ static func compute_stadium_maintenance(team: Team) -> int:
 	return int(float(team.stadium.capacity) * 30.0 * factor)
 
 
-# Personal técnico: aprox 5M para clubes top, 1-2M para pequeños
+# Personal técnico: salario real del cuerpo técnico actual + base fija (4M
+# que cubre kit man, médicos básicos, oficinas, etc).
 static func compute_staff_cost(team: Team) -> int:
-	return 1_000_000 + int(float(team.reputation) * 50_000.0)
+	var staff_salary: int = 0
+	if team.staff != null:
+		staff_salary = team.staff.total_salary()
+	# Base fija escalada por reputación del club (clubes grandes tienen más
+	# personal administrativo).
+	var base_admin: int = 1_500_000 + int(float(team.reputation) * 35_000.0)
+	return staff_salary + base_admin
 
 
 # Premio según posición en Liga
@@ -353,3 +360,9 @@ static func _apply_project_effect(team: Team, project: Dictionary) -> void:
 		"upgrade_museum":
 			if not "museo" in team.stadium.upgrades:
 				team.stadium.upgrades.append("museo")
+		"academia_premium":
+			if not "academia_premium" in team.stadium.upgrades:
+				team.stadium.upgrades.append("academia_premium")
+		"gimnasio_top":
+			if not "gimnasio_top" in team.stadium.upgrades:
+				team.stadium.upgrades.append("gimnasio_top")

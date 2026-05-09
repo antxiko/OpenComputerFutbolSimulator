@@ -102,8 +102,15 @@ static func _generate_youth(team: Team, slot: String, season_year: int, rng: Ran
 	p.positions = [slot]
 	p.preferred_foot = "L" if rng.randf() < 0.30 else "R"
 	# Tier: Y siempre (juvenil); potencial: depende de reputación del club
+	# y de la calidad del scout_chief + youth_coach. Academia premium
+	# añade un boost adicional.
 	p.tier = "Y"
-	p.potential_tier = _potential_for_youth(team.reputation, rng)
+	var rep_eff: int = team.reputation
+	if team.staff != null:
+		rep_eff += int(team.staff.scout_potential_bonus() * 100.0)  # +5/+10/+15 pts
+	if team.stadium != null and "academia_premium" in team.stadium.upgrades:
+		rep_eff += 10
+	p.potential_tier = _potential_for_youth(rep_eff, rng)
 	p.shirt_number = 30 + rng.randi_range(0, 20)
 	p.captain = false
 	p.traits = []

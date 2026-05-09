@@ -13,6 +13,7 @@ class_name Team extends Resource
 @export var manager: ManagerInfo = null
 @export var tactics_default: Tactics = null
 @export var finances: FinancesInfo = null
+@export var staff: StaffInfo = null
 @export var players: Array[Player] = []
 
 
@@ -38,6 +39,7 @@ static func from_dict(d: Dictionary) -> Team:
 	t.manager = ManagerInfo.from_dict(d.get("manager", {}))
 	t.tactics_default = Tactics.from_dict(d.get("tactics_default", {}))
 	t.finances = FinancesInfo.from_dict(d.get("finances", {}))
+	t.staff = StaffInfo.from_dict(d.get("staff", {}))
 	t.players = []
 	var players_in: Array = d.get("players", [])
 	for pd in players_in:

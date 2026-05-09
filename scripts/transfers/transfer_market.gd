@@ -91,8 +91,12 @@ static func run(teams: Array, season_year: int, seed_value: int, window: WindowC
 	# Jugadores ya transferidos en esta ventana — no se pueden re-vender
 	var transferred_this_window: Dictionary = {}
 	for t: Team in teams:
+		# El budget disponible es min(budget_transfers configurado, cash_balance real)
+		# multiplicado por el factor de la ventana (verano 1.0, invierno 0.30).
 		var base_budget: int = t.finances.budget_transfers_eur if t.finances != null else 0
-		budgets[t.id] = int(float(base_budget) * window.budget_factor)
+		var cash: int = t.finances.cash_balance if t.finances != null else 0
+		var effective: int = mini(base_budget, maxi(0, cash))
+		budgets[t.id] = int(float(effective) * window.budget_factor)
 		counts_in[t.id] = 0
 		counts_out[t.id] = 0
 		result.team_summary[t.id] = {
@@ -377,6 +381,11 @@ static func _apply_transfer(
 	# Actualiza presupuestos
 	budgets[buyer.id] -= transfer.fee_eur
 	budgets[seller.id] += transfer.fee_eur
+	# También aplicar al cash_balance real para coherencia
+	if buyer.finances != null:
+		buyer.finances.cash_balance -= transfer.fee_eur
+	if seller.finances != null:
+		seller.finances.cash_balance += transfer.fee_eur
 	counts_in[buyer.id] += 1
 	counts_out[seller.id] += 1
 	# Actualiza summary
