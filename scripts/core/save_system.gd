@@ -187,7 +187,7 @@ static func _team_to_dict(t: Team) -> Dictionary:
 		"short_name": t.short_name,
 		"city": t.city,
 		"founded": t.founded,
-		"stadium": {"name": t.stadium.name, "capacity": t.stadium.capacity} if t.stadium else {},
+		"stadium": _stadium_to_dict(t.stadium),
 		"colors": t.colors.duplicate(),
 		"division": t.division,
 		"reputation": t.reputation,
@@ -282,7 +282,18 @@ static func _finances_to_dict(f: FinancesInfo) -> Dictionary:
 		return {}
 	return {"budget_transfers_eur": f.budget_transfers_eur,
 			"wage_budget_eur_year": f.wage_budget_eur_year,
-			"tv_revenue_eur_year": f.tv_revenue_eur_year}
+			"tv_revenue_eur_year": f.tv_revenue_eur_year,
+			"cash_balance": f.cash_balance,
+			"last_season_summary": f.last_season_summary.duplicate(true),
+			"sponsors": f.sponsors.duplicate(true),
+			"ongoing_projects": f.ongoing_projects.duplicate(true)}
+
+
+static func _stadium_to_dict(s: StadiumInfo) -> Dictionary:
+	if s == null:
+		return {}
+	return {"name": s.name, "capacity": s.capacity, "tier": s.tier,
+			"state": s.state, "upgrades": s.upgrades.duplicate()}
 
 
 static func _serialize_table(table: LeagueTable) -> Dictionary:

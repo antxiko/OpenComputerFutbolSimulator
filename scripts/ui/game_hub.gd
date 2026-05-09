@@ -312,6 +312,10 @@ func _load_data() -> void:
 			push_error(e)
 		return
 	all_teams = loaded.teams.values()
+	# Inicializar caja + patrocinadores iniciales para todos los clubes
+	for t: Team in all_teams:
+		ClubFinances.ensure_initialized(t)
+		ClubFinances.ensure_initial_sponsors(t, year)
 	status_label.text = "Cargados %d equipos, %d jugadores." % [
 		all_teams.size(), loaded.player_id_index.size()]
 
@@ -1310,10 +1314,69 @@ func _on_reset_season() -> void:
 			_show_supercopa_modal(sc_result)
 		elif sc_result != null:
 			status_label.text = "🏆 Supercopa %d: %s campeón (final vs %s)" % [year, sc_result.champion_name, sc_result.runner_up_name]
+	# Cierre financiero de la temporada para todos los equipos
+	_close_finances_for_all(cup_bracket, summer_result)
 	# Ofertas de cambio de club al usuario tras temporada notable
 	if user_team_id != "":
 		_evaluate_manager_offers(cup_bracket)
 	_start_season()
+
+
+# Calcula y aplica el cierre financiero de la temporada para todos los teams.
+# Muestra modal al usuario con su balance.
+func _close_finances_for_all(cup_bracket: CupBracket, summer_result: TransferMarket.MarketResult) -> void:
+	# Pre-calcular: posiciones liga, status copa, transfers per team
+	var positions: Dictionary = {}  # team_id -> position
+	var divisions: Dictionary = {}  # team_id -> division
+	if primera_state.league_table != null:
+		var sorted_p: Array = primera_state.league_table.sorted_rows()
+		for i in sorted_p.size():
+			positions[sorted_p[i].team_id] = i + 1
+			divisions[sorted_p[i].team_id] = "primera"
+	if segunda_state.league_table != null:
+		var sorted_s: Array = segunda_state.league_table.sorted_rows()
+		for i in sorted_s.size():
+			positions[sorted_s[i].team_id] = i + 1
+			divisions[sorted_s[i].team_id] = "segunda"
+	# Cup status
+	var cup_status: Dictionary = {}
+	if cup_bracket != null:
+		if cup_bracket.champion_id != "":
+			cup_status[cup_bracket.champion_id] = "champion"
+		if cup_bracket.rounds.size() > 0:
+			var final_round: CupBracket.Round = cup_bracket.rounds[-1]
+			if final_round.fixtures.size() == 1:
+				var ffx: CupBracket.Fixture = final_round.fixtures[0]
+				var loser_id: String = ffx.away_id if ffx.winner_id == ffx.home_id else ffx.home_id
+				if loser_id != "":
+					cup_status[loser_id] = "finalist"
+	# Transfers per team
+	var transfers_in: Dictionary = {}
+	var transfers_out: Dictionary = {}
+	if summer_result != null:
+		for tr: TransferMarket.Transfer in summer_result.transfers:
+			transfers_in[tr.to_team_id] = int(transfers_in.get(tr.to_team_id, 0)) + tr.fee_eur
+			transfers_out[tr.from_team_id] = int(transfers_out.get(tr.from_team_id, 0)) + tr.fee_eur
+
+	# Cerrar para cada equipo
+	var user_summary: Dictionary = {}
+	for t: Team in all_teams:
+		var pos: int = int(positions.get(t.id, 20))
+		var div: String = String(divisions.get(t.id, t.division))
+		var cs: String = String(cup_status.get(t.id, ""))
+		var summary: Dictionary = ClubFinances.close_season(
+			t, year, div, pos, cs,
+			champions_state, europa_state, conference_state,
+			int(transfers_in.get(t.id, 0)),
+			int(transfers_out.get(t.id, 0))
+		)
+		# Avanzar proyectos en curso (ej: ampliación que termina este año)
+		ClubFinances.tick_projects(t, year + 1)
+		if t.id == user_team_id:
+			user_summary = summary
+
+	if not user_summary.is_empty():
+		_show_finance_balance_modal(user_summary)
 
 
 func _show_supercopa_modal(sc: SupercopaSimulator.SupercopaResult) -> void:
@@ -1874,9 +1937,14 @@ func _user_champions_path(bracket: ChampionsBracket) -> String:
 # Vista: 💰 Finanzas (presupuesto, salarios, balance del club del usuario)
 # =========================================================================== #
 func _render_finances_view() -> void:
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content_area.add_child(scroll)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 14)
-	content_area.add_child(box)
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(box)
 
 	if user_team_id == "":
 		var l := Label.new()
@@ -1896,69 +1964,341 @@ func _render_finances_view() -> void:
 	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 	box.add_child(title)
 
-	# Sección 1: presupuesto
-	var section1 := Label.new()
-	section1.text = "── Presupuesto ──"
-	section1.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
-	box.add_child(section1)
-	var grid1 := GridContainer.new()
-	grid1.columns = 2
-	grid1.add_theme_constant_override("h_separation", 24)
-	box.add_child(grid1)
-	_finances_row(grid1, "Presupuesto fichajes (verano)", team.finances.budget_transfers_eur)
-	_finances_row(grid1, "Tope salarial / año", team.finances.wage_budget_eur_year)
-	_finances_row(grid1, "Ingresos TV / año", team.finances.tv_revenue_eur_year)
+	# Caja actual destacada
+	var cash_label := Label.new()
+	cash_label.text = "💵 Caja: %s €" % TransferMarket._fmt_eur(team.finances.cash_balance)
+	cash_label.add_theme_font_size_override("font_size", 22)
+	cash_label.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7) if team.finances.cash_balance >= 0 else Color(1.0, 0.55, 0.55))
+	box.add_child(cash_label)
 
-	# Sección 2: salarios actuales
-	var section2 := Label.new()
-	section2.text = "── Salarios actuales ──"
-	section2.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
-	box.add_child(section2)
+	# Última temporada (resumen)
+	var summary: Dictionary = team.finances.last_season_summary
+	if not summary.is_empty():
+		_finances_section_header(box, "📊 Última temporada (%d-%d)" % [int(summary.get("year", 0)), int(summary.get("year", 0)) + 1])
+		var income: Dictionary = summary.get("income", {})
+		var expense: Dictionary = summary.get("expense", {})
+		var sub_grid := GridContainer.new()
+		sub_grid.columns = 4
+		sub_grid.add_theme_constant_override("h_separation", 20)
+		box.add_child(sub_grid)
+		# Ingresos
+		_make_subheader(sub_grid, "Ingresos", Color(0.7, 1.0, 0.7))
+		_make_subheader(sub_grid, "", Color.WHITE)
+		_make_subheader(sub_grid, "Gastos", Color(1.0, 0.7, 0.7))
+		_make_subheader(sub_grid, "", Color.WHITE)
+		_finance_pair(sub_grid, "Matchday (entradas)", int(income.get("matchday", 0)),
+			"Salarios", int(expense.get("salaries", 0)))
+		_finance_pair(sub_grid, "TV", int(income.get("tv", 0)),
+			"Mantenimiento estadio", int(expense.get("stadium_maintenance", 0)))
+		_finance_pair(sub_grid, "Patrocinadores", int(income.get("sponsors", 0)),
+			"Personal técnico", int(expense.get("staff", 0)))
+		_finance_pair(sub_grid, "Premios competiciones", int(income.get("prizes", 0)),
+			"Fichajes (gasto)", int(expense.get("transfers_out", 0)))
+		_finance_pair(sub_grid, "Ventas (ingreso)", int(income.get("transfers_in", 0)),
+			"", 0)
+		_finance_pair(sub_grid, "TOTAL", int(income.get("total", 0)),
+			"TOTAL", int(expense.get("total", 0)))
+		var net_label := Label.new()
+		var net_v: int = int(summary.get("net", 0))
+		net_label.text = "Balance neto: %s €" % TransferMarket._fmt_eur(net_v)
+		net_label.add_theme_font_size_override("font_size", 14)
+		net_label.add_theme_color_override("font_color", Color(0.6, 1.0, 0.6) if net_v >= 0 else Color(1.0, 0.6, 0.6))
+		box.add_child(net_label)
+		# Premios desglose
+		var pb: Dictionary = income.get("prize_breakdown", {})
+		if not pb.is_empty():
+			var pb_label := Label.new()
+			var parts: Array = []
+			for k in ["liga", "copa", "champions", "europa", "conference"]:
+				var v: int = int(pb.get(k, 0))
+				if v > 0:
+					parts.append("%s: %s" % [k.capitalize(), TransferMarket._fmt_eur(v)])
+			if parts.size() > 0:
+				pb_label.text = "  Premios: " + " · ".join(parts)
+				pb_label.add_theme_font_size_override("font_size", 11)
+				pb_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+				box.add_child(pb_label)
+
+	# Estadio
+	_finances_section_header(box, "🏟 Estadio")
+	if team.stadium != null:
+		var stad_grid := GridContainer.new()
+		stad_grid.columns = 2
+		stad_grid.add_theme_constant_override("h_separation", 20)
+		box.add_child(stad_grid)
+		_simple_row(stad_grid, "Nombre", team.stadium.name)
+		_simple_row(stad_grid, "Capacidad", "%d asientos" % team.stadium.capacity)
+		_simple_row(stad_grid, "Tier", "★".repeat(team.stadium.tier) + " (%d/5)" % team.stadium.tier)
+		_simple_row(stad_grid, "Estado", "%.0f / 100" % team.stadium.state)
+		_simple_row(stad_grid, "Ticket base", "%d €" % team.stadium.base_ticket_price())
+		var upg: String = "ninguna" if team.stadium.upgrades.is_empty() else ", ".join(team.stadium.upgrades)
+		_simple_row(stad_grid, "Mejoras", upg)
+
+		# Botones de mejora
+		var btn_box := HBoxContainer.new()
+		btn_box.add_theme_constant_override("separation", 6)
+		box.add_child(btn_box)
+		for action in [
+			["📐 Ampliar +5000 (30M, 1 temp.)", "stadium_expansion", 30_000_000],
+			["⬆ Subir tier (45M, 1 temp.)", "stadium_tier_up", 45_000_000],
+			["🌱 Césped híbrido (4M)", "upgrade_pitch", 4_000_000],
+			["🥂 Palcos VIP (10M)", "upgrade_vip", 10_000_000],
+			["🏛 Museo (3M)", "upgrade_museum", 3_000_000],
+		]:
+			var b := Button.new()
+			b.text = String(action[0])
+			b.tooltip_text = "Cuesta %s €" % TransferMarket._fmt_eur(int(action[2]))
+			var atype: String = String(action[1])
+			var cost: int = int(action[2])
+			b.disabled = team.finances.cash_balance < cost or _has_active_project(team, atype) or _has_upgrade(team, atype)
+			b.pressed.connect(func() -> void: _on_buy_stadium_upgrade(team, atype, cost))
+			btn_box.add_child(b)
+
+		# Proyectos en curso
+		if not team.finances.ongoing_projects.is_empty():
+			var oproj_label := Label.new()
+			oproj_label.text = "Proyectos en curso:"
+			oproj_label.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+			box.add_child(oproj_label)
+			for proj in team.finances.ongoing_projects:
+				var pl := Label.new()
+				pl.text = "  • %s (termina %d)" % [String(proj.get("type", "?")), int(proj.get("completes_year", 0))]
+				pl.add_theme_font_size_override("font_size", 11)
+				box.add_child(pl)
+
+	# Patrocinadores
+	_finances_section_header(box, "💼 Patrocinadores")
+	if team.finances.sponsors.is_empty():
+		var none_label := Label.new()
+		none_label.text = "  (sin patrocinadores activos)"
+		none_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+		box.add_child(none_label)
+	else:
+		for sp in team.finances.sponsors:
+			var sl := Label.new()
+			sl.text = "  • %s — %s — %s €/año (hasta %d)" % [
+				String(sp.get("type", "?")).capitalize().replace("_", " "),
+				String(sp.get("sponsor_name", "?")),
+				TransferMarket._fmt_eur(int(sp.get("amount_per_year", 0))),
+				int(sp.get("until_year", 0)),
+			]
+			sl.add_theme_font_size_override("font_size", 11)
+			box.add_child(sl)
+	# Botón buscar patrocinador
+	if team.finances.sponsors.size() < 4:
+		var find_btn := Button.new()
+		find_btn.text = "🔍 Buscar nuevo patrocinador"
+		find_btn.tooltip_text = "Negocia un patrocinador adicional. Coste: 500K €"
+		find_btn.disabled = team.finances.cash_balance < 500_000
+		find_btn.pressed.connect(func() -> void: _on_search_sponsor(team))
+		box.add_child(find_btn)
+
+	# Plantilla: salarios + valor (compactado)
+	_finances_section_header(box, "👥 Plantilla")
+	var grid_squad := GridContainer.new()
+	grid_squad.columns = 2
+	grid_squad.add_theme_constant_override("h_separation", 24)
+	box.add_child(grid_squad)
 	var total_salary: int = 0
-	var top_paid: Array = []
 	for p: Player in team.players:
-		var s: int = p.contract.salary_eur_year if p.contract else 0
-		total_salary += s
-		top_paid.append({ "name": p.name, "salary": s, "tier": p.tier, "age": p.age_at(year, 7, 1) })
-	top_paid.sort_custom(func(a, b): return int(a["salary"]) > int(b["salary"]))
-	var grid2 := GridContainer.new()
-	grid2.columns = 2
-	grid2.add_theme_constant_override("h_separation", 24)
-	box.add_child(grid2)
-	_finances_row(grid2, "Salarios totales / año", total_salary)
-	_finances_row(grid2, "Margen sobre tope", team.finances.wage_budget_eur_year - total_salary)
-	_finances_row(grid2, "Salario medio / jugador", total_salary / max(1, team.players.size()))
-
-	# Top 5 mejor pagados
-	var sub := Label.new()
-	sub.text = "Top 5 mejor pagados:"
-	sub.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
-	sub.add_theme_font_size_override("font_size", 12)
-	box.add_child(sub)
-	for i in mini(5, top_paid.size()):
-		var t: Dictionary = top_paid[i]
-		var l := Label.new()
-		l.text = "  %s (%s, %d años) — %s €/año" % [
-			String(t["name"]), String(t["tier"]), int(t["age"]),
-			TransferMarket._fmt_eur(int(t["salary"])),
-		]
-		l.add_theme_font_size_override("font_size", 11)
-		box.add_child(l)
-
-	# Sección 3: valor de plantilla
-	var section3 := Label.new()
-	section3.text = "── Valor de la plantilla ──"
-	section3.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
-	box.add_child(section3)
+		if p.contract != null:
+			total_salary += p.contract.salary_eur_year
 	var total_value: int = 0
 	for p: Player in team.players:
 		total_value += MarketValue.compute(p, year, "")
-	var grid3 := GridContainer.new()
-	grid3.columns = 2
-	grid3.add_theme_constant_override("h_separation", 24)
-	box.add_child(grid3)
-	_finances_row(grid3, "Valor de mercado total", total_value)
-	_finances_row(grid3, "Valor medio / jugador", total_value / max(1, team.players.size()))
+	_finances_row(grid_squad, "Salarios totales / año", total_salary)
+	_finances_row(grid_squad, "Tope salarial", team.finances.wage_budget_eur_year)
+	_finances_row(grid_squad, "Margen sobre tope", team.finances.wage_budget_eur_year - total_salary)
+	_finances_row(grid_squad, "Valor de mercado total", total_value)
+	_finances_row(grid_squad, "Presupuesto fichajes próximo verano", team.finances.budget_transfers_eur)
+
+
+func _finances_section_header(box: VBoxContainer, text: String) -> void:
+	var l := Label.new()
+	l.text = text
+	l.add_theme_font_size_override("font_size", 14)
+	l.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	box.add_child(l)
+
+
+func _make_subheader(grid: GridContainer, text: String, color: Color) -> void:
+	var l := Label.new()
+	l.text = text
+	l.add_theme_font_size_override("font_size", 12)
+	l.add_theme_color_override("font_color", color)
+	grid.add_child(l)
+
+
+func _simple_row(grid: GridContainer, label: String, value: String) -> void:
+	var l1 := Label.new()
+	l1.text = label
+	l1.add_theme_font_size_override("font_size", 12)
+	grid.add_child(l1)
+	var l2 := Label.new()
+	l2.text = value
+	l2.add_theme_font_size_override("font_size", 12)
+	l2.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	grid.add_child(l2)
+
+
+func _finance_pair(grid: GridContainer, label_in: String, amount_in: int, label_out: String, amount_out: int) -> void:
+	# 4 columnas: label_in | amount_in | label_out | amount_out
+	var l1 := Label.new()
+	l1.text = label_in
+	l1.add_theme_font_size_override("font_size", 11)
+	grid.add_child(l1)
+	var l2 := Label.new()
+	l2.text = "%s €" % TransferMarket._fmt_eur(amount_in) if amount_in > 0 else ""
+	l2.add_theme_font_size_override("font_size", 11)
+	l2.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+	l2.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	grid.add_child(l2)
+	var l3 := Label.new()
+	l3.text = label_out
+	l3.add_theme_font_size_override("font_size", 11)
+	grid.add_child(l3)
+	var l4 := Label.new()
+	l4.text = "%s €" % TransferMarket._fmt_eur(amount_out) if amount_out > 0 else ""
+	l4.add_theme_font_size_override("font_size", 11)
+	l4.add_theme_color_override("font_color", Color(1.0, 0.7, 0.7))
+	l4.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	grid.add_child(l4)
+
+
+func _has_active_project(team: Team, type: String) -> bool:
+	for p in team.finances.ongoing_projects:
+		if String(p.get("type", "")) == type:
+			return true
+	return false
+
+
+func _has_upgrade(team: Team, type: String) -> bool:
+	if team.stadium == null:
+		return false
+	# Para upgrades concretos, comprobar el flag.
+	match type:
+		"upgrade_pitch": return "cesped_hibrido" in team.stadium.upgrades
+		"upgrade_vip":   return "palcos_vip" in team.stadium.upgrades
+		"upgrade_museum": return "museo" in team.stadium.upgrades
+		_: return false
+
+
+func _on_buy_stadium_upgrade(team: Team, type: String, cost: int) -> void:
+	if team.finances == null or team.finances.cash_balance < cost:
+		status_label.text = "❌ No tienes caja suficiente para esta mejora."
+		return
+	team.finances.cash_balance -= cost
+	# Proyectos multi-temporada
+	if type in ["stadium_expansion", "stadium_tier_up"]:
+		var proj: Dictionary = {
+			"type": type,
+			"completes_year": year + 1,
+			"capacity_add": 5000,
+		}
+		team.finances.ongoing_projects.append(proj)
+		status_label.text = "🏗 Proyecto iniciado: termina la próxima temporada."
+	else:
+		# Mejoras inmediatas (cesped/palcos/museo): aplicar ya
+		ClubFinances._apply_project_effect(team, { "type": type })
+		status_label.text = "✅ Mejora aplicada al estadio."
+	_refresh_ui()
+
+
+func _on_search_sponsor(team: Team) -> void:
+	if team.finances == null or team.finances.cash_balance < 500_000:
+		return
+	team.finances.cash_balance -= 500_000
+	# Buscar un slot libre
+	var existing_types: Dictionary = {}
+	for sp in team.finances.sponsors:
+		existing_types[String(sp.get("type", ""))] = true
+	var available_types: Array = ["kit_main", "kit_sleeve", "training", "naming"]
+	var chosen_type: String = ""
+	for t_type in available_types:
+		if not existing_types.has(t_type):
+			chosen_type = t_type
+			break
+	if chosen_type == "":
+		# Renovar el de menor amount con mejora 10%
+		var lowest_idx: int = 0
+		var lowest_amount: int = 999_999_999
+		for i in team.finances.sponsors.size():
+			var a: int = int(team.finances.sponsors[i].get("amount_per_year", 0))
+			if a < lowest_amount:
+				lowest_amount = a
+				lowest_idx = i
+		var sp: Dictionary = team.finances.sponsors[lowest_idx]
+		sp["amount_per_year"] = int(float(lowest_amount) * 1.10)
+		sp["until_year"] = year + 3
+		status_label.text = "✅ Renovado %s con +10%% incremento." % String(sp.get("sponsor_name", "?"))
+	else:
+		var rep: int = team.reputation
+		team.finances.sponsors.append({
+			"type": chosen_type,
+			"sponsor_name": ClubFinances._sponsor_name_for_tier(rep),
+			"amount_per_year": ClubFinances._sponsor_amount(chosen_type, rep),
+			"until_year": year + 3,
+		})
+		status_label.text = "✅ Nuevo patrocinador: %s" % chosen_type.capitalize().replace("_", " ")
+	_refresh_ui()
+
+
+# Modal de balance fin de temporada para el usuario
+func _show_finance_balance_modal(summary: Dictionary) -> void:
+	var popup := AcceptDialog.new()
+	popup.title = "💰 Balance temporada %d-%d" % [int(summary.get("year", 0)), int(summary.get("year", 0)) + 1]
+	popup.size = Vector2(620, 460)
+	popup.ok_button_text = "Continuar"
+	add_child(popup)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	popup.add_child(box)
+
+	var income: Dictionary = summary.get("income", {})
+	var expense: Dictionary = summary.get("expense", {})
+
+	var net_v: int = int(summary.get("net", 0))
+	var net_label := Label.new()
+	net_label.text = "%s %s €" % ["📈" if net_v >= 0 else "📉", TransferMarket._fmt_eur(net_v)]
+	net_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	net_label.add_theme_font_size_override("font_size", 22)
+	net_label.add_theme_color_override("font_color", Color(0.6, 1.0, 0.6) if net_v >= 0 else Color(1.0, 0.6, 0.6))
+	box.add_child(net_label)
+	var cash_after_label := Label.new()
+	cash_after_label.text = "Caja tras la temporada: %s €" % TransferMarket._fmt_eur(int(summary.get("cash_balance_after", 0)))
+	cash_after_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	cash_after_label.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	box.add_child(cash_after_label)
+
+	box.add_child(HSeparator.new())
+
+	var income_label := Label.new()
+	income_label.text = "📈 Ingresos: %s €" % TransferMarket._fmt_eur(int(income.get("total", 0)))
+	income_label.add_theme_font_size_override("font_size", 14)
+	income_label.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+	box.add_child(income_label)
+	for k in [["Matchday", "matchday"], ["TV", "tv"], ["Patrocinadores", "sponsors"], ["Premios", "prizes"], ["Ventas", "transfers_in"]]:
+		var v: int = int(income.get(String(k[1]), 0))
+		var l := Label.new()
+		l.text = "    %s: %s €" % [String(k[0]), TransferMarket._fmt_eur(v)]
+		l.add_theme_font_size_override("font_size", 11)
+		box.add_child(l)
+
+	var expense_label := Label.new()
+	expense_label.text = "📉 Gastos: %s €" % TransferMarket._fmt_eur(int(expense.get("total", 0)))
+	expense_label.add_theme_font_size_override("font_size", 14)
+	expense_label.add_theme_color_override("font_color", Color(1.0, 0.7, 0.7))
+	box.add_child(expense_label)
+	for k in [["Salarios", "salaries"], ["Mantenimiento estadio", "stadium_maintenance"], ["Personal técnico", "staff"], ["Compras", "transfers_out"]]:
+		var v: int = int(expense.get(String(k[1]), 0))
+		var l := Label.new()
+		l.text = "    %s: %s €" % [String(k[0]), TransferMarket._fmt_eur(v)]
+		l.add_theme_font_size_override("font_size", 11)
+		box.add_child(l)
+
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
 
 
 func _finances_row(grid: GridContainer, label: String, amount: int) -> void:
