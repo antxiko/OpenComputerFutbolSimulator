@@ -722,6 +722,205 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 
 
 # =========================================================================== #
+# Renovaciones manuales de contrato (vista que se muestra entre temporadas)
+# =========================================================================== #
+# Devuelve un Dictionary[player_id, "renewed"|"released"] con la decisión
+# tomada por el usuario para cada jugador con contrato vencido. Los jugadores
+# sobre los que el usuario no decida nada quedan como "released" automático
+# (sin chance de auto-renew, porque el usuario ya conoció la lista).
+func _show_renewals_view_modal(team: Team, pending: Array, season_year: int) -> Dictionary:
+	var decisions: Dictionary = {}
+
+	var popup := AcceptDialog.new()
+	popup.title = "📝 Renovaciones de contrato — %s" % team.name
+	popup.dialog_close_on_escape = false
+	popup.unresizable = false
+	popup.min_size = Vector2(720, 540)
+	add_child(popup)
+
+	var root := VBoxContainer.new()
+	root.add_theme_constant_override("separation", 10)
+	popup.add_child(root)
+
+	var intro := Label.new()
+	intro.text = "Tus jugadores con contrato vencido al final de la temporada %d.\nDecide a quién renovar y a quién dejar marchar." % season_year
+	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	root.add_child(intro)
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(700, 420)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	root.add_child(scroll)
+
+	var list_box := VBoxContainer.new()
+	list_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list_box.add_theme_constant_override("separation", 6)
+	scroll.add_child(list_box)
+
+	var status_labels: Dictionary = {}  # player_id -> Label
+
+	for p: Player in pending:
+		var row := PanelContainer.new()
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var hbox := HBoxContainer.new()
+		hbox.add_theme_constant_override("separation", 12)
+		row.add_child(hbox)
+
+		var info := VBoxContainer.new()
+		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var primary: String = p.primary_position()
+		var ovr: int = PlayerFactory.compute_overall(p, primary)
+		var age: int = p.age_at(season_year, 7, 1)
+		var name_l := Label.new()
+		name_l.text = "%s (%s, %d años) · OVR %d · Tier %s" % [p.name, primary, age, ovr, p.tier]
+		name_l.add_theme_font_size_override("font_size", 14)
+		info.add_child(name_l)
+
+		var fair: int = ContractNegotiation.fair_salary(p, season_year)
+		var current_salary: int = p.contract.salary_eur_year if p.contract else 0
+		var detail_l := Label.new()
+		detail_l.text = "Salario actual: %s€/año · Justo estimado: %s€/año" % [_fmt_eur(current_salary), _fmt_eur(fair)]
+		detail_l.add_theme_font_size_override("font_size", 11)
+		detail_l.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+		info.add_child(detail_l)
+
+		var status_l := Label.new()
+		status_l.text = "⏳ Pendiente"
+		status_l.add_theme_font_size_override("font_size", 11)
+		status_l.add_theme_color_override("font_color", Color(0.9, 0.8, 0.4))
+		info.add_child(status_l)
+		status_labels[p.id] = status_l
+
+		hbox.add_child(info)
+
+		var renew_btn := Button.new()
+		renew_btn.text = "Renovar"
+		renew_btn.custom_minimum_size = Vector2(100, 40)
+		var captured_player: Player = p
+		var captured_status: Label = status_l
+		renew_btn.pressed.connect(_on_renew_player_pressed.bind(captured_player, season_year, decisions, captured_status))
+		hbox.add_child(renew_btn)
+
+		var release_btn := Button.new()
+		release_btn.text = "Liberar"
+		release_btn.custom_minimum_size = Vector2(100, 40)
+		release_btn.pressed.connect(_on_release_player_pressed.bind(captured_player.id, decisions, captured_status))
+		hbox.add_child(release_btn)
+
+		list_box.add_child(row)
+
+	popup.ok_button_text = "Aplicar y continuar al verano"
+	popup.popup_centered()
+	# Espera a que el usuario confirme. dialog_close_on_escape deshabilitado
+	# y sin botón cancel — el único exit es la señal confirmed.
+	await popup.confirmed
+	# Los pendientes sin decisión los marcamos como "released" — el usuario
+	# tuvo la oportunidad y la dejó pasar.
+	for pp: Player in pending:
+		if not decisions.has(pp.id):
+			decisions[pp.id] = "released"
+	popup.queue_free()
+	return decisions
+
+
+# Sub-modal para proponer una oferta de renovación al jugador.
+func _open_renewal_offer_modal(player: Player, season_year: int, decisions: Dictionary, status_label: Label) -> void:
+	var popup := AcceptDialog.new()
+	popup.title = "Oferta de renovación — %s" % player.name
+	popup.min_size = Vector2(440, 320)
+	add_child(popup)
+
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	popup.add_child(box)
+
+	var fair: int = ContractNegotiation.fair_salary(player, season_year)
+	var year_range: Array = ContractNegotiation.acceptable_years(player, season_year)
+
+	var info := Label.new()
+	info.text = "Salario justo estimado: %s€/año\nAños aceptables: %d–%d" % [_fmt_eur(fair), int(year_range[0]), int(year_range[1])]
+	info.add_theme_font_size_override("font_size", 12)
+	box.add_child(info)
+
+	# Salario propuesto en €/año (en miles de €)
+	var sal_label := Label.new()
+	sal_label.text = "Salario propuesto (€/año):"
+	box.add_child(sal_label)
+	var sal_spin := SpinBox.new()
+	sal_spin.min_value = 100_000
+	sal_spin.max_value = 50_000_000
+	sal_spin.step = 50_000
+	sal_spin.value = fair
+	box.add_child(sal_spin)
+
+	var years_label := Label.new()
+	years_label.text = "Años de contrato:"
+	box.add_child(years_label)
+	var years_spin := SpinBox.new()
+	years_spin.min_value = 1
+	years_spin.max_value = 6
+	years_spin.step = 1
+	years_spin.value = clampi(int(year_range[1]), 1, 6)
+	box.add_child(years_spin)
+
+	var feedback := Label.new()
+	feedback.text = ""
+	feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	feedback.add_theme_font_size_override("font_size", 12)
+	box.add_child(feedback)
+
+	# Botón de envío
+	var send_btn := Button.new()
+	send_btn.text = "Enviar oferta"
+	send_btn.pressed.connect(_on_send_renewal_offer.bind(player, season_year, sal_spin, years_spin, feedback, status_label, decisions, popup))
+	box.add_child(send_btn)
+
+	popup.ok_button_text = "Cerrar sin oferta"
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
+
+
+func _fmt_eur(amount: int) -> String:
+	if amount >= 1_000_000:
+		return "%.1fM" % (float(amount) / 1_000_000.0)
+	if amount >= 1_000:
+		return "%dK" % (amount / 1_000)
+	return str(amount)
+
+
+func _on_renew_player_pressed(player: Player, season_year: int, decisions: Dictionary, status_label: Label) -> void:
+	_open_renewal_offer_modal(player, season_year, decisions, status_label)
+
+
+func _on_release_player_pressed(player_id: String, decisions: Dictionary, status_label: Label) -> void:
+	decisions[player_id] = "released"
+	status_label.text = "❌ Liberado"
+	status_label.add_theme_color_override("font_color", Color(0.9, 0.5, 0.5))
+
+
+func _on_send_renewal_offer(player: Player, season_year: int, sal_spin: SpinBox, years_spin: SpinBox, feedback: Label, status_label: Label, decisions: Dictionary, popup: AcceptDialog) -> void:
+	var salary: int = int(sal_spin.value)
+	var years: int = int(years_spin.value)
+	var eval: Dictionary = ContractNegotiation.evaluate_offer(player, season_year, salary, years)
+	if bool(eval.get("accepted", false)):
+		ContractNegotiation.apply_renewal(player, season_year, salary, years)
+		decisions[player.id] = "renewed"
+		status_label.text = "✅ Renovado (%d años, %s€/año)" % [years, _fmt_eur(salary)]
+		status_label.add_theme_color_override("font_color", Color(0.4, 0.9, 0.5))
+		popup.queue_free()
+		return
+	feedback.text = String(eval.get("message", "Rechaza la oferta."))
+	feedback.add_theme_color_override("font_color", Color(0.95, 0.6, 0.5))
+	var counter_sal: int = int(eval.get("counter_salary", 0))
+	var counter_yrs: int = int(eval.get("counter_years", 0))
+	if counter_sal > 0:
+		sal_spin.value = counter_sal
+	if counter_yrs > 0:
+		years_spin.value = counter_yrs
+
+
+# =========================================================================== #
 # Objetivos del club (por temporada)
 # =========================================================================== #
 # Genera el objetivo de Liga al inicio de cada temporada, basado en la
@@ -1371,8 +1570,16 @@ func _on_reset_season() -> void:
 			p.season_assists = 0
 			p.season_matches = 0
 			p.season_minutes = 0
+	# Renovaciones manuales del usuario antes del verano
+	var user_decisions: Dictionary = {}
+	if user_team_id != "":
+		var user_team_for_renewals: Team = _find_team_by_id(user_team_id)
+		if user_team_for_renewals != null:
+			var pending: Array = ContractNegotiation.players_to_negotiate(user_team_for_renewals, year - 1)
+			if pending.size() > 0:
+				user_decisions = await _show_renewals_view_modal(user_team_for_renewals, pending, year - 1)
 	# Mercado de fichajes (verano)
-	var summer_result: TransferMarket.MarketResult = TransferMarket.run(all_teams, year, SEED_BASE * 7)
+	var summer_result: TransferMarket.MarketResult = TransferMarket.run(all_teams, year, SEED_BASE * 7, null, user_decisions)
 	# Modal de resumen (solo si hubo movimientos relevantes)
 	if user_team_id != "" and (summer_result.transfers.size() > 0 or summer_result.free_agent_signings.size() > 0):
 		_show_summer_market_modal(summer_result)

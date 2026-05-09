@@ -9,9 +9,9 @@ Todas las versiones publicadas, qué se hizo y qué queda. Formato basado en [Ke
 - **Recuperación parcial de condition entre partidos**: nueva clase `ConditionRecovery`. Antes reset a 100; ahora según días desde el último partido del jugador (1 día → 55, 3 días → 82, ≥5 → 100). Se beneficia de calendario real.
 - **Lesiones largas con seguimiento**: heal_after_days usa días reales del calendario (antes hardcoded 7). Modal "🏥 Parte médico" tras la jornada con lesiones graves del usuario, mostrando la fecha estimada de regreso.
 - **Reemplazo automático tras vender titular**: si un equipo vende a un jugador con overall ≥75 o que era core de su slot, gana 1 fichaje extra de slot para reemplazarlo en rondas posteriores del mercado.
+- **📝 Renovación manual de contratos**: nueva clase `ContractNegotiation`. Al final de temporada, modal que lista todos los jugadores del usuario con contrato vencido. Por jugador: [Renovar] (sub-modal con SpinBox para salario y años, evalúa oferta con probabilidad de aceptación según ratio salario/justo y rango de años por edad; counter-offer si rechazo) o [Liberar] (va al pool de free agents). Los demás clubes siguen flujo automático.
 
 ### Pendiente (v0.3.0)
-- Renovación de contratos manual (negociar con jugadores)
 - Pujas múltiples / contraofertas en mercado
 - Verificar plantillas hand-curadas (los 7 con `_draft_note`)
 

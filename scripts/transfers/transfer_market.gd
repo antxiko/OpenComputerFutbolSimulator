@@ -74,7 +74,7 @@ class MarketResult:
 	var loan_returns: Array = []
 
 
-static func run(teams: Array, season_year: int, seed_value: int, window: WindowConfig = null) -> MarketResult:
+static func run(teams: Array, season_year: int, seed_value: int, window: WindowConfig = null, user_decisions: Dictionary = {}) -> MarketResult:
 	if window == null:
 		window = summer_window()
 
@@ -121,7 +121,7 @@ static func run(teams: Array, season_year: int, seed_value: int, window: WindowC
 	# En invierno los contratos no se procesan — eso es exclusivo del verano.
 	var free_agents: Array = []
 	if window.label == "verano":
-		free_agents = _process_expired_contracts(teams, season_year, result, rng)
+		free_agents = _process_expired_contracts(teams, season_year, result, rng, user_decisions)
 
 	# Calcular media por slot en la liga (para detectar debilidad relativa)
 	var league_avg: Dictionary = _compute_league_average_by_slot(teams)
@@ -186,7 +186,7 @@ static func run(teams: Array, season_year: int, seed_value: int, window: WindowC
 # ----------------------------------------------------------------------
 # Contratos vencidos: renovación automática o release
 # ----------------------------------------------------------------------
-static func _process_expired_contracts(teams: Array, season_year: int, result: MarketResult, rng: RandomNumberGenerator) -> Array:
+static func _process_expired_contracts(teams: Array, season_year: int, result: MarketResult, rng: RandomNumberGenerator, user_decisions: Dictionary = {}) -> Array:
 	var free_agents: Array = []  # Array[{player, prev_team}]
 	for t: Team in teams:
 		var to_release: Array[Player] = []
@@ -195,6 +195,24 @@ static func _process_expired_contracts(teams: Array, season_year: int, result: M
 				continue
 			if p.contract.until_year > season_year:
 				continue  # contrato vigente
+
+			# Si el usuario ya tomó una decisión manual sobre este jugador,
+			# saltar la lógica automática y aplicar la suya directamente.
+			if user_decisions.has(p.id):
+				var decision: String = String(user_decisions[p.id])
+				if decision == "released":
+					to_release.append(p)
+					result.released.append({
+						"player_name": p.name,
+						"team_name": t.short_name,
+						"age": p.age_at(season_year, 7, 1),
+						"ovr": PlayerFactory.compute_overall(p, p.primary_position()),
+						"tier": p.tier,
+					})
+				# Si decision == "renewed", el contrato ya se actualizó manualmente.
+				# No requiere acción aquí — pasa de largo.
+				continue
+
 			# Contrato expirado: decidir renovar vs liberar.
 			var ovr: int = PlayerFactory.compute_overall(p, p.primary_position())
 			var age: int = p.age_at(season_year, 7, 1)
