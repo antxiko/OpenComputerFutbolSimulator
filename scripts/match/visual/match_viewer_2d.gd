@@ -90,6 +90,10 @@ var fallen_player_id: String = ""           # jugador "tirado" tras T_TACKLE_FAI
 var fallen_timer: float = 0.0
 var foul_shake_player_id: String = ""       # jugador con shake tras T_TACTICAL_FOUL
 var foul_shake_timer: float = 0.0
+# Extra offsets temporales (T_RUN, T_OVERLAP): player_id -> Vector2 que se
+# suma al target del jugador. Se decrementa con timer hasta volver a 0.
+var extra_offsets: Dictionary = {}          # player_id -> Vector2
+var extra_offset_timers: Dictionary = {}    # player_id -> float (segundos restantes)
 
 # UI refs
 var play_button: Button
@@ -296,6 +300,16 @@ func _process(delta: float) -> void:
 		foul_shake_timer -= delta
 		if foul_shake_timer <= 0.0:
 			foul_shake_player_id = ""
+	# Decrementar extra_offset_timers y limpiar offsets expirados
+	if not extra_offset_timers.is_empty():
+		var to_clear: Array = []
+		for pid in extra_offset_timers.keys():
+			extra_offset_timers[pid] -= delta
+			if float(extra_offset_timers[pid]) <= 0.0:
+				to_clear.append(pid)
+		for pid in to_clear:
+			extra_offset_timers.erase(pid)
+			extra_offsets.erase(pid)
 
 	# Animación continua: balón y jugadores se interpolan suavemente cada frame
 	if match_result != null:
@@ -454,6 +468,11 @@ func _compute_player_targets(lineup: Lineup, targets: Array, mirror: bool) -> vo
 		off.x = clamp(off.x, -0.22, 0.22)
 		off.y = clamp(off.y, -0.18, 0.18)
 
+		# 7) Extra offset puntual (T_RUN, T_OVERLAP) — movimiento sin balón
+		var pid: String = lineup.starting_eleven[i].id
+		if extra_offsets.has(pid):
+			off += extra_offsets[pid] as Vector2
+
 		if i < targets.size():
 			targets[i] = off
 		else:
@@ -479,7 +498,9 @@ func _advance_one_event() -> void:
 				MatchEvent.T_DRIBBLE, MatchEvent.T_INTERCEPT,
 				MatchEvent.T_TACKLE_FAIL, MatchEvent.T_TACTICAL_FOUL,
 				MatchEvent.T_THROW_IN, MatchEvent.T_GK_DIST,
-				MatchEvent.T_HEADER, MatchEvent.T_VOLLEY]:
+				MatchEvent.T_HEADER, MatchEvent.T_VOLLEY,
+				MatchEvent.T_PRESSURE, MatchEvent.T_CLEARANCE, MatchEvent.T_BACK_PASS,
+				MatchEvent.T_RUN, MatchEvent.T_OVERLAP]:
 			if highlights_only:
 				continue  # skip en modo highlights
 			_set_ball_for_event(ev)
@@ -649,6 +670,41 @@ func _set_ball_for_event(ev: MatchEvent) -> void:
 			ball_target = shooter_pos
 			_kick_off_ball_animation()
 			return
+	if ev.type == MatchEvent.T_BACK_PASS:
+		# Back pass al portero: balón al GK (secondary_player_id)
+		var gk_back: Vector2 = _get_player_field_pos(ev.secondary_player_id)
+		if gk_back != Vector2.ZERO:
+			ball_target = gk_back
+			_kick_off_ball_animation()
+			return
+	if ev.type == MatchEvent.T_PRESSURE:
+		# Presión: el balón sigue donde está, pero marcamos al presser con shake corto
+		foul_shake_player_id = ev.player_id
+		foul_shake_timer = 0.3
+		# No cambiamos ball_target — el presser se acerca al pasador, no toca el balón
+		return
+	if ev.type == MatchEvent.T_CLEARANCE:
+		# Despeje: balón se aleja del defensor en dirección random fuera del área
+		var clr_pos: Vector2 = _get_player_field_pos(ev.player_id)
+		if clr_pos != Vector2.ZERO:
+			# Despeje hacia el centro/lateral, distancia ~0.20
+			var clr_dir: Vector2 = Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)).normalized()
+			ball_target = clr_pos + clr_dir * 0.20
+			_kick_off_ball_animation()
+			return
+	if ev.type == MatchEvent.T_RUN or ev.type == MatchEvent.T_OVERLAP:
+		# Movimiento sin balón: el jugador corre hacia adelante (su área de
+		# ataque). Aplica un extra_offset temporal que se suma al target.
+		var attack_dir: float = 1.0 if (ev.team_id == match_result.home_team_id) else -1.0
+		var run_offset: Vector2
+		if ev.type == MatchEvent.T_RUN:
+			run_offset = Vector2(0.10 * attack_dir, randf_range(-0.04, 0.04))
+		else:  # OVERLAP
+			run_offset = Vector2(0.08 * attack_dir, 0.05 if randf() < 0.5 else -0.05)
+		extra_offsets[ev.player_id] = run_offset
+		extra_offset_timers[ev.player_id] = 1.5  # se mantiene 1.5 segundos
+		# El balón no se mueve por estos eventos
+		return
 	# Resto de eventos (foul, yellow, red, etc): posición por zona estándar
 	_update_ball_position()
 

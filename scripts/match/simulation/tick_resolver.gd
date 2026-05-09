@@ -650,6 +650,20 @@ static func _emit_decorative_chain(state: MatchState, poss: Lineup, defense: Lin
 				else:
 					events.append(_make_decorative(state, MatchEvent.T_DRIBBLE, poss.team.id, carrier.id, "", zone,
 						"%s recorta" % carrier.name))
+			# T_RUN: 30% de prob de que un atacante haga desmarque hacia el área
+			# cuando hay avance mid→atk. Visualmente el jugador "corre" hacia delante.
+			if zone == "mid" and next_zone == "atk" and vrng.randf() < 0.30:
+				var runner: Player = _pick_actor(poss, "attack", "atk", vrng)
+				if runner != null:
+					events.append(_make_decorative(state, MatchEvent.T_RUN, poss.team.id, runner.id, "", "atk",
+						"%s se desmarca al área" % runner.name))
+			# T_OVERLAP: 20% si carrier es lateral, el extremo del mismo lado overlapa
+			var carrier_slot_pre: String = _slot_of(poss, carrier.id) if carrier != null else ""
+			if carrier_slot_pre in ["LB", "LWB", "RB", "RWB"] and vrng.randf() < 0.20:
+				var overlapper: Player = _pick_actor(poss, "attack", next_zone, vrng)
+				if overlapper != null and overlapper.id != carrier.id:
+					events.append(_make_decorative(state, MatchEvent.T_OVERLAP, poss.team.id, overlapper.id, "", next_zone,
+						"%s sobrepasa por la banda" % overlapper.name))
 			# Pase a un jugador en la siguiente zona — tipo CROSS si carrier es de banda
 			var receiver: Player = _pick_actor(poss, "attack", next_zone, vrng)
 			if carrier != null and receiver != null and carrier.id != receiver.id:
@@ -663,10 +677,16 @@ static func _emit_decorative_chain(state: MatchState, poss: Lineup, defense: Lin
 					"Pase de %s a %s" % [carrier.name, receiver.name],
 					{"target_zone": next_zone}))
 		"keep":
-			# Pase corto entre dos jugadores en la misma zona
+			# Pase corto entre dos jugadores en la misma zona.
+			# En zona def, 15% de prob de que sea T_BACK_PASS al portero.
 			var p1: Player = _pick_actor(poss, "attack", zone, vrng)
 			var p2: Player = _pick_actor(poss, "attack", zone, vrng)
-			if p1 != null and p2 != null and p1.id != p2.id:
+			if zone == "def" and vrng.randf() < 0.15:
+				var gk_keep: Player = _find_goalkeeper(poss)
+				if p1 != null and gk_keep != null and p1.id != gk_keep.id:
+					events.append(_make_decorative(state, MatchEvent.T_BACK_PASS, poss.team.id, p1.id, gk_keep.id, zone,
+						"%s atrás a %s" % [p1.name, gk_keep.name]))
+			elif p1 != null and p2 != null and p1.id != p2.id:
 				events.append(_make_decorative(state, MatchEvent.T_PASS, poss.team.id, p1.id, p2.id, zone,
 					"Pase de %s a %s" % [p1.name, p2.name]))
 		"lose":
@@ -699,13 +719,26 @@ static func _emit_decorative_chain(state: MatchState, poss: Lineup, defense: Lin
 					events.append(_make_decorative(state, MatchEvent.T_THROW_IN, defense.team.id, thrower.id, "", "mid",
 						"Saque de banda de %s" % thrower.name))
 			else:
-				# Intercept clásico
+				# Intercept clásico (con variantes: pressure previo, clearance en
+				# zona atk, intercept normal).
+				# T_PRESSURE: 25% de prob — un segundo defensor presiona al passer
+				if passer != null and stopper != null and vrng.randf() < 0.25:
+					var presser: Player = _pick_actor(defense, "defense", def_zone, vrng)
+					if presser != null and presser.id != stopper.id:
+						events.append(_make_decorative(state, MatchEvent.T_PRESSURE, defense.team.id, presser.id,
+							passer.id, zone, "%s presiona" % presser.name))
 				if passer != null:
 					events.append(_make_decorative(state, MatchEvent.T_PASS, poss.team.id, passer.id,
 						stopper.id if stopper else "", zone, "Avanza %s..." % passer.name))
 				if stopper != null:
-					events.append(_make_decorative(state, MatchEvent.T_INTERCEPT, defense.team.id, stopper.id,
-						passer.id if passer else "", zone, "%s intercepta" % stopper.name))
+					# T_CLEARANCE en zona atk del atacante (defensor despeja en su área)
+					# 40% de los intercepts en zona atk son despejes contundentes.
+					if zone == "atk" and vrng.randf() < 0.40:
+						events.append(_make_decorative(state, MatchEvent.T_CLEARANCE, defense.team.id, stopper.id,
+							passer.id if passer else "", zone, "%s despeja" % stopper.name))
+					else:
+						events.append(_make_decorative(state, MatchEvent.T_INTERCEPT, defense.team.id, stopper.id,
+							passer.id if passer else "", zone, "%s intercepta" % stopper.name))
 		"shot":
 			# El pase previo al tiro se emite DENTRO de _resolve_shot — necesita
 			# saber quién es el shooter exacto (rng principal) para que el
