@@ -1,0 +1,225 @@
+{
+  "_doc": "Plantillas de preguntas de press conference. Cada plantilla tiene un question (con placeholders {rival}, {jornada}, {pos}) y 3 opciones de respuesta. Cada opción produce effects: morale (delta plantilla -3..+3), manager_rep (delta), board_satisfaction (delta -2..+2). El sistema elige una plantilla aleatoria de las que aplican según el contexto.",
+  "templates": [
+    {
+      "id": "rival_difficulty_easy",
+      "context": "rival_weaker",
+      "question": "El próximo partido es contra {rival}. ¿Cómo lo afronta el equipo?",
+      "answers": [
+        {
+          "label": "Confianza total, somos superiores",
+          "effects": { "morale": 1, "manager_rep": -1, "board_satisfaction": 0 },
+          "feedback": "Los aficionados se ilusionan. El rival podría motivarse extra."
+        },
+        {
+          "label": "Respeto al rival, partido difícil",
+          "effects": { "morale": 0, "manager_rep": 1, "board_satisfaction": 1 },
+          "feedback": "Discurso prudente bien valorado por el board."
+        },
+        {
+          "label": "Lo importante es jugar bien, no el rival",
+          "effects": { "morale": 1, "manager_rep": 0, "board_satisfaction": 0 },
+          "feedback": "Mensaje positivo pero genérico."
+        }
+      ]
+    },
+    {
+      "id": "rival_difficulty_hard",
+      "context": "rival_stronger",
+      "question": "Visitan a {rival}, uno de los grandes. ¿Qué espera del partido?",
+      "answers": [
+        {
+          "label": "Vamos a por todas, podemos ganarles",
+          "effects": { "morale": 2, "manager_rep": 1, "board_satisfaction": 0 },
+          "feedback": "Plantilla motivada. Ambición bien recibida."
+        },
+        {
+          "label": "Será un partido muy difícil, lucharemos",
+          "effects": { "morale": 0, "manager_rep": 0, "board_satisfaction": 0 },
+          "feedback": "Discurso conservador, sin grandes efectos."
+        },
+        {
+          "label": "Es casi imposible ganar allí",
+          "effects": { "morale": -2, "manager_rep": -2, "board_satisfaction": -1 },
+          "feedback": "Mensaje derrotista mal recibido por todos."
+        }
+      ]
+    },
+    {
+      "id": "after_loss",
+      "context": "after_loss",
+      "question": "Tras la derrota de la jornada pasada, ¿qué cambios habrá?",
+      "answers": [
+        {
+          "label": "Confianza en el grupo, solo es un mal día",
+          "effects": { "morale": 1, "manager_rep": 0, "board_satisfaction": 0 },
+          "feedback": "Los jugadores agradecen el respaldo."
+        },
+        {
+          "label": "Hay que mejorar mucho, era inaceptable",
+          "effects": { "morale": -2, "manager_rep": 1, "board_satisfaction": 1 },
+          "feedback": "Plantilla algo molesta pero board contento con la exigencia."
+        },
+        {
+          "label": "Habrá rotación, varios jugadores fuera",
+          "effects": { "morale": -1, "manager_rep": 0, "board_satisfaction": 0 },
+          "feedback": "Mensaje firme pero generador de incertidumbre."
+        }
+      ]
+    },
+    {
+      "id": "after_win",
+      "context": "after_win",
+      "question": "Buena victoria la semana pasada. ¿Qué destacaría?",
+      "answers": [
+        {
+          "label": "Mérito de los jugadores, han sido brillantes",
+          "effects": { "morale": 2, "manager_rep": 0, "board_satisfaction": 1 },
+          "feedback": "Plantilla encantada con el reconocimiento público."
+        },
+        {
+          "label": "Trabajo del cuerpo técnico, plan perfecto",
+          "effects": { "morale": -1, "manager_rep": 1, "board_satisfaction": 0 },
+          "feedback": "Algunos jugadores piensan que se atribuye demasiado."
+        },
+        {
+          "label": "Solo es una victoria más, queda mucho",
+          "effects": { "morale": 0, "manager_rep": 1, "board_satisfaction": 1 },
+          "feedback": "Discurso prudente, bien valorado."
+        }
+      ]
+    },
+    {
+      "id": "transfer_rumor",
+      "context": "always",
+      "question": "Hay rumores sobre la salida de un jugador clave. ¿Qué dice?",
+      "answers": [
+        {
+          "label": "El jugador está blindado, no se vende",
+          "effects": { "morale": 1, "manager_rep": 0, "board_satisfaction": -1 },
+          "feedback": "Plantilla tranquila pero el board querría flexibilidad."
+        },
+        {
+          "label": "Si llega oferta justa la valoraremos",
+          "effects": { "morale": -1, "manager_rep": 0, "board_satisfaction": 1 },
+          "feedback": "El jugador podría sentirse expuesto."
+        },
+        {
+          "label": "Sin comentarios sobre rumores",
+          "effects": { "morale": 0, "manager_rep": 0, "board_satisfaction": 0 },
+          "feedback": "Respuesta corporativa, sin efectos."
+        }
+      ]
+    },
+    {
+      "id": "press_critique",
+      "context": "always",
+      "question": "Algunos analistas critican su sistema de juego. ¿Cómo responde?",
+      "answers": [
+        {
+          "label": "Confío plenamente en mi idea de juego",
+          "effects": { "morale": 1, "manager_rep": 1, "board_satisfaction": 0 },
+          "feedback": "Plantilla y prensa ven al míster firme."
+        },
+        {
+          "label": "Siempre es bueno escuchar y mejorar",
+          "effects": { "morale": 0, "manager_rep": -1, "board_satisfaction": 0 },
+          "feedback": "Mensaje humilde puede leerse como duda."
+        },
+        {
+          "label": "Quien crea que sabe más, que entrene él",
+          "effects": { "morale": 0, "manager_rep": -2, "board_satisfaction": -1 },
+          "feedback": "Mensaje agresivo mal valorado por el board."
+        }
+      ]
+    },
+    {
+      "id": "young_talent",
+      "context": "always",
+      "question": "Cantera reclama oportunidades. ¿Habrá minutos para jóvenes?",
+      "answers": [
+        {
+          "label": "Tendrán oportunidades cuando estén listos",
+          "effects": { "morale": 0, "manager_rep": 0, "board_satisfaction": 0 },
+          "feedback": "Respuesta diplomática estándar."
+        },
+        {
+          "label": "Sí, vamos a apostar por la cantera",
+          "effects": { "morale": 1, "manager_rep": 1, "board_satisfaction": 1 },
+          "feedback": "Aficionados y board valoran la apuesta."
+        },
+        {
+          "label": "El primer equipo prioriza experiencia",
+          "effects": { "morale": -1, "manager_rep": 0, "board_satisfaction": -1 },
+          "feedback": "Cantera y board no contentos con el mensaje."
+        }
+      ]
+    },
+    {
+      "id": "objective_question",
+      "context": "always",
+      "question": "Estamos {pos}º en la tabla. ¿Cómo van los objetivos del club?",
+      "answers": [
+        {
+          "label": "Vamos por delante de lo previsto",
+          "effects": { "morale": 1, "manager_rep": 1, "board_satisfaction": 1 },
+          "feedback": "Mensaje optimista bien recibido."
+        },
+        {
+          "label": "Aún hay mucho por mejorar",
+          "effects": { "morale": 0, "manager_rep": 0, "board_satisfaction": 0 },
+          "feedback": "Discurso prudente, sin efectos."
+        },
+        {
+          "label": "El objetivo está en peligro, hay que reaccionar",
+          "effects": { "morale": -2, "manager_rep": -1, "board_satisfaction": -1 },
+          "feedback": "Mensaje pesimista genera tensión."
+        }
+      ]
+    },
+    {
+      "id": "injury_concern",
+      "context": "always",
+      "question": "Hay varias bajas por lesión. ¿Cómo afectan al equipo?",
+      "answers": [
+        {
+          "label": "Quien juegue dará el máximo",
+          "effects": { "morale": 1, "manager_rep": 0, "board_satisfaction": 0 },
+          "feedback": "Plantilla agradecida con el respaldo."
+        },
+        {
+          "label": "Es un problema serio, necesitamos refuerzos",
+          "effects": { "morale": -1, "manager_rep": 0, "board_satisfaction": -1 },
+          "feedback": "Board prefiere no oír quejas en público."
+        },
+        {
+          "label": "Las lesiones forman parte del fútbol",
+          "effects": { "morale": 0, "manager_rep": 1, "board_satisfaction": 0 },
+          "feedback": "Respuesta serena bien valorada."
+        }
+      ]
+    },
+    {
+      "id": "fan_pressure",
+      "context": "always",
+      "question": "La afición pide más espectáculo. ¿Qué responde?",
+      "answers": [
+        {
+          "label": "Trabajaremos para ofrecer mejor fútbol",
+          "effects": { "morale": 0, "manager_rep": 0, "board_satisfaction": 1 },
+          "feedback": "Mensaje seguro y bien recibido."
+        },
+        {
+          "label": "Lo importante son los resultados, no el espectáculo",
+          "effects": { "morale": 0, "manager_rep": -1, "board_satisfaction": 0 },
+          "feedback": "Algunos aficionados se molestan."
+        },
+        {
+          "label": "Daremos espectáculo y resultados",
+          "effects": { "morale": 1, "manager_rep": 1, "board_satisfaction": 1 },
+          "feedback": "Respuesta ambiciosa que ilusiona a todos."
+        }
+      ]
+    }
+  ]
+}

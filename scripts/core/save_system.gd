@@ -30,6 +30,10 @@ class SaveData:
 	var user_lineup_template: Dictionary = {}
 	var user_career_history: Array = []
 	var user_protagonist_id: String = ""
+	# v0.3.1 — profundidad mánager
+	var inbox_messages: Array = []  # Array[InboxMessage] (deserializados)
+	var manager_reputation: int = 0
+	var board_expectations_dict: Dictionary = {}  # serialized BoardExpectations o {}
 
 
 # ============================================================================
@@ -39,7 +43,9 @@ static func save_game(slot_name: String, year: int, all_teams: Array,
 		primera_jornada: int, segunda_jornada: int,
 		primera_table: LeagueTable, segunda_table: LeagueTable,
 		user_team_id: String = "", user_lineup_template: Dictionary = {},
-		user_career_history: Array = [], user_protagonist_id: String = "") -> Dictionary:
+		user_career_history: Array = [], user_protagonist_id: String = "",
+		inbox_messages: Array = [], manager_reputation: int = 0,
+		board_expectations: BoardExpectations = null) -> Dictionary:
 	# Crear directorio
 	if not DirAccess.dir_exists_absolute(SAVE_DIR):
 		var err: int = DirAccess.make_dir_recursive_absolute(SAVE_DIR)
@@ -58,6 +64,9 @@ static func save_game(slot_name: String, year: int, all_teams: Array,
 		"user_lineup_template": user_lineup_template.duplicate(true),
 		"user_career_history": user_career_history.duplicate(true),
 		"user_protagonist_id": user_protagonist_id,
+		"inbox_messages": inbox_messages.map(func(m: InboxMessage) -> Dictionary: return m.to_dict()),
+		"manager_reputation": manager_reputation,
+		"board_expectations": board_expectations.to_dict() if board_expectations != null else {},
 		"teams": all_teams.map(func(t: Team) -> Dictionary: return _team_to_dict(t)),
 	}
 
@@ -98,6 +107,13 @@ static func load_game(slot_name: String) -> SaveData:
 	save_data.user_lineup_template = parsed.get("user_lineup_template", {}).duplicate(true)
 	save_data.user_career_history = parsed.get("user_career_history", []).duplicate(true)
 	save_data.user_protagonist_id = String(parsed.get("user_protagonist_id", ""))
+	# v0.3.1 — profundidad mánager (defaults tolerantes para saves anteriores)
+	save_data.inbox_messages = []
+	for m_dict in parsed.get("inbox_messages", []):
+		if typeof(m_dict) == TYPE_DICTIONARY:
+			save_data.inbox_messages.append(InboxMessage.from_dict(m_dict))
+	save_data.manager_reputation = int(parsed.get("manager_reputation", 0))
+	save_data.board_expectations_dict = parsed.get("board_expectations", {}).duplicate(true)
 	# Reconstruir equipos desde el dict
 	save_data.teams = []
 	for team_dict in parsed.get("teams", []):

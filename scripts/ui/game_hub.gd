@@ -38,6 +38,7 @@ const VIEW_CALENDAR := "calendar"
 const VIEW_RIVAL := "rival"
 const VIEW_DECISIONS := "decisions"
 const VIEW_EMPLOYEES := "employees"
+const VIEW_INBOX := "inbox"
 
 
 # --------------------------------------------------------------------------- #
@@ -73,6 +74,17 @@ var user_team_id: String = ""
 # Camera A2 light: id del jugador "protagonista" del usuario. Se setea desde
 # la vista Plantilla. Si está vacío, no hay protagonista. Persiste en save.
 var user_protagonist_id: String = ""
+# v0.3.1 — profundidad mánager
+# Inbox del usuario: lista de InboxMessage (más reciente primero al renderizar)
+var user_inbox: Array = []  # Array[InboxMessage]
+# Reputación del mánager (separada del club). Default = team.reputation cuando se elige equipo.
+var manager_reputation: int = 0
+# Expectativas del board para la temporada actual del usuario
+var board_expectations: BoardExpectations = null
+# Plantillas de press conference cargadas de data/press_conferences/templates.json
+var press_templates: Array = []
+# Última jornada en que se mostró press conference (para evitar duplicados)
+var last_press_jornada: int = 0
 # Alineación personalizada del usuario, dict con keys:
 #   formation, eleven_ids (Array[String]), slot_assignments (Array[String]),
 #   tactics: { mentality, tempo, pressing, width }
@@ -131,6 +143,7 @@ func _ready() -> void:
 	segunda_state.division = "segunda"
 	_build_ui()
 	_load_data()
+	_load_press_templates()
 	# Aplicar configuración de GameSession (si venimos del menú principal)
 	if GameSession.start_mode == "new_game":
 		user_team_id = GameSession.pending_user_team_id
@@ -372,6 +385,10 @@ func _start_season() -> void:
 	# Generar objetivo del club para esta temporada
 	if user_team_id != "":
 		_generate_season_objective()
+	# v0.3.1: inicializar manager_reputation y generar BoardExpectations
+	if user_team_id != "":
+		_initialize_manager_reputation_from_team()
+		_ensure_board_expectations()
 	# Pre-temporada: 3 amistosos para el equipo del usuario antes de la jornada 1
 	if user_team_id != "":
 		_run_preseason_friendlies()
@@ -1077,6 +1094,12 @@ func _evaluate_season_objective() -> Dictionary:
 func _show_objective_evaluation_modal(eval: Dictionary) -> void:
 	if eval.is_empty():
 		return
+	# v0.3.1: registrar en inbox
+	_inbox_add("objective", "🎯 Objetivo de temporada: %s" % String(eval.get("verdict", "")),
+		"Objetivo: %dº (%s). Posición final: %dº." % [
+			int(eval.get("target_position", 0)),
+			String(eval.get("description", "")),
+			int(eval.get("actual_position", 0))])
 	var popup := AcceptDialog.new()
 	popup.title = "🎯 Evaluación del objetivo"
 	popup.size = Vector2(540, 320)
@@ -1169,6 +1192,12 @@ func _show_coach_award_modal(verdict: String, points: int, prize: int) -> void:
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
 	popup.popup_centered()
+	# v0.3.1: registrar en inbox
+	_inbox_add("coach_award", "🏅 Entrenador del mes",
+		"%s — %d puntos en las últimas 4 jornadas. Premio: %s€." % [
+			verdict, points, TransferMarket._fmt_eur(prize)])
+	# Bonus a manager_reputation por premio (cosmético, +1)
+	manager_reputation = clampi(manager_reputation + 1, 0, 99)
 
 
 func _init_division(state: DivisionState, seed_offset: int) -> void:
@@ -1193,6 +1222,12 @@ func _on_advance_jornada() -> void:
 	if user_team_id != "":
 		var user_fx: Dictionary = _find_user_fixture_in_current_jornada()
 		if not user_fx.is_empty():
+			# v0.3.1: press conference 50% prob (no jornada 1, no si ya hubo en esta jornada)
+			if primera_state.current_jornada >= 1 \
+					and last_press_jornada != primera_state.current_jornada \
+					and randf() < 0.50:
+				last_press_jornada = primera_state.current_jornada
+				await _show_press_conference_modal()
 			_show_pre_match_modal(user_fx)
 			return  # esperamos a que el modal continúe
 	_do_advance_jornada()
@@ -1207,6 +1242,10 @@ func _do_advance_jornada() -> void:
 		_simulate_jornada(segunda_state)
 		any_advanced = true
 
+	# v0.3.1: evaluación mid-season del board (tras jornada 19+)
+	if user_team_id != "" and primera_state.current_jornada >= 19 \
+			and board_expectations != null and not board_expectations.mid_season_evaluated:
+		_evaluate_board_mid_season()
 	# Mercado de invierno: tras la jornada 19 (mitad de Liga), si no se ha
 	# ejecutado todavía este año, abrir la mini-ventana invernal.
 	if not winter_market_done and primera_state.current_jornada >= 19:
@@ -1415,11 +1454,14 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 
 	var popup := ConfirmationDialog.new()
 	popup.title = "Pre-partido — Jornada %d (%s)" % [user_fx_data["jornada_num"], String(user_fx_data["division"]).capitalize()]
-	popup.size = Vector2(560, 360)
+	popup.size = Vector2(560, 420)
 	popup.ok_button_text = "▶ Jugar (resultado directo)"
 	popup.cancel_button_text = "Configurar alineación"
 	# Botón extra: jugar y abrir visor 2D automáticamente al terminar
 	popup.add_button("🎬 Jugar y ver en 2D", true, "play_with_2d")
+	# v0.3.1: pre-match bloqueante. ESC no cierra; el usuario debe elegir botón.
+	popup.dialog_close_on_escape = false
+	popup.exclusive = true
 	add_child(popup)
 
 	var content := VBoxContainer.new()
@@ -1477,6 +1519,37 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 	l_eleven.add_theme_font_size_override("font_size", 11)
 	content.add_child(l_eleven)
 
+	# v0.3.1: team news (lesionados/sancionados) + manager rep
+	content.add_child(HSeparator.new())
+	var news_text: Array[String] = []
+	var inj_count: int = 0
+	var susp_count: int = 0
+	for p: Player in user_team.players:
+		if InjurySystem.is_injured(p):
+			inj_count += 1
+			if news_text.size() < 4:
+				news_text.append("🏥 %s (%s)" % [p.name, InjurySystem.injury_summary(p)])
+		elif CardSystem.is_suspended(p):
+			susp_count += 1
+			if news_text.size() < 6:
+				news_text.append("🟥 %s (sancionado %d)" % [p.name, p.suspended_matches])
+	var news_l := Label.new()
+	if news_text.is_empty():
+		news_l.text = "Sin lesiones ni sancionados — plantilla disponible al 100%."
+		news_l.add_theme_color_override("font_color", Color(0.5, 0.9, 0.5))
+	else:
+		news_l.text = "Bajas (%d lesionados, %d sancionados):\n  " % [inj_count, susp_count] + "\n  ".join(news_text)
+		news_l.add_theme_color_override("font_color", Color(1.0, 0.7, 0.5))
+	news_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	news_l.add_theme_font_size_override("font_size", 11)
+	content.add_child(news_l)
+
+	var rep_l := Label.new()
+	rep_l.text = "Tu reputación de mánager: %d  ·  Reputación del club: %d" % [manager_reputation, user_team.reputation]
+	rep_l.add_theme_font_size_override("font_size", 11)
+	rep_l.add_theme_color_override("font_color", Color(0.85, 0.85, 0.4))
+	content.add_child(rep_l)
+
 	popup.confirmed.connect(func() -> void:
 		popup.queue_free()
 		auto_open_2d_after_match = false
@@ -1519,6 +1592,18 @@ func _on_reset_season() -> void:
 	var sc_qualifiers: Array = []
 	if primera_state.league_table != null and segunda_state.league_table != null:
 		cup_bracket = CupSimulator.run(all_teams, year, SEED_BASE + year * 7)
+		# v0.3.1: evaluación final del board + bonus por títulos en manager_reputation
+		if user_team_id != "":
+			_evaluate_board_final()
+			# Bonus por campeón Liga
+			var liga_sorted_eval: Array = primera_state.league_table.sorted_rows()
+			if liga_sorted_eval.size() > 0 and (liga_sorted_eval[0] as LeagueTable.TeamRow).team_id == user_team_id:
+				manager_reputation = clampi(manager_reputation + 5, 0, 99)
+				_inbox_add("board_message", "¡CAMPEÓN DE LIGA!", "Has ganado la Liga. Reputación de mánager +5 (ahora %d)." % manager_reputation)
+			# Bonus por Copa
+			if cup_bracket != null and cup_bracket.champion_id == user_team_id:
+				manager_reputation = clampi(manager_reputation + 3, 0, 99)
+				_inbox_add("board_message", "¡CAMPEÓN DE COPA!", "Has ganado la Copa del Rey. Reputación de mánager +3 (ahora %d)." % manager_reputation)
 		if user_team_id != "":
 			_capture_career_record(cup_bracket)
 		# Capturar clasificados a Supercopa: top 2 Liga + finalistas Copa
@@ -1915,6 +2000,13 @@ func _compute_manager_score(user_team: Team, cup_bracket: CupBracket) -> int:
 
 
 func _show_manager_offers_modal(current_team: Team, offers: Array, score: int) -> void:
+	# v0.3.1: registrar en inbox
+	if not offers.is_empty():
+		var offer_names: Array[String] = []
+		for o: Team in offers:
+			offer_names.append(o.short_name)
+		_inbox_add("manager_offer", "📨 Ofertas de mánager (%d)" % offers.size(),
+			"Tras tu temporada en %s, te buscan: %s." % [current_team.short_name, ", ".join(offer_names)])
 	var popup := AcceptDialog.new()
 	popup.title = "📨 Ofertas de mánager"
 	popup.size = Vector2(640, 480)
@@ -2019,6 +2111,15 @@ func _accept_manager_offer(new_team_id: String, new_team_name: String) -> void:
 	# Resetear alineación personal: el nuevo club tiene jugadores distintos
 	user_lineup_template = {}
 	_initialize_user_lineup()
+	# v0.3.1: reset protagonist (nuevo equipo) y board expectations (se regenerará en _start_season)
+	user_protagonist_id = ""
+	board_expectations = null
+	# Manager reputation se mantiene (es del entrenador, no del club)
+	_inbox_add("manager_offer", "Nuevo destino: %s" % new_team_name,
+		"Has aceptado dirigir a %s%s. Tu reputación de mánager (%d) se mantiene." % [
+			new_team_name,
+			" (dejas %s)" % old_team.short_name if old_team else "",
+			manager_reputation])
 	# Forzar refresco UI
 	current_view = VIEW_HUB
 	selected_team = null
@@ -3143,6 +3244,10 @@ func _simulate_jornada(state: DivisionState) -> void:
 							"dias": dias,
 							"match_date": match_date,
 						})
+						# v0.3.1: registrar en inbox
+						_inbox_add("injury", "🏥 Lesión grave: %s" % inj_player.name,
+							"%s sufre una lesión %s. Baja estimada: %d días." % [
+								inj_player.name, String(inj_player.injury.get("tipo", "?")), dias])
 			# Goles
 			for pid in result.scorers.keys():
 				var goals: int = int(result.scorers[pid])
@@ -3233,7 +3338,8 @@ func _save_to_slot(slot: String) -> void:
 		slot, year, all_teams,
 		primera_state.current_jornada, segunda_state.current_jornada,
 		primera_state.league_table, segunda_state.league_table,
-		user_team_id, user_lineup_template, user_career_history, user_protagonist_id)
+		user_team_id, user_lineup_template, user_career_history, user_protagonist_id,
+		user_inbox, manager_reputation, board_expectations)
 	if result.get("ok", false):
 		status_label.text = "Partida guardada en '%s' — %s" % [slot, result["saved_at"]]
 	else:
@@ -3281,6 +3387,13 @@ func _load_from_slot(slot: String) -> void:
 	user_lineup_template = save_data.user_lineup_template.duplicate(true)
 	user_career_history = save_data.user_career_history.duplicate(true)
 	user_protagonist_id = save_data.user_protagonist_id
+	# v0.3.1 — profundidad mánager (defaults tolerantes para saves de v0.3.0)
+	user_inbox = save_data.inbox_messages.duplicate()
+	manager_reputation = save_data.manager_reputation
+	if not save_data.board_expectations_dict.is_empty():
+		board_expectations = BoardExpectations.from_dict(save_data.board_expectations_dict)
+	else:
+		board_expectations = null
 	# Si la save está mid-season tras la jornada 19, asumimos que el winter
 	# market ya se ejecutó. Evita disparo duplicado al avanzar jornadas.
 	winter_market_done = (save_data.primera_jornada >= 19)
@@ -3385,6 +3498,7 @@ func _refresh_ui() -> void:
 		VIEW_RIVAL: _render_rival_view()
 		VIEW_DECISIONS: _render_decisions_view()
 		VIEW_EMPLOYEES: _render_employees_view()
+		VIEW_INBOX: _render_inbox_view()
 
 
 # --------------------------------------------------------------------------- #
@@ -3500,7 +3614,10 @@ func _render_hub_view() -> void:
 	left_col.add_theme_constant_override("separation", 0)
 	body.add_child(left_col)
 	# Cuadrante: SEGUIMIENTO (verde)
+	var unread_inbox: int = _inbox_unread_count()
+	var inbox_text: String = "INBOX (%d)" % unread_inbox if unread_inbox > 0 else "INBOX"
 	left_col.add_child(_make_quadrant("SEGUIMIENTO", Color(0.32, 0.62, 0.30), [
+		["📬", inbox_text, "Mensajes de board, prensa, agentes y eventos del club", _on_select_view.bind(VIEW_INBOX)],
 		["📊", "RESULTADOS", "Última jornada con resultados", _on_select_view.bind(VIEW_FIXTURES)],
 		["🏆", "CLASIFICACIÓN", "Tabla actual de Liga", _on_select_view.bind(VIEW_TABLE)],
 		["📅", "CALENDARIO", "Calendario completo de la temporada", _on_select_view.bind(VIEW_CALENDAR)],
@@ -3909,6 +4026,7 @@ func _view_title_for(view: String) -> String:
 		VIEW_RIVAL:     return "🔍 Ver rival"
 		VIEW_DECISIONS: return "⚖ Decisiones"
 		VIEW_EMPLOYEES: return "👔 Empleados"
+		VIEW_INBOX: return "📬 Inbox"
 		VIEW_MATCH:     return "📺 Detalle de partido"
 		_: return ""
 
@@ -5152,3 +5270,374 @@ func _on_change_slot_player(slot_idx: int, slot: String, team: Team) -> void:
 	)
 	popup.canceled.connect(func() -> void: popup.queue_free())
 	popup.popup_centered()
+
+
+# =========================================================================== #
+# v0.3.1 — Profundidad mánager: Inbox, Press Conferences, Board, Manager Rep
+# =========================================================================== #
+
+func _load_press_templates() -> void:
+	var path := "res://data/press_conferences/templates.json"
+	if not FileAccess.file_exists(path):
+		press_templates = []
+		return
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		press_templates = []
+		return
+	var content := file.get_as_text()
+	file.close()
+	var parsed: Variant = JSON.parse_string(content)
+	if typeof(parsed) != TYPE_DICTIONARY:
+		press_templates = []
+		return
+	press_templates = parsed.get("templates", [])
+
+
+# Añade un mensaje al inbox del usuario (solo si user_team_id está seteado).
+func _inbox_add(type_: String, title: String, body: String, data: Dictionary = {}) -> void:
+	if user_team_id == "":
+		return
+	var jornada: int = primera_state.current_jornada if primera_state != null else 0
+	var msg: InboxMessage = InboxMessage.make(type_, title, body, year, jornada, data)
+	user_inbox.append(msg)
+	while user_inbox.size() > 200:
+		user_inbox.pop_front()
+
+
+func _inbox_unread_count() -> int:
+	var c: int = 0
+	for m in user_inbox:
+		if not (m as InboxMessage).read:
+			c += 1
+	return c
+
+
+# --------------------------------------------------------------------------- #
+# Vista: Inbox
+# --------------------------------------------------------------------------- #
+func _render_inbox_view() -> void:
+	if user_team_id == "":
+		var l := Label.new()
+		l.text = "Selecciona un club para ver el inbox."
+		content_area.add_child(l)
+		return
+
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 12)
+	content_area.add_child(header)
+
+	var title := Label.new()
+	title.text = "📬 Inbox del mánager  ·  %d mensajes (%d sin leer)" % [user_inbox.size(), _inbox_unread_count()]
+	title.add_theme_font_size_override("font_size", 16)
+	header.add_child(title)
+
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(spacer)
+
+	var mark_btn := Button.new()
+	mark_btn.text = "Marcar todo como leído"
+	mark_btn.pressed.connect(_on_mark_all_inbox_read)
+	header.add_child(mark_btn)
+
+	content_area.add_child(HSeparator.new())
+
+	if user_inbox.is_empty():
+		var empty := Label.new()
+		empty.text = "(sin mensajes)"
+		empty.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+		content_area.add_child(empty)
+		return
+
+	# Más recientes primero
+	for i in range(user_inbox.size() - 1, -1, -1):
+		var m: InboxMessage = user_inbox[i]
+		content_area.add_child(_make_inbox_row(m))
+
+
+func _on_mark_all_inbox_read() -> void:
+	for m in user_inbox:
+		(m as InboxMessage).read = true
+	_refresh_ui()
+
+
+func _make_inbox_row(m: InboxMessage) -> Control:
+	var panel := PanelContainer.new()
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	panel.add_child(box)
+
+	var hdr := HBoxContainer.new()
+	hdr.add_theme_constant_override("separation", 10)
+	box.add_child(hdr)
+
+	var icon := Label.new()
+	icon.text = _inbox_type_icon(m.type)
+	icon.add_theme_font_size_override("font_size", 16)
+	hdr.add_child(icon)
+
+	var title := Label.new()
+	title.text = m.title if m.title != "" else "(sin título)"
+	title.add_theme_font_size_override("font_size", 14)
+	if not m.read:
+		title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	hdr.add_child(title)
+
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hdr.add_child(spacer)
+
+	var when_l := Label.new()
+	var jornada_text: String = "j%d" % m.jornada_when if m.jornada_when > 0 else "—"
+	when_l.text = "[%d · %s]" % [m.year_when, jornada_text]
+	when_l.add_theme_font_size_override("font_size", 11)
+	when_l.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+	hdr.add_child(when_l)
+
+	if not m.body.is_empty():
+		var body_l := Label.new()
+		body_l.text = m.body
+		body_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		body_l.add_theme_font_size_override("font_size", 12)
+		body_l.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+		box.add_child(body_l)
+
+	if not m.read:
+		var btn := Button.new()
+		btn.text = "Marcar como leído"
+		btn.flat = true
+		btn.pressed.connect(_on_mark_inbox_message_read.bind(m))
+		box.add_child(btn)
+
+	return panel
+
+
+func _on_mark_inbox_message_read(m: InboxMessage) -> void:
+	m.read = true
+	_refresh_ui()
+
+
+func _inbox_type_icon(t: String) -> String:
+	match t:
+		"injury": return "🏥"
+		"press": return "🎤"
+		"board_message": return "📋"
+		"agent_offer": return "🤝"
+		"transfer_rumor": return "💬"
+		"manager_offer": return "📨"
+		"coach_award": return "🏅"
+		"objective": return "🎯"
+		"national_call": return "🌍"
+	return "📩"
+
+
+# --------------------------------------------------------------------------- #
+# Press conference modal (asíncrono)
+# --------------------------------------------------------------------------- #
+func _show_press_conference_modal() -> bool:
+	if press_templates.is_empty() or user_team_id == "":
+		return false
+	var ctx: String = _press_context()
+	var pool: Array = []
+	for t in press_templates:
+		var tctx: String = String((t as Dictionary).get("context", "always"))
+		if tctx == "always" or tctx == ctx:
+			pool.append(t)
+	if pool.is_empty():
+		return false
+	var template: Dictionary = pool[randi() % pool.size()]
+	var question: String = String(template.get("question", "")).format(_press_placeholders())
+	var answers: Array = template.get("answers", [])
+	if answers.is_empty():
+		return false
+
+	var popup := AcceptDialog.new()
+	popup.title = "🎤 Rueda de prensa"
+	popup.dialog_close_on_escape = false
+	popup.min_size = Vector2(560, 360)
+	add_child(popup)
+
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	popup.add_child(box)
+
+	var q_label := Label.new()
+	q_label.text = question
+	q_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	q_label.add_theme_font_size_override("font_size", 14)
+	box.add_child(q_label)
+
+	box.add_child(HSeparator.new())
+
+	var feedback_label := Label.new()
+	feedback_label.text = ""
+	feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	feedback_label.add_theme_font_size_override("font_size", 12)
+	feedback_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+
+	var btn_group := ButtonGroup.new()
+	var picked: Array = [-1]
+	for i in answers.size():
+		var ans: Dictionary = answers[i]
+		var btn := Button.new()
+		btn.text = "%d. %s" % [i + 1, String(ans.get("label", ""))]
+		btn.toggle_mode = true
+		btn.button_group = btn_group
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn.pressed.connect(_on_press_answer_picked.bind(i, answers, feedback_label, picked))
+		box.add_child(btn)
+
+	box.add_child(HSeparator.new())
+	box.add_child(feedback_label)
+
+	popup.ok_button_text = "Cerrar"
+	popup.popup_centered()
+	await popup.confirmed
+	popup.queue_free()
+	return true
+
+
+func _on_press_answer_picked(idx: int, answers: Array, feedback_label: Label, picked: Array) -> void:
+	if int(picked[0]) >= 0:
+		var ans2: Dictionary = answers[idx]
+		feedback_label.text = "(Ya respondiste — solo cuenta la primera elección.) %s" % String(ans2.get("feedback", ""))
+		return
+	picked[0] = idx
+	var ans: Dictionary = answers[idx]
+	var effects: Dictionary = ans.get("effects", {})
+	var team := _find_team_by_id(user_team_id)
+	if team != null:
+		var morale_delta: int = int(effects.get("morale", 0))
+		if morale_delta != 0:
+			for p: Player in team.players:
+				p.morale = clampf(p.morale + float(morale_delta), 0.0, 100.0)
+	manager_reputation = clampi(manager_reputation + int(effects.get("manager_rep", 0)), 0, 99)
+	_inbox_add("press", "Rueda de prensa: respuesta",
+		"Respuesta: %s\n%s" % [String(ans.get("label", "")), String(ans.get("feedback", ""))])
+	feedback_label.text = String(ans.get("feedback", ""))
+
+
+func _press_context() -> String:
+	var st := primera_state
+	if st.last_jornada_results.is_empty():
+		return "always"
+	for r: MatchResult in st.last_jornada_results:
+		if r.home_team_id == user_team_id or r.away_team_id == user_team_id:
+			var user_won: bool = (r.home_team_id == user_team_id and r.score_home > r.score_away) \
+					or (r.away_team_id == user_team_id and r.score_away > r.score_home)
+			var user_lost: bool = (r.home_team_id == user_team_id and r.score_home < r.score_away) \
+					or (r.away_team_id == user_team_id and r.score_away < r.score_home)
+			if user_won: return "after_win"
+			if user_lost: return "after_loss"
+	return "always"
+
+
+func _press_placeholders() -> Dictionary:
+	var rival_name: String = "el próximo rival"
+	var ut := _find_team_by_id(user_team_id)
+	var rival_team: Team = _find_next_rival(ut) if ut != null else null
+	if rival_team != null:
+		rival_name = rival_team.short_name
+	var pos_text: String = "?"
+	if primera_state.league_table != null:
+		var sorted: Array = primera_state.league_table.sorted_rows()
+		for i in sorted.size():
+			if (sorted[i] as LeagueTable.TeamRow).team_id == user_team_id:
+				pos_text = str(i + 1)
+				break
+	return {
+		"rival": rival_name,
+		"jornada": primera_state.current_jornada + 1,
+		"pos": pos_text,
+	}
+
+
+# --------------------------------------------------------------------------- #
+# Board expectations
+# --------------------------------------------------------------------------- #
+func _ensure_board_expectations() -> void:
+	if user_team_id == "":
+		return
+	if board_expectations != null and board_expectations.year == year:
+		return
+	var team := _find_team_by_id(user_team_id)
+	if team == null:
+		return
+	board_expectations = BoardExpectations.generate_for_team(team, year)
+	_inbox_add("board_message", "Objetivos de temporada %d-%d" % [year, year + 1],
+		board_expectations.summary_text(team.name))
+
+
+func _evaluate_board_mid_season() -> void:
+	if board_expectations == null or board_expectations.mid_season_evaluated:
+		return
+	if user_team_id == "" or primera_state.league_table == null:
+		return
+	var sorted: Array = primera_state.league_table.sorted_rows()
+	var user_pos: int = -1
+	for i in sorted.size():
+		if (sorted[i] as LeagueTable.TeamRow).team_id == user_team_id:
+			user_pos = i + 1
+			break
+	if user_pos < 0:
+		return
+	var verdict: String = "ok"
+	var msg: String = ""
+	if user_pos > board_expectations.target_liga_pos + 4:
+		verdict = "failing"
+		msg = "Llevas el equipo en posición %d, lejos del objetivo de %d. La paciencia del board es limitada." % [
+			user_pos, board_expectations.target_liga_pos]
+	elif user_pos > board_expectations.target_liga_pos:
+		verdict = "warning"
+		msg = "Estás en posición %d, por debajo del objetivo de %d. Hay que mejorar." % [
+			user_pos, board_expectations.target_liga_pos]
+	else:
+		msg = "Vas en posición %d, dentro de lo esperado. Sigue así." % user_pos
+	board_expectations.mid_season_evaluated = true
+	board_expectations.mid_season_verdict = verdict
+	_inbox_add("board_message", "Evaluación de mitad de temporada", msg)
+
+
+func _evaluate_board_final() -> int:
+	if board_expectations == null or user_team_id == "" or primera_state.league_table == null:
+		return 0
+	var sorted: Array = primera_state.league_table.sorted_rows()
+	var user_pos: int = -1
+	for i in sorted.size():
+		if (sorted[i] as LeagueTable.TeamRow).team_id == user_team_id:
+			user_pos = i + 1
+			break
+	if user_pos < 0:
+		return 0
+	var delta: int = 0
+	var verdict: String = ""
+	if user_pos < board_expectations.target_liga_pos:
+		verdict = "exceeded"
+		delta = 3
+	elif user_pos == board_expectations.target_liga_pos:
+		verdict = "met"
+		delta = 1
+	elif user_pos <= board_expectations.target_liga_pos + 3:
+		verdict = "missed"
+		delta = -2
+	else:
+		verdict = "failed"
+		delta = -5
+	board_expectations.final_verdict = verdict
+	manager_reputation = clampi(manager_reputation + delta, 0, 99)
+	var verdict_text: Dictionary = {
+		"exceeded": "¡Has SUPERADO las expectativas! Excelente temporada.",
+		"met": "Has cumplido las expectativas. Buen trabajo.",
+		"missed": "Has quedado por debajo de las expectativas. Toca mejorar.",
+		"failed": "Temporada muy decepcionante. El board está furioso.",
+	}
+	_inbox_add("board_message", "Evaluación final de temporada",
+		"%s\nManager reputation: %+d (ahora %d)." % [verdict_text.get(verdict, "?"), delta, manager_reputation])
+	return delta
+
+
+func _initialize_manager_reputation_from_team() -> void:
+	var team := _find_team_by_id(user_team_id)
+	if team != null and manager_reputation == 0:
+		manager_reputation = team.reputation
