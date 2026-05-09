@@ -1897,14 +1897,11 @@ func _render_champions_view() -> void:
 		content_area.add_child(l)
 		return
 
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	content_area.add_child(scroll)
+	# content_area ya está dentro de un ScrollContainer.
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 16)
 	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(vbox)
+	content_area.add_child(vbox)
 
 	# Selector de competición (botones simples)
 	var tabs := HBoxContainer.new()
@@ -2120,14 +2117,11 @@ func _user_champions_path(bracket: ChampionsBracket) -> String:
 # Vista: 💰 Finanzas (presupuesto, salarios, balance del club del usuario)
 # =========================================================================== #
 func _render_finances_view() -> void:
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	content_area.add_child(scroll)
+	# content_area ya está dentro de un ScrollContainer en _build_ui.
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 14)
 	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(box)
+	content_area.add_child(box)
 
 	if user_team_id == "":
 		var l := Label.new()
@@ -2581,17 +2575,16 @@ func _render_calendar_view() -> void:
 	var st := _current_state()
 	if st.calendar.is_empty():
 		var l := Label.new()
-		l.text = "No hay calendario disponible."
+		l.text = "No hay calendario disponible. Empieza una temporada primero."
+		l.add_theme_font_size_override("font_size", 14)
 		content_area.add_child(l)
 		return
 
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	content_area.add_child(scroll)
+	# content_area ya está dentro de un ScrollContainer.
 	var vbox := VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 8)
-	scroll.add_child(vbox)
+	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content_area.add_child(vbox)
 
 	var title := Label.new()
 	title.text = "📅 Calendario %s · Temporada %d-%d" % [
@@ -3543,20 +3536,19 @@ func _render_employees_view() -> void:
 	var team := _find_team_by_id(user_team_id)
 	if team == null:
 		var l := Label.new()
-		l.text = "Sin club seleccionado."
+		l.text = "Sin club seleccionado. Inicia 'Nueva partida' desde el menú principal y elige tu club."
+		l.add_theme_font_size_override("font_size", 14)
 		content_area.add_child(l)
 		return
 	if team.organigrama == null:
 		team.organigrama = OrganigramaFactory.generate(team, year)
 
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	content_area.add_child(scroll)
+	# content_area ya está dentro de un ScrollContainer (en _build_ui),
+	# por eso no añadimos otro scroll aquí (causaba doble-scroll y altura 0).
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 12)
 	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(box)
+	content_area.add_child(box)
 
 	# Header con resumen
 	var size_label: String = OrganigramaFactory.size_for(team)
