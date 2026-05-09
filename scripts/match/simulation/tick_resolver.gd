@@ -186,6 +186,9 @@ static func _resolve_shot(
 
 	# Pase decorativo previo al tiro: usa visual_rng para no afectar
 	# selecciones siguientes. El receptor es siempre el shooter para coherencia.
+	# Además detectamos tipo de remate (header / volley / disparo normal).
+	var shot_is_header: bool = from_set_piece  # córners suelen acabar en cabezazo
+	var shot_is_volley: bool = false
 	if not from_set_piece:
 		var vrng: RandomNumberGenerator = state.visual_rng
 		var creator: Player = _pick_actor(poss, "attack", state.zone, vrng)
@@ -196,6 +199,21 @@ static func _resolve_shot(
 				pass_type = MatchEvent.T_CROSS
 			events.append(_make_decorative(state, pass_type, poss.team.id, creator.id, shooter.id, state.zone,
 				"%s de %s a %s" % ["Centro" if pass_type == MatchEvent.T_CROSS else "Pase", creator.name, shooter.name]))
+			# Si fue centro: 60% header. Si pase normal: 8% volley aleatorio.
+			if pass_type == MatchEvent.T_CROSS and vrng.randf() < 0.60:
+				shot_is_header = true
+			elif pass_type == MatchEvent.T_PASS and vrng.randf() < 0.08:
+				shot_is_volley = true
+	# Emit el tipo de remate como evento decorativo previo al shot resolution.
+	if shot_is_header:
+		# Bonus de selección: jugadores altos (físico alto) son más probables
+		var vrng2: RandomNumberGenerator = state.visual_rng
+		# Mantenemos al shooter actual; el T_HEADER es solo descriptivo.
+		events.append(_make_decorative(state, MatchEvent.T_HEADER, poss.team.id, shooter.id, "", "atk",
+			"Cabezazo de %s" % shooter.name))
+	elif shot_is_volley:
+		events.append(_make_decorative(state, MatchEvent.T_VOLLEY, poss.team.id, shooter.id, "", "atk",
+			"¡Volea de %s!" % shooter.name))
 
 	# Atributos relevantes
 	var tiro: int = int(shooter.attributes.get("tiro", 50))
@@ -300,6 +318,16 @@ static func _maybe_foul(state: MatchState, def_lineup: Lineup, events: Array[Mat
 			state.zone = "atk"
 		_resolve_penalty(state, def_lineup, fouler, events, rng)
 		return  # penalty consume el resto del tick — sin tarjetas extra
+
+	# Si no es penalty pero la falta está en zona ofensiva, emit T_FREE_KICK
+	# decorativo. El visor coloca el balón en el sitio de la falta antes de
+	# que el atacante reanude el juego en el siguiente tick.
+	if foul_zone in ["mid", "atk"] and initial_poss_id != "":
+		var atk_lineup: Lineup = state.lineup_for(initial_poss_id)
+		var server: Player = _pick_actor(atk_lineup, "attack", foul_zone, state.visual_rng)
+		if server != null:
+			events.append(_make_event_for_team(state, initial_poss_id, MatchEvent.T_FREE_KICK,
+				server.id, "Tiro libre para %s — saca %s" % [atk_lineup.team.short_name, server.name]))
 
 	# ¿Tarjeta? Probabilidad escala con aggression del jugador.
 	# Factor: 0.75 (agg=10) a 1.30 (agg=99) — amplificación moderada.
@@ -642,26 +670,42 @@ static func _emit_decorative_chain(state: MatchState, poss: Lineup, defense: Lin
 				events.append(_make_decorative(state, MatchEvent.T_PASS, poss.team.id, p1.id, p2.id, zone,
 					"Pase de %s a %s" % [p1.name, p2.name]))
 		"lose":
-			# Pase fallido → intercepción del rival.
-			# En zona "atk" del atacante (peligrosa), 30% de prob de que la pérdida
-			# sea por falta táctica del defensor en vez de intercept limpio.
+			# Pase fallido. Variantes según zona:
+			# - atk: 30% tactical_foul, 25% GK distribution, resto intercept
+			# - mid: 30% throw_in (balón sale por banda), resto intercept
+			# - def: intercept directo
 			var passer: Player = _pick_actor(poss, "attack", zone, vrng)
 			var def_zone: String = _inverse_zone(zone)
 			var stopper: Player = _pick_actor(defense, "defense", def_zone, vrng)
-			var is_tactical: bool = (zone == "atk" and vrng.randf() < 0.30)
-			if passer != null:
-				events.append(_make_decorative(state, MatchEvent.T_PASS, poss.team.id, passer.id,
-					stopper.id if stopper else "", zone,
-					"Avanza %s..." % passer.name))
-			if stopper != null:
-				if is_tactical:
+			var roll: float = vrng.randf()
+			if zone == "atk" and roll < 0.30:
+				# Falta táctica
+				if passer != null:
+					events.append(_make_decorative(state, MatchEvent.T_PASS, poss.team.id, passer.id,
+						stopper.id if stopper else "", zone, "Avanza %s..." % passer.name))
+				if stopper != null:
 					events.append(_make_decorative(state, MatchEvent.T_TACTICAL_FOUL, defense.team.id, stopper.id,
-						passer.id if passer else "", zone,
-						"Falta táctica de %s" % stopper.name))
-				else:
+						passer.id if passer else "", zone, "Falta táctica de %s" % stopper.name))
+			elif zone == "atk" and roll < 0.55:
+				# GK distribution: el portero recoge en su área y saca
+				var gk: Player = _find_goalkeeper(defense)
+				if gk != null:
+					events.append(_make_decorative(state, MatchEvent.T_GK_DIST, defense.team.id, gk.id, "", "def",
+						"%s recoge y saca" % gk.name))
+			elif zone == "mid" and roll < 0.30:
+				# Throw-in: balón sale por banda. Quien lo saca es lateral del defensor.
+				var thrower: Player = _pick_throw_in_taker(defense, vrng)
+				if thrower != null:
+					events.append(_make_decorative(state, MatchEvent.T_THROW_IN, defense.team.id, thrower.id, "", "mid",
+						"Saque de banda de %s" % thrower.name))
+			else:
+				# Intercept clásico
+				if passer != null:
+					events.append(_make_decorative(state, MatchEvent.T_PASS, poss.team.id, passer.id,
+						stopper.id if stopper else "", zone, "Avanza %s..." % passer.name))
+				if stopper != null:
 					events.append(_make_decorative(state, MatchEvent.T_INTERCEPT, defense.team.id, stopper.id,
-						passer.id if passer else "", zone,
-						"%s intercepta" % stopper.name))
+						passer.id if passer else "", zone, "%s intercepta" % stopper.name))
 		"shot":
 			# El pase previo al tiro se emite DENTRO de _resolve_shot — necesita
 			# saber quién es el shooter exacto (rng principal) para que el
@@ -680,6 +724,25 @@ static func _next_zone_attack(zone: String) -> String:
 		"def": return "mid"
 		"mid": return "atk"
 		_: return "atk"
+
+
+# Selecciona quien saca un saque de banda: lateral más cercano al balón.
+# v1: simplemente uno de los laterales del lineup, aleatorio.
+static func _pick_throw_in_taker(lineup: Lineup, rng: RandomNumberGenerator) -> Player:
+	var laterals: Array = []
+	for i in lineup.starting_eleven.size():
+		var slot: String = lineup.slot_assignments[i]
+		if slot in ["LB", "RB", "LWB", "RWB", "LM", "RM"]:
+			laterals.append(lineup.starting_eleven[i])
+	if laterals.is_empty():
+		# Fallback: cualquier mediocentro
+		for i in lineup.starting_eleven.size():
+			var slot: String = lineup.slot_assignments[i]
+			if slot in ["CM", "CDM", "CAM"]:
+				laterals.append(lineup.starting_eleven[i])
+	if laterals.is_empty():
+		return null
+	return laterals[rng.randi() % laterals.size()]
 
 
 static func _make_decorative(state: MatchState, type: String, team_id: String, player_id: String, secondary_id: String, zone: String, desc: String, meta: Dictionary = {}) -> MatchEvent:

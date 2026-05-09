@@ -477,7 +477,9 @@ func _advance_one_event() -> void:
 		# jugador receptor pero NO se loggea ni cuenta como highlight.
 		if ev.type in [MatchEvent.T_PASS, MatchEvent.T_LONG_BALL, MatchEvent.T_CROSS,
 				MatchEvent.T_DRIBBLE, MatchEvent.T_INTERCEPT,
-				MatchEvent.T_TACKLE_FAIL, MatchEvent.T_TACTICAL_FOUL]:
+				MatchEvent.T_TACKLE_FAIL, MatchEvent.T_TACTICAL_FOUL,
+				MatchEvent.T_THROW_IN, MatchEvent.T_GK_DIST,
+				MatchEvent.T_HEADER, MatchEvent.T_VOLLEY]:
 			if highlights_only:
 				continue  # skip en modo highlights
 			_set_ball_for_event(ev)
@@ -498,7 +500,8 @@ func _advance_one_event() -> void:
 		if ev.type in [MatchEvent.T_SHOT_ON, MatchEvent.T_SHOT_OFF, MatchEvent.T_SHOT_BLOCKED,
 				MatchEvent.T_SAVE, MatchEvent.T_YELLOW, MatchEvent.T_RED, MatchEvent.T_SUBSTITUTION,
 				MatchEvent.T_HALFTIME, MatchEvent.T_FULLTIME, MatchEvent.T_KICKOFF,
-				MatchEvent.T_CORNER, MatchEvent.T_OFFSIDE, MatchEvent.T_PENALTY]:
+				MatchEvent.T_CORNER, MatchEvent.T_OFFSIDE, MatchEvent.T_PENALTY,
+				MatchEvent.T_FREE_KICK]:
 			var color: Color = Color(0.85, 0.85, 0.85)
 			if ev.type == MatchEvent.T_RED:
 				color = Color(1.0, 0.4, 0.4)
@@ -510,6 +513,8 @@ func _advance_one_event() -> void:
 				color = Color(0.8, 0.8, 1.0)
 			elif ev.type == MatchEvent.T_PENALTY:
 				color = Color(1.0, 0.6, 0.4)
+			elif ev.type == MatchEvent.T_FREE_KICK:
+				color = Color(0.85, 0.95, 0.6)
 			_log_event(ev, color)
 			_set_ball_for_event(ev)
 			# End playback en FULLTIME
@@ -574,6 +579,13 @@ func _set_ball_for_event(ev: MatchEvent) -> void:
 		ball_target = Vector2(px, 0.50)
 		_kick_off_ball_animation()
 		return
+	if ev.type == MatchEvent.T_FREE_KICK:
+		# Balón al jugador que saca la falta
+		var server_pos: Vector2 = _get_player_field_pos(ev.player_id)
+		if server_pos != Vector2.ZERO:
+			ball_target = server_pos
+			_kick_off_ball_animation()
+			return
 	# Eventos granulares: balón hacia el receptor (pase) o actor (regate/intercept)
 	if ev.type == MatchEvent.T_PASS or ev.type == MatchEvent.T_LONG_BALL or ev.type == MatchEvent.T_CROSS:
 		var receiver_pos: Vector2 = _get_player_field_pos(ev.secondary_player_id)
@@ -612,6 +624,29 @@ func _set_ball_for_event(ev: MatchEvent) -> void:
 			foul_shake_player_id = ev.player_id
 			foul_shake_timer = 0.5
 			ball_target = foul_pos
+			_kick_off_ball_animation()
+			return
+	if ev.type == MatchEvent.T_THROW_IN:
+		# Saque de banda: balón a la banda más cercana al jugador
+		var thrower_pos: Vector2 = _get_player_field_pos(ev.player_id)
+		if thrower_pos != Vector2.ZERO:
+			# Subir el balón a la línea de banda (y ≈ 0.02 o 0.98 según lado)
+			var sideline_y: float = 0.02 if thrower_pos.y < 0.5 else 0.98
+			ball_target = Vector2(thrower_pos.x, sideline_y)
+			_kick_off_ball_animation()
+			return
+	if ev.type == MatchEvent.T_GK_DIST:
+		# Portero saca: balón al GK
+		var gk_pos: Vector2 = _get_player_field_pos(ev.player_id)
+		if gk_pos != Vector2.ZERO:
+			ball_target = gk_pos
+			_kick_off_ball_animation()
+			return
+	if ev.type == MatchEvent.T_HEADER or ev.type == MatchEvent.T_VOLLEY:
+		# Cabezazo / volea: balón al shooter (ya suele estar ahí)
+		var shooter_pos: Vector2 = _get_player_field_pos(ev.player_id)
+		if shooter_pos != Vector2.ZERO:
+			ball_target = shooter_pos
 			_kick_off_ball_animation()
 			return
 	# Resto de eventos (foul, yellow, red, etc): posición por zona estándar
