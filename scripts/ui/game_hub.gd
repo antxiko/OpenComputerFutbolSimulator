@@ -99,6 +99,9 @@ var last_team_talk_jornada: int = -10  # cooldown — no team talks consecutivas
 # Bonus temporal para el próximo partido del usuario tras team talk exitosa.
 # Se consume al simular el partido y se resetea.
 var team_talk_form_bonus: float = 0.0
+# Histórico ligero: últimos 5 resultados del usuario {won, lost, diff, jornada}
+# para detectar rachas de derrotas (trigger Ted Lasso).
+var user_recent_results: Array = []
 # Alineación personalizada del usuario, dict con keys:
 #   formation, eleven_ids (Array[String]), slot_assignments (Array[String]),
 #   tactics: { mentality, tempo, pressing, width }
@@ -3250,6 +3253,19 @@ func _simulate_jornada(state: DivisionState) -> void:
 		if result != null:
 			state.league_table.record_match(result)
 			state.last_jornada_results.append(result)
+			# v0.3.2: histórico de resultados del usuario para Ted Lasso (rachas)
+			if result.home_team_id == user_team_id or result.away_team_id == user_team_id:
+				var is_h: bool = result.home_team_id == user_team_id
+				var u_s: int = result.score_home if is_h else result.score_away
+				var r_s: int = result.score_away if is_h else result.score_home
+				user_recent_results.append({
+					"won": u_s > r_s,
+					"lost": u_s < r_s,
+					"diff": u_s - r_s,
+					"jornada": state.current_jornada + 1,
+				})
+				while user_recent_results.size() > 5:
+					user_recent_results.pop_front()
 			# Procesar tarjetas → posibles sanciones para el próximo partido
 			CardSystem.process_match(result, all_teams)
 			# Stats de jugador por temporada: matches + minutos (titulares = 90 min)
@@ -3375,7 +3391,7 @@ func _save_to_slot(slot: String) -> void:
 		primera_state.current_jornada, segunda_state.current_jornada,
 		primera_state.league_table, segunda_state.league_table,
 		user_team_id, user_lineup_template, user_career_history, user_protagonist_id,
-		user_inbox, manager_reputation, board_expectations, agents_pool)
+		user_inbox, manager_reputation, board_expectations, agents_pool, user_recent_results)
 	if result.get("ok", false):
 		status_label.text = "Partida guardada en '%s' — %s" % [slot, result["saved_at"]]
 	else:
@@ -3433,6 +3449,7 @@ func _load_from_slot(slot: String) -> void:
 	# v0.3.2: pool de agentes (si no hay en save, dejar vacío y _ensure_agents_initialized
 	# lo regenerará al volver a _load_data)
 	agents_pool = save_data.agents_pool.duplicate()
+	user_recent_results = save_data.user_recent_results.duplicate(true)
 	# Si la save está mid-season tras la jornada 19, asumimos que el winter
 	# market ya se ejecutó. Evita disparo duplicado al avanzar jornadas.
 	winter_market_done = (save_data.primera_jornada >= 19)
@@ -6072,9 +6089,19 @@ func _detect_team_talk_trigger(post_match: bool) -> String:
 			var is_user_home: bool = last_result.home_team_id == user_team_id
 			var user_score: int = last_result.score_home if is_user_home else last_result.score_away
 			var rival_score: int = last_result.score_away if is_user_home else last_result.score_home
-			# Humillación: derrota por ≥4 goles de diferencia
+			# Humillación: derrota por ≥4 goles de diferencia (puntual)
 			if rival_score - user_score >= 4:
 				return "derrota_4_o_mas_diferencia"
+		# Racha de derrotas: 3 últimas seguidas en user_recent_results
+		if user_recent_results.size() >= 3:
+			var last3: Array = user_recent_results.slice(user_recent_results.size() - 3)
+			var all_lost: bool = true
+			for r: Dictionary in last3:
+				if not bool(r.get("lost", false)):
+					all_lost = false
+					break
+			if all_lost:
+				return "3_derrotas_seguidas"
 		# Morale promedio bajo (vestuario tenso) — concha azul cuando vas mal
 		var morale_sum: float = 0.0
 		var morale_count: int = 0

@@ -36,6 +36,8 @@ class SaveData:
 	var board_expectations_dict: Dictionary = {}  # serialized BoardExpectations o {}
 	# v0.3.2 — agentes (pool persistido para mantener relations + asignaciones)
 	var agents_pool: Array = []  # Array[Agent] (deserializados)
+	# v0.3.2 — histórico ligero para detectar rachas (Ted Lasso 3 derrotas seguidas)
+	var user_recent_results: Array = []
 
 
 # ============================================================================
@@ -48,7 +50,7 @@ static func save_game(slot_name: String, year: int, all_teams: Array,
 		user_career_history: Array = [], user_protagonist_id: String = "",
 		inbox_messages: Array = [], manager_reputation: int = 0,
 		board_expectations: BoardExpectations = null,
-		agents_pool: Array = []) -> Dictionary:
+		agents_pool: Array = [], user_recent_results: Array = []) -> Dictionary:
 	# Crear directorio
 	if not DirAccess.dir_exists_absolute(SAVE_DIR):
 		var err: int = DirAccess.make_dir_recursive_absolute(SAVE_DIR)
@@ -71,6 +73,7 @@ static func save_game(slot_name: String, year: int, all_teams: Array,
 		"manager_reputation": manager_reputation,
 		"board_expectations": board_expectations.to_dict() if board_expectations != null else {},
 		"agents_pool": agents_pool.map(func(a: Agent) -> Dictionary: return a.to_dict()),
+		"user_recent_results": user_recent_results.duplicate(true),
 		"teams": all_teams.map(func(t: Team) -> Dictionary: return _team_to_dict(t)),
 	}
 
@@ -123,6 +126,7 @@ static func load_game(slot_name: String) -> SaveData:
 	for a_dict in parsed.get("agents_pool", []):
 		if typeof(a_dict) == TYPE_DICTIONARY:
 			save_data.agents_pool.append(Agent.from_dict(a_dict))
+	save_data.user_recent_results = parsed.get("user_recent_results", []).duplicate(true)
 	# Reconstruir equipos desde el dict
 	save_data.teams = []
 	for team_dict in parsed.get("teams", []):
