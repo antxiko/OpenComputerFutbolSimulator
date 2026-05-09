@@ -10,8 +10,28 @@ Todas las versiones publicadas, qué se hizo y qué queda. Formato basado en [Ke
 - **⭐ Camera A2 light — jugador protagonista**: `Lineup.protagonist_id` (solo seteado en el lineup del usuario). En `_pick_actor`/`_pick_assistant` con `role="attack"`, el protagonista recibe +30% peso → más probable que sea shooter/creator. UI: selector encima de la plantilla del equipo del usuario. Visor: anillo amarillo pulsante + nombre sobre el jugador. Persiste en save.
 - Calibración intacta tras los cambios: 2.35 g/p, 25.10 tiros/p, 9.11 córners/p (target ~2.5 / ~25 / ~10).
 
+### Añadido (v0.4.2 candidato)
+- **Set pieces realistas**:
+  - **T_PENALTY** (afecta motor): faltas en zona `atk` del atacante tienen 3.5% de prob de ser señaladas como penalty. Conversión modulada por `porteria` del GK + `tiro` del lanzador, centro en 0.82 (porteria=70). Calibrado a 0.30 penalties/partido y 78% conversión (real La Liga). Tarjeta amarilla automática al fouler. `_pick_penalty_kicker` prioriza atacantes con buen tiro+mentalidad. Visor: balón al punto de penalty + log destacado.
+  - **T_FREE_KICK** (decorativo): tras foul (no penalty) en zona mid/atk, balón al server del equipo atacante.
+  - **T_THROW_IN** (decorativo): 30% de las pérdidas en zona `mid` son saques de banda; el lateral del defensor saca, balón sube a la línea de banda.
+  - **T_GK_DIST** (decorativo): 25% de las pérdidas en zona `atk` son recogidas del portero, que saca el balón.
+  - Bug fix latente: `_maybe_foul` ahora recibe `initial_zone`/`initial_poss_id` capturados al inicio del tick — antes podía elegir fouler en zona equivocada cuando el outcome cambiaba la zona.
+- **Tipos de remate**: en `_resolve_shot`:
+  - **T_HEADER**: si córner (60% prob) o pase previo era T_CROSS (60% prob).
+  - **T_VOLLEY**: 8% de los pases normales acaban en volea.
+- **Defensa granular**:
+  - **T_PRESSURE**: 25% de los intercepts tienen un segundo defensor presionando al pasador (shake 0.3s, sin tocar balón).
+  - **T_CLEARANCE**: 40% de los intercepts en `atk` son despejes contundentes (balón rebota a 0.20 en dirección random).
+  - **T_BACK_PASS**: 15% de los "keep" en zona `def` son pase atrás al portero.
+- **Movimientos sin balón**:
+  - **T_RUN**: 30% de los avances mid→atk tienen un atacante haciendo desmarque al área (extra_offset hacia adelante 1.5s).
+  - **T_OVERLAP**: 20% cuando el carrier es lateral, el extremo del mismo lado sobrepasa por fuera.
+- Sistema de `extra_offsets: Dictionary[player_id, Vector2]` + timers en el visor para movimientos coreografiados temporales sin tocar la formación base.
+- `tools/debug_penalties.gd` para verificar la calibración específica de penalty.
+
 ### Añadido (v0.4.1 candidato)
-- **Más variedad granular**: nuevos tipos `T_CROSS` (centro desde banda — laterales/extremos), `T_TACKLE_FAIL` (regate fallido con caída — 25% de los regates ahora salen mal en vez de limpios), `T_TACTICAL_FOUL` (falta táctica del defensor cortando contra en zona peligrosa — 30% de las pérdidas en `atk`). El visor dibuja X roja sobre el jugador caído (timer 0.6s) y shake horizontal sobre el que comete falta táctica (timer 0.5s).
+- **Variedad granular base**: nuevos tipos `T_CROSS` (centro desde banda — laterales/extremos), `T_TACKLE_FAIL` (regate fallido con caída — 25% de los regates ahora salen mal en vez de limpios), `T_TACTICAL_FOUL` (falta táctica del defensor cortando contra en zona peligrosa — 30% de las pérdidas en `atk`). El visor dibuja X roja sobre el jugador caído (timer 0.6s) y shake horizontal sobre el que comete falta táctica (timer 0.5s).
 
 ### Pendiente (v0.4.0+)
 - Camera mode A2 full (control directo del jugador con teclado — refactor enorme)
