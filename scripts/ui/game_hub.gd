@@ -4934,6 +4934,17 @@ func _resolve_buy(player: Player, seller_team: Team, fee: int, accept_p: float, 
 	if user_team == null:
 		return
 	if rng.randf() > accept_p:
+		# Rechazo inicial. Si la oferta estaba en zona "seria" (≥70% MV),
+		# el vendedor emite contraoferta pidiendo +15-25%.
+		var slot: String = player.primary_position()
+		var mv: int = MarketValue.compute(player, year, slot)
+		if mv > 0:
+			var ratio: float = float(fee) / float(mv)
+			if ratio >= 0.7 and ratio < 1.1:
+				var bump: float = lerpf(0.25, 0.15, clampf((ratio - 0.7) / 0.4, 0.0, 1.0))
+				var counter_fee: int = int(float(fee) * (1.0 + bump))
+				_show_counter_offer_modal(player, seller_team, fee, counter_fee)
+				return
 		status_label.text = "❌ %s rechaza la oferta por %s." % [seller_team.short_name, player.name]
 		return
 	# Transfer
@@ -4945,6 +4956,62 @@ func _resolve_buy(player: Player, seller_team: Team, fee: int, accept_p: float, 
 		seller_team.finances.budget_transfers_eur += fee
 	status_label.text = "✓ %s fichado por %s. Coste: %s" % [player.name, user_team.short_name, TransferMarket._fmt_eur(fee)]
 	_refresh_ui()
+
+
+func _show_counter_offer_modal(player: Player, seller_team: Team, original_fee: int, counter_fee: int) -> void:
+	var user_team := _find_team_by_id(user_team_id)
+	if user_team == null:
+		return
+	var popup := ConfirmationDialog.new()
+	popup.title = "Contraoferta de %s" % seller_team.short_name
+	popup.size = Vector2(440, 220)
+	add_child(popup)
+	var box := VBoxContainer.new()
+	popup.add_child(box)
+	var info := Label.new()
+	info.text = "%s rechaza tu oferta de %s por %s.\n\nPide %s para aceptar la venta." % [
+		seller_team.short_name, TransferMarket._fmt_eur(original_fee), player.name,
+		TransferMarket._fmt_eur(counter_fee),
+	]
+	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(info)
+	var budget: int = user_team.finances.budget_transfers_eur if user_team.finances else 0
+	if counter_fee > budget:
+		var warn := Label.new()
+		warn.text = "⚠ Excede tu presupuesto (%s)." % TransferMarket._fmt_eur(budget)
+		warn.add_theme_color_override("font_color", Color(1.0, 0.6, 0.4))
+		box.add_child(warn)
+		popup.get_ok_button().disabled = true
+	popup.ok_button_text = "Pagar %s" % TransferMarket._fmt_eur(counter_fee)
+	popup.cancel_button_text = "Rechazar"
+	popup.confirmed.connect(_on_accept_counter_offer.bind(player, seller_team, counter_fee, popup))
+	popup.canceled.connect(_on_reject_counter_offer.bind(player, seller_team, popup))
+	popup.popup_centered()
+
+
+func _on_accept_counter_offer(player: Player, seller_team: Team, counter_fee: int, popup: ConfirmationDialog) -> void:
+	popup.queue_free()
+	var user_team := _find_team_by_id(user_team_id)
+	if user_team == null or user_team.finances == null:
+		return
+	if counter_fee > user_team.finances.budget_transfers_eur:
+		status_label.text = "Presupuesto insuficiente para la contraoferta."
+		return
+	seller_team.players.erase(player)
+	user_team.players.append(player)
+	player.joined_year = year
+	user_team.finances.budget_transfers_eur -= counter_fee
+	if seller_team.finances:
+		seller_team.finances.budget_transfers_eur += counter_fee
+	status_label.text = "✓ %s fichado por %s tras contraoferta. Coste: %s" % [
+		player.name, user_team.short_name, TransferMarket._fmt_eur(counter_fee),
+	]
+	_refresh_ui()
+
+
+func _on_reject_counter_offer(player: Player, seller_team: Team, popup: ConfirmationDialog) -> void:
+	popup.queue_free()
+	status_label.text = "❌ Rechazaste la contraoferta de %s por %s." % [seller_team.short_name, player.name]
 
 
 func _on_attempt_sell(player: Player, fee: int) -> void:

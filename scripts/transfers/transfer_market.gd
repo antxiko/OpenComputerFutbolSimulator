@@ -356,12 +356,36 @@ static func _attempt_signing(
 			if fee > budgets[buyer.id]:
 				continue
 
-		# 3) Probabilidad de venta
+		# 3) Probabilidad de venta. Si el seller rechaza pero el fee está cerca
+		# del market value, emite contraoferta (+15-25%). El buyer acepta si
+		# tiene presupuesto y el counter ≤ 1.3x del fee inicial.
 		var accept_prob: float = _seller_acceptance_prob(candidate, seller, fee, season_year, buyer)
 		if window != null and window.label == "invierno":
 			accept_prob -= 0.20  # mid-season los clubes se aferran a sus jugadores
 		if rng.randf() > accept_prob:
-			continue
+			# Counter-offer: solo si fee inicial estaba en zona "seria" (≥70% MV)
+			var mv: int = MarketValue.compute(candidate, season_year, slot)
+			if mv <= 0:
+				continue
+			var ratio: float = float(fee) / float(mv)
+			if ratio < 0.7 or ratio >= 1.1:
+				# Demasiado bajo o ya alto: no hay counter, simplemente falla
+				continue
+			# Counter en función de cuán cerca quedó: cuanto más bajo el fee,
+			# más sube el counter. Rango +15% a +25%.
+			var bump: float = lerpf(0.25, 0.15, clampf((ratio - 0.7) / 0.4, 0.0, 1.0))
+			var counter_fee: int = int(float(fee) * (1.0 + bump))
+			# Buyer acepta el counter si tiene budget y no excede 1.3x del fee inicial
+			if counter_fee > budgets[buyer.id] or counter_fee > int(float(fee) * 1.30):
+				continue
+			# Reintentar con counter_fee. La probabilidad de aceptación con
+			# el nuevo precio sube — el seller estaba abierto a vender más caro.
+			var counter_prob: float = _seller_acceptance_prob(candidate, seller, counter_fee, season_year, buyer)
+			if window != null and window.label == "invierno":
+				counter_prob -= 0.20
+			if rng.randf() > counter_prob:
+				continue
+			fee = counter_fee
 
 		# Crear el Transfer record
 		var t := Transfer.new()
