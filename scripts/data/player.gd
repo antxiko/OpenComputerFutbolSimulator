@@ -43,6 +43,9 @@ class_name Player extends Resource
 @export var season_assists: int = 0
 @export var season_matches: int = 0
 @export var season_minutes: int = 0  # 90 por partido jugado, simplificación
+# Fecha del último partido del jugador (para recuperación parcial de condition
+# entre partidos según días de descanso). Vacío = nunca ha jugado.
+@export var last_match_date: Dictionary = {}
 
 # Historial estadístico por temporada — se rellena al final de cada temporada
 @export var history: Array = []

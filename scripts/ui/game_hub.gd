@@ -1835,6 +1835,9 @@ func _capture_career_record(cup_bracket: CupBracket) -> void:
 		"top_scorer_name": "—",
 		"top_scorer_goals": 0,
 		"cup_progress": "—",
+		"champions_progress": "—",
+		"europa_progress": "—",
+		"conference_progress": "—",
 	}
 	for i in sorted.size():
 		if sorted[i].team_id == user_team_id:
@@ -1861,7 +1864,55 @@ func _capture_career_record(cup_bracket: CupBracket) -> void:
 	# Progreso en Copa
 	if cup_bracket != null:
 		record["cup_progress"] = _compute_user_cup_progress(cup_bracket)
+	# Progreso europeo (si el usuario clasificó la temporada anterior)
+	if champions_state != null:
+		record["champions_progress"] = _compute_user_european_progress(champions_state)
+	if europa_state != null:
+		record["europa_progress"] = _compute_user_european_progress(europa_state)
+	if conference_state != null:
+		record["conference_progress"] = _compute_user_european_progress(conference_state)
 	user_career_history.append(record)
+
+
+# Devuelve "—" si el usuario no jugó esa competición; si jugó, dice hasta
+# qué ronda llegó (Campeón, Subcampeón, Semis, Cuartos, Octavos, Grupos).
+func _compute_user_european_progress(bracket: ChampionsBracket) -> String:
+	if bracket == null or user_team_id == "":
+		return "—"
+	# Verificar si el usuario participó
+	var participated: bool = false
+	if not bracket.groups.is_empty():
+		for g: ChampionsBracket.Group in bracket.groups:
+			if user_team_id in g.team_ids:
+				participated = true
+				break
+	if not participated:
+		# Buscar también en KO rounds (Europa/Conference no tienen grupos)
+		for r: ChampionsBracket.KORound in bracket.ko_rounds:
+			for fx: ChampionsBracket.KOFixture in r.fixtures:
+				if fx.home_id == user_team_id or fx.away_id == user_team_id:
+					participated = true
+					break
+			if participated:
+				break
+	if not participated:
+		return "—"
+	# Campeón / subcampeón
+	if bracket.champion_id == user_team_id:
+		return "🏆 Campeón"
+	# Buscar última ronda donde apareció
+	var last_round: String = "Fase de grupos"
+	for r: ChampionsBracket.KORound in bracket.ko_rounds:
+		for fx: ChampionsBracket.KOFixture in r.fixtures:
+			if fx.home_id == user_team_id or fx.away_id == user_team_id:
+				if fx.winner_id == user_team_id:
+					last_round = "Pasó %s" % r.name
+				else:
+					if r.name == "Final":
+						return "🥈 Subcampeón"
+					last_round = "Eliminado en %s" % r.name
+				break
+	return last_round
 
 
 func _compute_user_cup_progress(bracket: CupBracket) -> String:
@@ -2760,17 +2811,17 @@ func _render_career_view() -> void:
 
 	content_area.add_child(HSeparator.new())
 
-	# Tabla por temporada
+	# Tabla por temporada con columnas extras de competiciones europeas
 	var grid := GridContainer.new()
-	grid.columns = 8
-	grid.add_theme_constant_override("h_separation", 16)
+	grid.columns = 11
+	grid.add_theme_constant_override("h_separation", 12)
 	grid.add_theme_constant_override("v_separation", 3)
 	content_area.add_child(grid)
-	for h in ["Año", "Div", "Pos", "PJ-G-E-P", "GF/GC", "Pts", "Pichichi", "Copa"]:
+	for h in ["Año", "Div", "Pos", "PJ-G-E-P", "GF/GC", "Pts", "Pichichi", "Copa", "🏆 Champ", "⭐ Europa", "🥉 Conf"]:
 		var l := Label.new()
 		l.text = h
 		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
-		l.add_theme_font_size_override("font_size", 12)
+		l.add_theme_font_size_override("font_size", 11)
 		grid.add_child(l)
 	# Ordenar por año descendente
 	var sorted_history: Array = user_career_history.duplicate()
@@ -2780,9 +2831,9 @@ func _render_career_view() -> void:
 		var pos: int = int(r["position"])
 		var color: Color = Color(0.85, 0.85, 0.85)
 		if pos == 1 and r["division"] == "primera":
-			color = Color(1.0, 0.85, 0.2)  # oro: campeón
+			color = Color(1.0, 0.85, 0.2)
 		elif pos <= 4 and r["division"] == "primera":
-			color = Color(0.6, 1.0, 0.7)  # verde: top 4
+			color = Color(0.6, 1.0, 0.7)
 		elif pos <= 6 and r["division"] == "primera":
 			color = Color(0.6, 0.8, 1.0)
 		var cells: Array[String] = [
@@ -2792,14 +2843,17 @@ func _render_career_view() -> void:
 			"%d-%d-%d-%d" % [int(r["played"]), int(r["won"]), int(r["drawn"]), int(r["lost"])],
 			"%d/%d" % [int(r["gf"]), int(r["ga"])],
 			str(int(r["points"])),
-			"%s (%d)" % [String(r["top_scorer_name"]).left(20), int(r["top_scorer_goals"])],
-			String(r["cup_progress"]),
+			"%s (%d)" % [String(r["top_scorer_name"]).left(18), int(r["top_scorer_goals"])],
+			String(r.get("cup_progress", "—")),
+			String(r.get("champions_progress", "—")),
+			String(r.get("europa_progress", "—")),
+			String(r.get("conference_progress", "—")),
 		]
 		for c in cells:
 			var l := Label.new()
 			l.text = c
 			l.add_theme_color_override("font_color", color)
-			l.add_theme_font_size_override("font_size", 11)
+			l.add_theme_font_size_override("font_size", 10)
 			grid.add_child(l)
 
 
@@ -2810,14 +2864,17 @@ func _simulate_jornada(state: DivisionState) -> void:
 	var team_index: Dictionary = {}
 	for t: Team in state.teams:
 		team_index[t.id] = t
-		# Restablecer condición antes de la jornada
-		for p: Player in t.players:
-			p.condition = 100.0
 
 	state.last_jornada_results = []
 	for fixture: Dictionary in jornada:
 		var home: Team = team_index[fixture["home_id"]]
 		var away: Team = team_index[fixture["away_id"]]
+		# Recuperación parcial de condition basada en los días desde su
+		# último partido individual (rota titulares más realista cuando
+		# hay partidos seguidos).
+		var match_date: Dictionary = fixture.get("match_date", {})
+		ConditionRecovery.apply_to_team(home, match_date)
+		ConditionRecovery.apply_to_team(away, match_date)
 		# Decrementar sanciones (los suspendidos cumplen ESTE partido)
 		CardSystem.decrement_for_team(home)
 		CardSystem.decrement_for_team(away)
@@ -2847,6 +2904,9 @@ func _simulate_jornada(state: DivisionState) -> void:
 			for p: Player in away_lineup.starting_eleven:
 				p.season_matches += 1
 				p.season_minutes += 90
+			# Registrar fecha del último partido (para recovery próximo)
+			ConditionRecovery.record_match_played(home_lineup, match_date)
+			ConditionRecovery.record_match_played(away_lineup, match_date)
 			# Goles
 			for pid in result.scorers.keys():
 				var goals: int = int(result.scorers[pid])

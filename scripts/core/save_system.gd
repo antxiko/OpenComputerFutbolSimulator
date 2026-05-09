@@ -223,6 +223,7 @@ static func _team_from_dict(d: Dictionary) -> Team:
 		p.season_assists = int(pd.get("season_assists", 0))
 		p.season_matches = int(pd.get("season_matches", 0))
 		p.season_minutes = int(pd.get("season_minutes", 0))
+		p.last_match_date = pd.get("last_match_date", {}).duplicate()
 		p.history = pd.get("history", []).duplicate()
 	return t
 
@@ -254,6 +255,7 @@ static func _player_to_dict(p: Player) -> Dictionary:
 		"season_assists": p.season_assists,
 		"season_matches": p.season_matches,
 		"season_minutes": p.season_minutes,
+		"last_match_date": p.last_match_date.duplicate() if p.last_match_date else {},
 		"history": p.history.duplicate(),
 		"contract": _contract_to_dict(p.contract),
 	}
