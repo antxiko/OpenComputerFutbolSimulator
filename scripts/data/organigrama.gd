@@ -14,8 +14,15 @@ func by_section(section: String) -> Array:
 func total_salary() -> int:
 	var t: int = 0
 	for e: Employee in employees:
-		t += e.salary_eur_year
+		t += e.total_salary()
 	return t
+
+
+func total_headcount() -> int:
+	var n: int = 0
+	for e: Employee in employees:
+		n += e.count
+	return n
 
 
 # Calidad media de una sección (jefe pesa más)

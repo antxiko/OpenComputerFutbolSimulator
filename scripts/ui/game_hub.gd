@@ -3480,8 +3480,9 @@ func _render_employees_view() -> void:
 	var size_label: String = OrganigramaFactory.size_for(team)
 	var pretty_size: String = "GRANDE" if size_label == "grande" else ("MEDIANO" if size_label == "mediano" else "PEQUEÑO")
 	var header := Label.new()
-	header.text = "👔 Organigrama de %s — Club %s (%d empleados, %s €/año en salarios)" % [
+	header.text = "👔 Organigrama de %s — Club %s · %d empleados (%d entradas) · %s €/año en salarios" % [
 		team.name, pretty_size,
+		team.organigrama.total_headcount(),
 		team.organigrama.employees.size(),
 		TransferMarket._fmt_eur(team.organigrama.total_salary()),
 	]
@@ -3524,11 +3525,12 @@ func _render_employees_view() -> void:
 			grid.add_child(hl)
 		for emp: Employee in sec_employees:
 			var l_name := Label.new()
-			l_name.text = emp.name
+			l_name.text = emp.name if emp.count == 1 else "%s ×%d" % [emp.role_label, emp.count]
 			l_name.add_theme_font_size_override("font_size", 11)
 			grid.add_child(l_name)
 			var l_role := Label.new()
-			l_role.text = emp.role_label
+			# Si es individual, mostrar el rol; si es grupal, mostrar "—"
+			l_role.text = emp.role_label if emp.count == 1 else "—"
 			l_role.add_theme_font_size_override("font_size", 11)
 			l_role.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
 			grid.add_child(l_role)
@@ -3538,7 +3540,13 @@ func _render_employees_view() -> void:
 			l_q.add_theme_color_override("font_color", Color(1.0, 0.95, 0.4))
 			grid.add_child(l_q)
 			var l_sal := Label.new()
-			l_sal.text = "%s €" % TransferMarket._fmt_eur(emp.salary_eur_year)
+			if emp.count == 1:
+				l_sal.text = "%s €" % TransferMarket._fmt_eur(emp.salary_eur_year)
+			else:
+				l_sal.text = "%s × %d = %s €" % [
+					TransferMarket._fmt_eur(emp.salary_eur_year), emp.count,
+					TransferMarket._fmt_eur(emp.total_salary()),
+				]
 			l_sal.add_theme_font_size_override("font_size", 11)
 			grid.add_child(l_sal)
 			# Acción: subir calidad si <5
