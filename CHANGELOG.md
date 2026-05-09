@@ -2,6 +2,26 @@
 
 Todas las versiones publicadas, qué se hizo y qué queda. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [v0.3.1] - 2026-05-09
+
+### Añadido — Profundidad del rol mánager (FM-feel)
+- **📬 Inbox de mensajes**: nueva vista accesible desde el cuadrante "Seguimiento" del hub con badge de no-leídos. Tipos: `injury`, `press`, `board_message`, `agent_offer`, `transfer_rumor`, `manager_offer`, `coach_award`, `objective`, `national_call`, `general`. Cada mensaje guarda año + jornada + estado leído. Acumula histórico (cap 200 entries). Botón "Marcar todo como leído". Eventos existentes (lesiones graves, premio coach, ofertas mánager, evaluación objetivo) ahora también dejan registro.
+- **🎤 Press conferences pre-partido**: 50% prob de modal antes de cada partido del usuario (no jornada 1). 10 plantillas en `data/press_conferences/templates.json` con preguntas filtradas por contexto (`after_win`/`after_loss`/`always`). 3 respuestas por pregunta con efectos en morale plantilla, manager_reputation y board_satisfaction. Solo se aplica el efecto de la PRIMERA respuesta seleccionada.
+- **📋 Junta directiva (BoardExpectations)**: generadas al inicio de temporada según reputación del club: posición Liga objetivo (rep ≥90 → top 3, rep <60 → no descender), Copa esperada, ratio finanzas. Evaluación mid-season (jornada 19) y final con verdict `exceeded`/`met`/`missed`/`failed` y delta a manager_reputation (-5 a +3).
+- **🚪 Pre-partido bloqueante**: el modal pre-partido ya NO se cierra con ESC (`dialog_close_on_escape = false`, `exclusive = true`). El usuario debe pulsar uno de los 3 botones [▶ Jugar] / [Configurar alineación] / [🎬 Jugar y ver en 2D]. El modal ahora muestra "team news" (lesionados/sancionados) y reputación de mánager + club.
+- **⭐ Reputación del mánager** (separada del club): `manager_reputation: int`, persistida en save. Default = `team.reputation` al elegir equipo. Sube con: campeón Liga (+5), Copa (+3), entrenador del mes (+1), eval board exceeded (+3). Baja con: eval board missed (-2) / failed (-5). Se mantiene al cambiar de club por oferta de mánager.
+
+### Archivos
+- **NUEVO** `scripts/data/inbox_message.gd` (Resource: type, title, body, read, year_when, jornada_when, data)
+- **NUEVO** `scripts/data/board_expectations.gd` (Resource con generate_for_team + summary_text)
+- **NUEVO** `data/press_conferences/templates.json` (10 plantillas)
+- `scripts/ui/game_hub.gd` — VIEW_INBOX + modales + hooks en _start_season / _on_advance_jornada / _on_reset_season / _accept_manager_offer
+- `scripts/core/save_system.gd` — persistir inbox + manager_reputation + board_expectations (defaults tolerantes)
+
+### Calibración intacta
+- 2.68 g/p (target ~2.5), 25.08 tiros/p, 21.3% bloqueados ✓, 34.6% a portería ✓, 8.84 córners/p, 0.30 penalties/p con 78% conversión.
+
+
 ## [v0.3.0] - 2026-05-09
 
 ### Añadido — gestión y mercado
