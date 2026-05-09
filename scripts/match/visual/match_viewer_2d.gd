@@ -56,6 +56,7 @@ var ball_target: Vector2 = Vector2(0.50, 0.50)
 # `SHOT_TRANSIT_TIME` segundos para tiros (más rápido pero VISIBLE).
 const BALL_TRANSIT_TIME: float = 0.55
 const SHOT_TRANSIT_TIME: float = 0.30
+const PASS_TRANSIT_TIME: float = 0.28  # pases granulares: balón viaja rápido entre jugadores
 var ball_trail: Array = []           # Vector2[] últimas posiciones para dibujar estela
 var ball_anim_total: float = BALL_TRANSIT_TIME  # tiempo total para cruzar la distancia actual
 var ball_anim_remaining: float = 0.0
@@ -327,7 +328,12 @@ func _update_ball_smooth(delta: float) -> void:
 # Llamada cuando ball_target cambia. Resetea animación con duración apropiada.
 func _kick_off_ball_animation() -> void:
 	ball_anim_origin = ball_pos
-	ball_anim_total = SHOT_TRANSIT_TIME if shot_animation_active else BALL_TRANSIT_TIME
+	if shot_animation_active:
+		ball_anim_total = SHOT_TRANSIT_TIME
+	elif last_event_type in [MatchEvent.T_PASS, MatchEvent.T_LONG_BALL, MatchEvent.T_DRIBBLE, MatchEvent.T_INTERCEPT]:
+		ball_anim_total = PASS_TRANSIT_TIME
+	else:
+		ball_anim_total = BALL_TRANSIT_TIME
 	ball_anim_remaining = ball_anim_total
 
 
@@ -454,6 +460,15 @@ func _advance_one_event() -> void:
 		if ev.zone in ["def", "mid", "atk"]:
 			current_zone = ev.zone
 		last_event_type = ev.type
+		# Eventos granulares (pases, regates, intercepciones): el balón viaja al
+		# jugador receptor pero NO se loggea ni cuenta como highlight.
+		if ev.type in [MatchEvent.T_PASS, MatchEvent.T_LONG_BALL, MatchEvent.T_DRIBBLE, MatchEvent.T_INTERCEPT]:
+			if highlights_only:
+				continue  # skip en modo highlights
+			_set_ball_for_event(ev)
+			# Delay reducido para que los pases pasen rápido y no eternicen el partido
+			time_acc = -play_delay_ms * 0.55  # próxima animación en ~45% del delay normal
+			return
 		# Actualizar marcador en goles
 		if ev.type == MatchEvent.T_GOAL:
 			if ev.team_id == match_result.home_team_id:
@@ -536,8 +551,52 @@ func _set_ball_for_event(ev: MatchEvent) -> void:
 		ball_target = Vector2(0.50, 0.50)
 		_kick_off_ball_animation()
 		return
+	# Eventos granulares: balón hacia el receptor (pase) o actor (regate/intercept)
+	if ev.type == MatchEvent.T_PASS or ev.type == MatchEvent.T_LONG_BALL:
+		var receiver_pos: Vector2 = _get_player_field_pos(ev.secondary_player_id)
+		if receiver_pos != Vector2.ZERO:
+			ball_target = receiver_pos
+			_kick_off_ball_animation()
+			return
+	if ev.type == MatchEvent.T_DRIBBLE:
+		# El balón se queda con el regateador, pequeña oscilación en el sitio
+		var actor_pos: Vector2 = _get_player_field_pos(ev.player_id)
+		if actor_pos != Vector2.ZERO:
+			ball_target = actor_pos + Vector2(randf_range(-0.03, 0.03), randf_range(-0.03, 0.03))
+			_kick_off_ball_animation()
+			return
+	if ev.type == MatchEvent.T_INTERCEPT:
+		var int_pos: Vector2 = _get_player_field_pos(ev.player_id)
+		if int_pos != Vector2.ZERO:
+			ball_target = int_pos
+			_kick_off_ball_animation()
+			return
 	# Resto de eventos (foul, yellow, red, etc): posición por zona estándar
 	_update_ball_position()
+
+
+# Devuelve la posición del jugador en coordenadas del campo (0..1) incluyendo
+# el offset dinámico actual. Vector2.ZERO si no se encuentra (id vacío o
+# jugador no está en pista).
+func _get_player_field_pos(player_id: String) -> Vector2:
+	if player_id == "" or home_lineup == null or away_lineup == null:
+		return Vector2.ZERO
+	# Buscar en home
+	for i in home_lineup.starting_eleven.size():
+		if home_lineup.starting_eleven[i].id == player_id:
+			var slot: String = home_lineup.slot_assignments[i] if i < home_lineup.slot_assignments.size() else "CM"
+			var base: Vector2 = SLOT_POSITIONS.get(slot, Vector2(0.5, 0.5))
+			var off: Vector2 = home_player_offsets[i] if i < home_player_offsets.size() else Vector2.ZERO
+			return base + off
+	# Buscar en away (mirror)
+	for i in away_lineup.starting_eleven.size():
+		if away_lineup.starting_eleven[i].id == player_id:
+			var slot: String = away_lineup.slot_assignments[i] if i < away_lineup.slot_assignments.size() else "CM"
+			var base: Vector2 = SLOT_POSITIONS.get(slot, Vector2(0.5, 0.5))
+			base.x = 1.0 - base.x  # mirror
+			var off: Vector2 = away_player_offsets[i] if i < away_player_offsets.size() else Vector2.ZERO
+			return base + off
+	return Vector2.ZERO
 
 
 func _update_ball_position() -> void:

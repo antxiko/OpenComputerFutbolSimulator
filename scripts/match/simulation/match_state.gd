@@ -17,6 +17,10 @@ var zone: String = "mid"  # zona desde POV del equipo en posesión
 
 var events: Array[MatchEvent] = []
 var rng: RandomNumberGenerator
+# RNG independiente para eventos decorativos (pases, regates, intercepciones).
+# Tiene su propio seed para no consumir aleatoriedad del rng principal —
+# así los outcomes y stats de partidos con seeds antiguos siguen siendo idénticos.
+var visual_rng: RandomNumberGenerator
 
 # Stats por equipo
 var stats: Dictionary = {}        # team_id -> Dictionary
@@ -35,6 +39,8 @@ func init_from_lineups(home: Lineup, away: Lineup, seed_value: int) -> void:
 	away_lineup = away
 	rng = RandomNumberGenerator.new()
 	rng.seed = seed_value
+	visual_rng = RandomNumberGenerator.new()
+	visual_rng.seed = seed_value ^ 0x5A5A5A5A
 	stats[home.team.id] = _empty_stats()
 	stats[away.team.id] = _empty_stats()
 	for p in home.starting_eleven:

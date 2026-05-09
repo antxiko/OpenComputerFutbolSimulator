@@ -18,6 +18,12 @@ const T_INJURY       := "injury"
 const T_SUBSTITUTION := "substitution"
 const T_CHANCE       := "chance"
 const T_TURNOVER     := "turnover"   # poco interesante, normalmente filtrado del log
+# Eventos granulares (visualización detallada — no afectan stats principales)
+const T_PASS         := "pass"          # pase corto entre dos jugadores
+const T_LONG_BALL    := "long_ball"     # pase largo (cambia zona)
+const T_DRIBBLE      := "dribble"       # regate de un jugador
+const T_TACKLE       := "tackle"        # entrada limpia de defensor (no falta)
+const T_INTERCEPT    := "intercept"     # intercepción de pase
 
 @export var minute: int = 0
 @export var second_in_minute: int = 0
