@@ -24,6 +24,7 @@ extends Control
 const SEASON_YEAR_INITIAL := 2026
 const SEED_BASE := 42
 
+const VIEW_HUB := "hub"
 const VIEW_TABLE := "table"
 const VIEW_FIXTURES := "fixtures"
 const VIEW_TEAM := "team"
@@ -34,6 +35,8 @@ const VIEW_CAREER := "career"
 const VIEW_CHAMPIONS := "champions"
 const VIEW_FINANCES := "finances"
 const VIEW_CALENDAR := "calendar"
+const VIEW_RIVAL := "rival"
+const VIEW_DECISIONS := "decisions"
 
 
 # --------------------------------------------------------------------------- #
@@ -59,7 +62,7 @@ var primera_state: DivisionState = DivisionState.new()
 var segunda_state: DivisionState = DivisionState.new()
 var year: int = SEASON_YEAR_INITIAL
 var selected_division: String = "primera"
-var current_view: String = VIEW_TABLE
+var current_view: String = VIEW_HUB
 var selected_team: Team = null
 var selected_match: MatchResult = null
 
@@ -333,7 +336,7 @@ func _start_season() -> void:
 	segunda_state.teams = all_teams.filter(func(t: Team) -> bool: return t.division == "segunda")
 	_init_division(primera_state, SEED_BASE)
 	_init_division(segunda_state, SEED_BASE + 1)
-	current_view = VIEW_TABLE
+	current_view = VIEW_HUB
 	selected_team = null
 	selected_match = null
 	winter_market_done = false  # se podrá abrir el mercado invernal otra vez
@@ -2847,6 +2850,7 @@ func _refresh_ui() -> void:
 		c.queue_free()
 
 	match current_view:
+		VIEW_HUB: _render_hub_view()
 		VIEW_TABLE: _render_table_view()
 		VIEW_FIXTURES: _render_fixtures_view()
 		VIEW_TEAM: _render_team_view()
@@ -2857,11 +2861,484 @@ func _refresh_ui() -> void:
 		VIEW_CHAMPIONS: _render_champions_view()
 		VIEW_FINANCES: _render_finances_view()
 		VIEW_CALENDAR: _render_calendar_view()
+		VIEW_RIVAL: _render_rival_view()
+		VIEW_DECISIONS: _render_decisions_view()
 
 
 # --------------------------------------------------------------------------- #
 # Vista: Clasificación
 # --------------------------------------------------------------------------- #
+# =========================================================================== #
+# Vista: 🏠 HUB principal estilo PC Manager
+# =========================================================================== #
+# 4 cuadrantes: Seguimiento (verde) | Entrenador (azul)
+#               Mercado    (rojo)   | Finanzas   (marrón)
+# Centro: tu equipo + próximo rival
+func _render_hub_view() -> void:
+	var team := _find_team_by_id(user_team_id) if user_team_id != "" else null
+
+	# Layout principal: VBox con header + (HBox con cuadrantes) + footer
+	var root := VBoxContainer.new()
+	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	root.add_theme_constant_override("separation", 8)
+	content_area.add_child(root)
+
+	# === HEADER ===
+	var header := PanelContainer.new()
+	var header_bg := StyleBoxFlat.new()
+	header_bg.bg_color = Color(0.10, 0.13, 0.18)
+	header_bg.border_color = Color(0.4, 0.5, 0.6)
+	header_bg.set_border_width_all(1)
+	header_bg.content_margin_left = 12
+	header_bg.content_margin_right = 12
+	header_bg.content_margin_top = 8
+	header_bg.content_margin_bottom = 8
+	header.add_theme_stylebox_override("panel", header_bg)
+	root.add_child(header)
+	var header_h := HBoxContainer.new()
+	header_h.add_theme_constant_override("separation", 16)
+	header.add_child(header_h)
+	# Logo + nombre equipo
+	var team_box := HBoxContainer.new()
+	team_box.add_theme_constant_override("separation", 8)
+	header_h.add_child(team_box)
+	if team != null:
+		var logo := _make_team_logo(team, 48)
+		team_box.add_child(logo)
+		var team_label := Label.new()
+		team_label.text = team.name
+		team_label.add_theme_font_size_override("font_size", 18)
+		team_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.6))
+		team_box.add_child(team_label)
+	else:
+		var team_label := Label.new()
+		team_label.text = "(sin club)"
+		team_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+		team_box.add_child(team_label)
+	# Spacer
+	var sp1 := Control.new()
+	sp1.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header_h.add_child(sp1)
+	# Título
+	var title := Label.new()
+	title.text = "MENU PROMANAGER"
+	title.add_theme_font_size_override("font_size", 22)
+	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	header_h.add_child(title)
+	# Spacer 2
+	var sp2 := Control.new()
+	sp2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header_h.add_child(sp2)
+	# Fecha + jornada + competición
+	var info_v := VBoxContainer.new()
+	header_h.add_child(info_v)
+	var jornada_lbl := Label.new()
+	jornada_lbl.text = "Liga %s · Jornada %d" % [
+		"1ª" if selected_division == "primera" else "2ª",
+		_current_state().current_jornada + 1,
+	]
+	jornada_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	jornada_lbl.add_theme_font_size_override("font_size", 13)
+	jornada_lbl.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	info_v.add_child(jornada_lbl)
+	var year_lbl := Label.new()
+	year_lbl.text = "Temporada %d-%d" % [year, year + 1]
+	year_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	year_lbl.add_theme_font_size_override("font_size", 11)
+	year_lbl.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	info_v.add_child(year_lbl)
+
+	# === CUERPO: 4 cuadrantes + centro ===
+	var body := HBoxContainer.new()
+	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.add_theme_constant_override("separation", 0)
+	root.add_child(body)
+
+	# Columna izquierda
+	var left_col := VBoxContainer.new()
+	left_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	left_col.add_theme_constant_override("separation", 0)
+	body.add_child(left_col)
+	# Cuadrante: SEGUIMIENTO (verde)
+	left_col.add_child(_make_quadrant("SEGUIMIENTO", Color(0.32, 0.62, 0.30), [
+		["📊", "RESULTADOS", "Última jornada con resultados", _on_select_view.bind(VIEW_FIXTURES)],
+		["🏆", "CLASIFICACIÓN", "Tabla actual de Liga", _on_select_view.bind(VIEW_TABLE)],
+		["📅", "CALENDARIO", "Calendario completo de la temporada", _on_select_view.bind(VIEW_CALENDAR)],
+	]))
+	# Cuadrante: MERCADO (rojo)
+	left_col.add_child(_make_quadrant("MERCADO", Color(0.75, 0.25, 0.25), [
+		["💸", "FICHAR", "Mercado de fichajes", _on_select_view.bind(VIEW_MARKET)],
+		["👥", "PLANTILLA", "Tu plantilla con stats", _on_select_view.bind(VIEW_TEAM)],
+		["👔", "EMPLEADOS", "Cuerpo técnico", _on_select_view.bind(VIEW_FINANCES)],
+	]))
+
+	# Columna central — escudo grande + próximo rival
+	var center_col := VBoxContainer.new()
+	center_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	center_col.alignment = BoxContainer.ALIGNMENT_CENTER
+	center_col.custom_minimum_size = Vector2(200, 0)
+	body.add_child(center_col)
+	if team != null:
+		# Tu equipo: escudo grande
+		center_col.add_child(_make_spacer(20))
+		var your_logo := _make_team_logo(team, 96)
+		var your_logo_box := CenterContainer.new()
+		your_logo_box.add_child(your_logo)
+		center_col.add_child(your_logo_box)
+		var your_name := Label.new()
+		your_name.text = team.short_name
+		your_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		your_name.add_theme_font_size_override("font_size", 14)
+		your_name.add_theme_color_override("font_color", Color(1.0, 0.95, 0.6))
+		center_col.add_child(your_name)
+		# Próximo rival
+		var rival: Team = _find_next_rival(team)
+		if rival != null:
+			var vs_label := Label.new()
+			vs_label.text = "── próximo rival ──"
+			vs_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			vs_label.add_theme_font_size_override("font_size", 11)
+			vs_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+			center_col.add_child(vs_label)
+			var rival_logo := _make_team_logo(rival, 64)
+			var rival_logo_box := CenterContainer.new()
+			rival_logo_box.add_child(rival_logo)
+			center_col.add_child(rival_logo_box)
+			var rival_name := Label.new()
+			rival_name.text = rival.short_name
+			rival_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			rival_name.add_theme_font_size_override("font_size", 12)
+			center_col.add_child(rival_name)
+		# Caja
+		if team.finances != null:
+			center_col.add_child(_make_spacer(10))
+			var cash_label := Label.new()
+			cash_label.text = "💵 %s €" % TransferMarket._fmt_eur(team.finances.cash_balance)
+			cash_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			cash_label.add_theme_font_size_override("font_size", 13)
+			cash_label.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7) if team.finances.cash_balance >= 0 else Color(1.0, 0.6, 0.6))
+			center_col.add_child(cash_label)
+
+	# Columna derecha
+	var right_col := VBoxContainer.new()
+	right_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	right_col.add_theme_constant_override("separation", 0)
+	body.add_child(right_col)
+	# Cuadrante: ENTRENADOR (azul)
+	right_col.add_child(_make_quadrant("ENTRENADOR", Color(0.25, 0.45, 0.80), [
+		["🎯", "ALINEACIÓN", "Define tu once y formación", _on_select_view.bind(VIEW_TACTICS)],
+		["📋", "TÁCTICAS", "Mentalidad, presión, tempo", _on_select_view.bind(VIEW_TACTICS)],
+		["🔍", "VER RIVAL", "Información del próximo rival", _on_select_view.bind(VIEW_RIVAL)],
+	]))
+	# Cuadrante: FINANZAS (marrón/dorado)
+	right_col.add_child(_make_quadrant("FINANZAS", Color(0.65, 0.45, 0.20), [
+		["💰", "CAJA", "Balance, ingresos, gastos", _on_select_view.bind(VIEW_FINANCES)],
+		["⚖", "DECISIONES", "Objetivo, sponsors, carrera", _on_select_view.bind(VIEW_DECISIONS)],
+		["🏟", "ESTADIO", "Mejoras y ampliaciones", _on_select_view.bind(VIEW_FINANCES)],
+	]))
+
+	# === FOOTER ===
+	var footer_p := PanelContainer.new()
+	var footer_bg := StyleBoxFlat.new()
+	footer_bg.bg_color = Color(0.10, 0.13, 0.18)
+	footer_bg.set_border_width_all(1)
+	footer_bg.border_color = Color(0.4, 0.5, 0.6)
+	footer_bg.content_margin_left = 8
+	footer_bg.content_margin_right = 8
+	footer_bg.content_margin_top = 6
+	footer_bg.content_margin_bottom = 6
+	footer_p.add_theme_stylebox_override("panel", footer_bg)
+	root.add_child(footer_p)
+	var footer_h := HBoxContainer.new()
+	footer_h.add_theme_constant_override("separation", 8)
+	footer_p.add_child(footer_h)
+	# Botones
+	for b_data in [
+		["🚪 SALIR", _on_back_to_menu],
+		["💾 GUARDAR", _on_save_game],
+		["📰 NOTICIAS", _on_select_view.bind(VIEW_CAREER)],
+	]:
+		var b := Button.new()
+		b.text = String(b_data[0])
+		b.pressed.connect(Callable(b_data[1]))
+		footer_h.add_child(b)
+	# Spacer
+	var sp_f := Control.new()
+	sp_f.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	footer_h.add_child(sp_f)
+	# Boton SEGUIR (avanzar jornada) destacado
+	var seguir_btn := Button.new()
+	seguir_btn.text = "▶ SEGUIR"
+	seguir_btn.add_theme_font_size_override("font_size", 16)
+	seguir_btn.custom_minimum_size = Vector2(160, 0)
+	seguir_btn.pressed.connect(_on_advance_jornada)
+	footer_h.add_child(seguir_btn)
+	# Reset season
+	var rs_btn := Button.new()
+	rs_btn.text = "🔁 NUEVA TEMP."
+	rs_btn.tooltip_text = "Cierra esta temporada y empieza la siguiente"
+	rs_btn.pressed.connect(_on_reset_season)
+	footer_h.add_child(rs_btn)
+
+
+# Crea un panel de cuadrante con título y 3 botones (icono + label + tooltip).
+func _make_quadrant(title: String, accent_color: Color, actions: Array) -> Control:
+	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Color(0.13, 0.16, 0.22)
+	bg.border_color = accent_color
+	bg.set_border_width_all(2)
+	bg.set_corner_radius_all(4)
+	bg.content_margin_left = 8
+	bg.content_margin_right = 8
+	bg.content_margin_top = 6
+	bg.content_margin_bottom = 6
+	panel.add_theme_stylebox_override("panel", bg)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 4)
+	panel.add_child(v)
+	# Título del cuadrante
+	var t := Label.new()
+	t.text = title
+	t.add_theme_font_size_override("font_size", 16)
+	t.add_theme_color_override("font_color", accent_color.lightened(0.4))
+	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(t)
+	# Botones
+	for action in actions:
+		var icon: String = String(action[0])
+		var label: String = String(action[1])
+		var tooltip: String = String(action[2])
+		var callback: Callable = action[3]
+		var b := Button.new()
+		b.text = "  %s   %s" % [icon, label]
+		b.tooltip_text = tooltip
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.add_theme_font_size_override("font_size", 14)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.custom_minimum_size = Vector2(0, 38)
+		b.pressed.connect(callback)
+		v.add_child(b)
+	return panel
+
+
+# Carga el escudo del equipo desde assets/logos/<team_id>.png. Si no existe,
+# muestra fallback con las iniciales sobre fondo del color del equipo.
+func _make_team_logo(team: Team, size: int) -> Control:
+	# Probar extensiones en orden: png, jpg, jpeg
+	for ext in ["png", "jpg", "jpeg"]:
+		var logo_path: String = "res://assets/logos/%s.%s" % [team.id, ext]
+		if ResourceLoader.exists(logo_path):
+			var tex: Texture2D = load(logo_path)
+			if tex != null:
+				var rect := TextureRect.new()
+				rect.texture = tex
+				rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+				rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+				rect.custom_minimum_size = Vector2(size, size)
+				return rect
+	# Fallback: panel con color del equipo + short_name
+	var p := PanelContainer.new()
+	p.custom_minimum_size = Vector2(size, size)
+	var bg := StyleBoxFlat.new()
+	var color_hex: String = String(team.colors.get("primary", "#888888"))
+	bg.bg_color = Color.from_string(color_hex, Color(0.5, 0.5, 0.5))
+	bg.set_corner_radius_all(int(size / 4))
+	p.add_theme_stylebox_override("panel", bg)
+	var l := Label.new()
+	l.text = team.short_name
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.add_theme_font_size_override("font_size", int(size / 3.5))
+	l.add_theme_color_override("font_color", Color.from_string(String(team.colors.get("secondary", "#FFFFFF")), Color.WHITE))
+	p.add_child(l)
+	return p
+
+
+func _find_next_rival(team: Team) -> Team:
+	var st: DivisionState = primera_state if team.division == "primera" else segunda_state
+	if st.calendar.is_empty():
+		return null
+	if st.current_jornada >= st.calendar.size():
+		return null
+	var jornada: Array = st.calendar[st.current_jornada]
+	for fixture: Dictionary in jornada:
+		if fixture["home_id"] == team.id:
+			return _find_team_by_id(String(fixture["away_id"]))
+		if fixture["away_id"] == team.id:
+			return _find_team_by_id(String(fixture["home_id"]))
+	return null
+
+
+# =========================================================================== #
+# Vista: 🔍 VER RIVAL — info del próximo oponente
+# =========================================================================== #
+func _render_rival_view() -> void:
+	var team := _find_team_by_id(user_team_id)
+	if team == null:
+		var l := Label.new()
+		l.text = "Sin club seleccionado."
+		content_area.add_child(l)
+		return
+	var rival: Team = _find_next_rival(team)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 12)
+	content_area.add_child(box)
+	# Botón volver al hub
+	var back := Button.new()
+	back.text = "← Volver al hub"
+	back.pressed.connect(_on_select_view.bind(VIEW_HUB))
+	box.add_child(back)
+
+	if rival == null:
+		var l := Label.new()
+		l.text = "No hay próximo partido (¿temporada terminada?)."
+		box.add_child(l)
+		return
+
+	# Cabecera con escudos
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 24)
+	header.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_child(header)
+	header.add_child(_make_team_logo(team, 80))
+	var vs := Label.new()
+	vs.text = "VS"
+	vs.add_theme_font_size_override("font_size", 28)
+	vs.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	header.add_child(vs)
+	header.add_child(_make_team_logo(rival, 80))
+
+	# Info del rival
+	var name_label := Label.new()
+	name_label.text = rival.name
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.add_theme_font_size_override("font_size", 20)
+	name_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+	box.add_child(name_label)
+
+	# Datos clave
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 24)
+	box.add_child(grid)
+	_simple_row(grid, "Ciudad", rival.city)
+	_simple_row(grid, "Estadio", rival.stadium.name if rival.stadium else "?")
+	_simple_row(grid, "Aforo", "%d asientos" % (rival.stadium.capacity if rival.stadium else 0))
+	_simple_row(grid, "Reputación", "%d / 100" % rival.reputation)
+	_simple_row(grid, "División", rival.division.capitalize())
+	_simple_row(grid, "Entrenador", rival.manager.name if rival.manager else "?")
+	_simple_row(grid, "Formación habitual", rival.tactics_default.formation if rival.tactics_default else "?")
+
+	# Posición liga del rival
+	var st: DivisionState = primera_state if rival.division == "primera" else segunda_state
+	if st.league_table != null:
+		var sorted_rows: Array = st.league_table.sorted_rows()
+		for i in sorted_rows.size():
+			if sorted_rows[i].team_id == rival.id:
+				_simple_row(grid, "Posición Liga", "%dº con %d pts" % [i + 1, sorted_rows[i].points()])
+				break
+
+	# Top 5 jugadores rival por overall
+	var top_label := Label.new()
+	top_label.text = "── Jugadores destacados ──"
+	top_label.add_theme_font_size_override("font_size", 14)
+	top_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	box.add_child(top_label)
+	var rivals_sorted: Array = rival.players.duplicate()
+	rivals_sorted.sort_custom(func(a: Player, b: Player) -> bool:
+		return PlayerFactory.compute_overall(a, "") > PlayerFactory.compute_overall(b, ""))
+	for i in mini(5, rivals_sorted.size()):
+		var p: Player = rivals_sorted[i]
+		var ovr: int = PlayerFactory.compute_overall(p, "")
+		var line := Label.new()
+		line.text = "  %s — %s — ovr %d (%s)" % [p.name, _position_label(p), ovr, p.tier]
+		line.add_theme_font_size_override("font_size", 12)
+		box.add_child(line)
+
+
+# =========================================================================== #
+# Vista: ⚖ DECISIONES — objetivo, sponsors, carrera
+# =========================================================================== #
+func _render_decisions_view() -> void:
+	var team := _find_team_by_id(user_team_id)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 12)
+	content_area.add_child(box)
+	var back := Button.new()
+	back.text = "← Volver al hub"
+	back.pressed.connect(_on_select_view.bind(VIEW_HUB))
+	box.add_child(back)
+
+	var title := Label.new()
+	title.text = "⚖ Decisiones del club"
+	title.add_theme_font_size_override("font_size", 20)
+	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	box.add_child(title)
+
+	# Objetivo
+	if not season_objective.is_empty():
+		var obj_label := Label.new()
+		obj_label.text = "🎯 Objetivo: %s (posición %dº)" % [
+			String(season_objective.get("description", "")),
+			int(season_objective.get("target_position", 0)),
+		]
+		obj_label.add_theme_font_size_override("font_size", 13)
+		obj_label.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+		box.add_child(obj_label)
+
+	# Sponsors actuales
+	if team != null and team.finances != null:
+		var sp_header := Label.new()
+		sp_header.text = "💼 Patrocinadores"
+		sp_header.add_theme_font_size_override("font_size", 14)
+		sp_header.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+		box.add_child(sp_header)
+		if team.finances.sponsors.is_empty():
+			var n := Label.new()
+			n.text = "  (sin patrocinadores activos)"
+			box.add_child(n)
+		for sp in team.finances.sponsors:
+			var l := Label.new()
+			l.text = "  • %s — %s — %s €/año (hasta %d)" % [
+				String(sp.get("type", "?")).capitalize().replace("_", " "),
+				String(sp.get("sponsor_name", "?")),
+				TransferMarket._fmt_eur(int(sp.get("amount_per_year", 0))),
+				int(sp.get("until_year", 0)),
+			]
+			l.add_theme_font_size_override("font_size", 11)
+			box.add_child(l)
+		if team.finances.sponsors.size() < 4:
+			var find_btn := Button.new()
+			find_btn.text = "🔍 Buscar nuevo patrocinador (500K)"
+			find_btn.disabled = team.finances.cash_balance < 500_000
+			find_btn.pressed.connect(func() -> void: _on_search_sponsor(team))
+			box.add_child(find_btn)
+
+	# Acceso a carrera
+	box.add_child(HSeparator.new())
+	var career_btn := Button.new()
+	career_btn.text = "📈 Histórico de carrera"
+	career_btn.pressed.connect(_on_select_view.bind(VIEW_CAREER))
+	box.add_child(career_btn)
+	var ch_btn := Button.new()
+	ch_btn.text = "🏆 Champions / Europa / Conference"
+	ch_btn.pressed.connect(_on_select_view.bind(VIEW_CHAMPIONS))
+	box.add_child(ch_btn)
+
+
+func _make_spacer(h: int) -> Control:
+	var s := Control.new()
+	s.custom_minimum_size = Vector2(0, h)
+	return s
+
+
 func _render_table_view() -> void:
 	var grid := GridContainer.new()
 	grid.columns = 10
