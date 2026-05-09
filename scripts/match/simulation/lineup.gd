@@ -25,6 +25,11 @@ var slot_assignments: Array[String] = []     # tamaño 11, posición que ocupa c
 var subs_available: Array[Player] = []
 var tactics: Tactics
 var auto_picked: bool = false
+# Camera A2 light: id del jugador "protagonista" del partido. Si se setea,
+# ese jugador recibe boost en _pick_actor (más probable shooter/asistente)
+# y el visor lo destaca con anillo + cámara que lo sigue.
+# Solo el lineup del equipo del usuario suele tenerlo seteado.
+var protagonist_id: String = ""
 
 
 # Penalización por dejar el lineup en automático ("vago tax").

@@ -70,6 +70,9 @@ var selected_match: MatchResult = null
 # "Mi club" — el equipo que dirige el usuario (si lo hay).
 # Cuando se establece, el usuario puede personalizar la alineación.
 var user_team_id: String = ""
+# Camera A2 light: id del jugador "protagonista" del usuario. Se setea desde
+# la vista Plantilla. Si está vacío, no hay protagonista. Persiste en save.
+var user_protagonist_id: String = ""
 # Alineación personalizada del usuario, dict con keys:
 #   formation, eleven_ids (Array[String]), slot_assignments (Array[String]),
 #   tactics: { mentality, tempo, pressing, width }
@@ -3230,7 +3233,7 @@ func _save_to_slot(slot: String) -> void:
 		slot, year, all_teams,
 		primera_state.current_jornada, segunda_state.current_jornada,
 		primera_state.league_table, segunda_state.league_table,
-		user_team_id, user_lineup_template, user_career_history)
+		user_team_id, user_lineup_template, user_career_history, user_protagonist_id)
 	if result.get("ok", false):
 		status_label.text = "Partida guardada en '%s' — %s" % [slot, result["saved_at"]]
 	else:
@@ -3277,6 +3280,7 @@ func _load_from_slot(slot: String) -> void:
 	user_team_id = save_data.user_team_id
 	user_lineup_template = save_data.user_lineup_template.duplicate(true)
 	user_career_history = save_data.user_career_history.duplicate(true)
+	user_protagonist_id = save_data.user_protagonist_id
 	# Si la save está mid-season tras la jornada 19, asumimos que el winter
 	# market ya se ejecutó. Evita disparo duplicado al avanzar jornadas.
 	winter_market_done = (save_data.primera_jornada >= 19)
@@ -4399,6 +4403,10 @@ func _render_team_view() -> void:
 	header.add_theme_font_size_override("font_size", 14)
 	content_area.add_child(header)
 
+	# Camera A2 light: selector de jugador protagonista (solo en equipo del usuario)
+	if selected_team.id == user_team_id and user_team_id != "":
+		_render_protagonist_selector()
+
 	# Tabla de plantilla
 	var grid := GridContainer.new()
 	grid.columns = 13
@@ -4475,6 +4483,51 @@ func _render_team_view() -> void:
 			elif i == 0 or i >= 3:
 				l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 			grid.add_child(l)
+
+
+func _render_protagonist_selector() -> void:
+	var user_team := _find_team_by_id(user_team_id)
+	if user_team == null:
+		return
+	var box := PanelContainer.new()
+	var hbox := HBoxContainer.new()
+	hbox.add_theme_constant_override("separation", 10)
+	box.add_child(hbox)
+	content_area.add_child(box)
+
+	var lbl := Label.new()
+	lbl.text = "⭐ Jugador protagonista (Camera A2):"
+	lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	lbl.add_theme_font_size_override("font_size", 13)
+	hbox.add_child(lbl)
+
+	var opt := OptionButton.new()
+	opt.add_item("(ninguno)", -1)
+	var current_idx: int = 0
+	# Lista los jugadores válidos (no lesionados, no cedidos fuera)
+	var idx_to_id: Array[String] = [""]
+	for i in user_team.players.size():
+		var p: Player = user_team.players[i]
+		if InjurySystem.is_injured(p):
+			continue
+		if p.loan_origin_team_id != "" and p.loan_until_year > year:
+			continue  # cedido FUERA
+		var ovr: int = PlayerFactory.compute_overall(p, p.primary_position())
+		var label: String = "%s (%s · OVR %d)" % [p.name, p.primary_position(), ovr]
+		opt.add_item(label, opt.item_count - 1)
+		idx_to_id.append(p.id)
+		if p.id == user_protagonist_id:
+			current_idx = idx_to_id.size() - 1
+	opt.selected = current_idx
+	opt.item_selected.connect(func(idx: int) -> void:
+		user_protagonist_id = idx_to_id[idx] if idx < idx_to_id.size() else "")
+	hbox.add_child(opt)
+
+	var info := Label.new()
+	info.text = "  +30%% probabilidad de ser shooter/asistente · destacado en visor 2D"
+	info.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	info.add_theme_font_size_override("font_size", 11)
+	hbox.add_child(info)
 
 
 func _on_team_selector_changed(idx: int, st: DivisionState) -> void:
@@ -4650,6 +4703,13 @@ func _build_user_lineup(team: Team) -> Lineup:
 	t.width = String(tactics_dict.get("width", "normal"))
 	lineup.tactics = t
 	lineup.auto_picked = false  # ¡no penalización!
+	# Camera A2 light: pasar el protagonista del usuario si lo hay y está en pista
+	if user_protagonist_id != "" and not InjurySystem.is_injured(team.find_player(user_protagonist_id)):
+		# Verifica que el protagonista esté en starting_eleven (no en banquillo/lesionado)
+		for p in starting:
+			if p.id == user_protagonist_id:
+				lineup.protagonist_id = user_protagonist_id
+				break
 	return lineup
 
 

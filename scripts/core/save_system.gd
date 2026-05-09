@@ -29,6 +29,7 @@ class SaveData:
 	var user_team_id: String = ""
 	var user_lineup_template: Dictionary = {}
 	var user_career_history: Array = []
+	var user_protagonist_id: String = ""
 
 
 # ============================================================================
@@ -38,7 +39,7 @@ static func save_game(slot_name: String, year: int, all_teams: Array,
 		primera_jornada: int, segunda_jornada: int,
 		primera_table: LeagueTable, segunda_table: LeagueTable,
 		user_team_id: String = "", user_lineup_template: Dictionary = {},
-		user_career_history: Array = []) -> Dictionary:
+		user_career_history: Array = [], user_protagonist_id: String = "") -> Dictionary:
 	# Crear directorio
 	if not DirAccess.dir_exists_absolute(SAVE_DIR):
 		var err: int = DirAccess.make_dir_recursive_absolute(SAVE_DIR)
@@ -56,6 +57,7 @@ static func save_game(slot_name: String, year: int, all_teams: Array,
 		"user_team_id": user_team_id,
 		"user_lineup_template": user_lineup_template.duplicate(true),
 		"user_career_history": user_career_history.duplicate(true),
+		"user_protagonist_id": user_protagonist_id,
 		"teams": all_teams.map(func(t: Team) -> Dictionary: return _team_to_dict(t)),
 	}
 
@@ -95,6 +97,7 @@ static func load_game(slot_name: String) -> SaveData:
 	save_data.user_team_id = String(parsed.get("user_team_id", ""))
 	save_data.user_lineup_template = parsed.get("user_lineup_template", {}).duplicate(true)
 	save_data.user_career_history = parsed.get("user_career_history", []).duplicate(true)
+	save_data.user_protagonist_id = String(parsed.get("user_protagonist_id", ""))
 	# Reconstruir equipos desde el dict
 	save_data.teams = []
 	for team_dict in parsed.get("teams", []):

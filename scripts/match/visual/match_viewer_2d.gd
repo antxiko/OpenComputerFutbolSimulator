@@ -749,6 +749,15 @@ func _draw_team(panel: Control, rect: Rect2, lineup: Lineup, color: Color, mirro
 		if has_possession:
 			panel.draw_circle(Vector2(px, py), 12.0, Color(1.0, 1.0, 0.4, 0.18))
 
+		# Camera A2 light: anillo destacado para el protagonista del usuario
+		var is_protagonist: bool = (lineup.protagonist_id != "" and
+			lineup.starting_eleven[i].id == lineup.protagonist_id)
+		if is_protagonist:
+			# Aro exterior pulsante (oscilación con el reloj)
+			var pulse: float = 0.5 + 0.5 * sin(float(Time.get_ticks_msec()) / 250.0)
+			var ring_alpha: float = 0.55 + pulse * 0.30
+			panel.draw_arc(Vector2(px, py), 14.0, 0, TAU, 32, Color(1.0, 0.85, 0.2, ring_alpha), 2.5)
+
 		panel.draw_circle(Vector2(px, py), 9.0, color)
 		panel.draw_circle(Vector2(px, py), 9.0, Color(0, 0, 0, 0.6), false, 1.5)
 		# Dorsal
@@ -756,6 +765,11 @@ func _draw_team(panel: Control, rect: Rect2, lineup: Lineup, color: Color, mirro
 		var label_size: int = 10
 		panel.draw_string(ThemeDB.fallback_font, Vector2(px - 6, py + 4), str(dorsal),
 			HORIZONTAL_ALIGNMENT_CENTER, -1, label_size, Color(1, 1, 1))
+		# Nombre del protagonista visible sobre su jugador
+		if is_protagonist:
+			var pname: String = lineup.starting_eleven[i].name
+			panel.draw_string(ThemeDB.fallback_font, Vector2(px - 30, py - 14), pname,
+				HORIZONTAL_ALIGNMENT_CENTER, 60, 9, Color(1.0, 0.85, 0.2))
 
 
 func _team_color(team: Team, is_home: bool) -> Color:

@@ -335,11 +335,17 @@ static func _pick_actor(lineup: Lineup, role: String, zone: String, rng: RandomN
 	var weights: Array = []
 	var players: Array = []
 	var total: float = 0.0
+	# Camera A2 light: el protagonista del usuario recibe +30% peso en role
+	# "attack" (más prob. shooter/creator). NO se aplica en "defense" para
+	# evitar que cometa más faltas.
+	var protag_id: String = lineup.protagonist_id
 	for i in lineup.starting_eleven.size():
 		var p: Player = lineup.starting_eleven[i]
 		var slot: String = lineup.slot_assignments[i]
 		var w: float = PositionContribution.actor_weight(p, slot, role, zone)
 		if w > 0.0:
+			if role == "attack" and protag_id != "" and p.id == protag_id:
+				w *= 1.30
 			weights.append(w)
 			players.append(p)
 			total += w
@@ -361,6 +367,7 @@ static func _pick_assistant(lineup: Lineup, shooter: Player, rng: RandomNumberGe
 	var weights: Array = []
 	var players: Array = []
 	var total: float = 0.0
+	var protag_id: String = lineup.protagonist_id
 	for i in lineup.starting_eleven.size():
 		var p: Player = lineup.starting_eleven[i]
 		if p.id == shooter.id:
@@ -377,6 +384,9 @@ static func _pick_assistant(lineup: Lineup, shooter: Player, rng: RandomNumberGe
 		# diagonal a extremo, etc.). Ratio realista ~10-15% de las asistencias.
 		if slot in ["CB", "LB", "RB", "CDM", "LWB", "RWB"] and pase >= 70:
 			w += (pase - 60.0) / 100.0 * 0.5
+		# Camera A2 light: protagonista boost
+		if protag_id != "" and p.id == protag_id:
+			w *= 1.30
 		if w > 0.0:
 			weights.append(w)
 			players.append(p)
