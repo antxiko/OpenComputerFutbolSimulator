@@ -155,34 +155,52 @@ jobs:
             echo "tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Extract changelog section for this version
+        id: changelog
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          # Extrae la sección "## [TAG]" hasta el siguiente "## ["
+          if [ -f CHANGELOG.md ]; then
+            awk -v tag="$TAG" '
+              $0 ~ "^## \\[" tag "\\]" { found=1; print; next }
+              found && /^## \[/ { exit }
+              found { print }
+            ' CHANGELOG.md > /tmp/changelog_section.md
+            if [ -s /tmp/changelog_section.md ]; then
+              echo "Changelog section found for $TAG"
+            else
+              echo "No section for $TAG in CHANGELOG.md, using fallback"
+              echo "Versión $TAG. Ver [CHANGELOG.md](https://github.com/antxiko/OpenComputerFutbolSimulator/blob/main/CHANGELOG.md) para detalles." > /tmp/changelog_section.md
+            fi
+          else
+            echo "CHANGELOG.md no encontrado." > /tmp/changelog_section.md
+          fi
+          # Encadenar con la información común (sin heredocs para no romper YAML)
+          cp /tmp/changelog_section.md /tmp/release_body.md
+          {
+            printf '\n\n'
+            printf -- '---\n\n'
+            printf '## Descargas\n\n'
+            printf -- '- **Windows**: `OpenComputerFutbolSimulator-windows-x86_64.zip`\n'
+            printf -- '- **Linux**: `OpenComputerFutbolSimulator-linux-x86_64.tar.gz`\n'
+            printf -- '- **macOS**: `OpenComputerFutbolSimulator-macos-universal.zip`\n\n'
+            printf 'En macOS, al primer arranque puede aparecer un aviso de "desarrollador no identificado": click derecho → Abrir → Confirmar.\n\n'
+            printf '## Cómo jugar\n\n'
+            printf '1. Descomprime el zip/tar.gz para tu sistema operativo.\n'
+            printf '2. Ejecuta el binario.\n'
+            printf '3. "Nueva partida" → escoge tu club → dirige tu carrera.\n\n'
+            printf 'Ver [README.md](https://github.com/antxiko/OpenComputerFutbolSimulator/blob/main/README.md), [MANUAL.md](https://github.com/antxiko/OpenComputerFutbolSimulator/blob/main/MANUAL.md) y [CHANGELOG.md](https://github.com/antxiko/OpenComputerFutbolSimulator/blob/main/CHANGELOG.md).\n'
+          } >> /tmp/release_body.md
+          echo "----- Release body preview -----"
+          cat /tmp/release_body.md
+          echo "--------------------------------"
+
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: ${{ steps.version.outputs.tag }}
-          body: |
-            # OpenComputerFutbolSimulator ${{ steps.version.outputs.tag }}
-
-            Simulador híbrido de La Liga española en Godot 4.6.2.
-            Multi-temporada (2026-2046), 42 equipos (Primera + Segunda), Champions League, Copa del Rey, Supercopa.
-
-            ## Descargas
-
-            - **Windows**: `OpenComputerFutbolSimulator-windows-x86_64.zip`
-            - **Linux**: `OpenComputerFutbolSimulator-linux-x86_64.tar.gz`
-            - **macOS**: `OpenComputerFutbolSimulator-macos-universal.zip`
-
-            En macOS, al primer arranque puede aparecer un aviso de "desarrollador no identificado":
-            click derecho → Abrir → Confirmar.
-
-            ## Cómo jugar
-
-            1. Descomprime el zip/tar.gz para tu sistema operativo.
-            2. Ejecuta el binario.
-            3. "Nueva partida" → escoge tu club → dirige tu carrera.
-
-            Ver [README.md](https://github.com/antxiko/OpenComputerFutbolSimulator/blob/main/README.md)
-            y [MANUAL.md](https://github.com/antxiko/OpenComputerFutbolSimulator/blob/main/MANUAL.md) para más detalles.
+          body_path: /tmp/release_body.md
           draft: false
           prerelease: ${{ contains(steps.version.outputs.tag, '-') }}
           files: |

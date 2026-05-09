@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://b1ocfsmview2d01"]
+[gd_scene format=3 uid="uid://b1soewfm1ommy"]
 
 [ext_resource type="Script" path="res://scripts/match/visual/match_viewer_2d.gd" id="1_mv"]
 

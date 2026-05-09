@@ -90,6 +90,9 @@ static func run(teams: Array, season_year: int, seed_value: int, window: WindowC
 	var counts_out: Dictionary = {}
 	# Jugadores ya transferidos en esta ventana — no se pueden re-vender
 	var transferred_this_window: Dictionary = {}
+	# Bonus de fichaje al vender titular: si un equipo pierde un core, gana
+	# un slot extra de fichaje (replacement). Se rellena en _apply_transfer.
+	var extra_signings_allowed: Dictionary = {}
 	for t: Team in teams:
 		# El budget disponible es min(budget_transfers configurado, cash_balance real)
 		# multiplicado por el factor de la ventana (verano 1.0, invierno 0.30).
@@ -99,6 +102,7 @@ static func run(teams: Array, season_year: int, seed_value: int, window: WindowC
 		budgets[t.id] = int(float(effective) * window.budget_factor)
 		counts_in[t.id] = 0
 		counts_out[t.id] = 0
+		extra_signings_allowed[t.id] = 0
 		result.team_summary[t.id] = {
 			"name": t.name,
 			"signings_count": 0,
@@ -136,7 +140,7 @@ static func run(teams: Array, season_year: int, seed_value: int, window: WindowC
 	# mercado se mueve en oleadas.
 	for round_idx in window.rounds:
 		for buyer: Team in team_order:
-			if counts_in[buyer.id] >= window.max_signings:
+			if counts_in[buyer.id] >= window.max_signings + int(extra_signings_allowed[buyer.id]):
 				continue
 			# Antes de intentar un fichaje pagado, intenta firmar un free agent
 			# si el equipo tiene un slot débil que un agente libre cubre.
@@ -153,7 +157,7 @@ static func run(teams: Array, season_year: int, seed_value: int, window: WindowC
 			var transfer := _attempt_signing(buyer, teams, league_avg, budgets, counts_in, counts_out, transferred_this_window, season_year, rng, window)
 			if transfer != null:
 				result.transfers.append(transfer)
-				_apply_transfer(transfer, teams, budgets, counts_in, counts_out, result)
+				_apply_transfer(transfer, teams, budgets, counts_in, counts_out, result, extra_signings_allowed)
 				transferred_this_window[transfer.player_id] = true
 
 	# Cesiones: pasada extra al final solo en verano. Equipos grandes con
@@ -365,7 +369,8 @@ static func _apply_transfer(
 	budgets: Dictionary,
 	counts_in: Dictionary,
 	counts_out: Dictionary,
-	result: MarketResult
+	result: MarketResult,
+	extra_signings_allowed: Dictionary = {}
 ) -> void:
 	var buyer: Team = _find_team_by_id(all_teams, transfer.to_team_id)
 	var seller: Team = _find_team_by_id(all_teams, transfer.from_team_id)
@@ -388,6 +393,17 @@ static func _apply_transfer(
 		seller.finances.cash_balance += transfer.fee_eur
 	counts_in[buyer.id] += 1
 	counts_out[seller.id] += 1
+	# Si el vendedor pierde un titular core (overall ≥75 o sin alternativas),
+	# gana 1 slot extra de fichaje para reemplazarlo en rondas posteriores.
+	if extra_signings_allowed.has(seller.id) and player.primary_position() != "":
+		var primary: String = player.primary_position()
+		var ovr: int = PlayerFactory.compute_overall(player, primary)
+		var alts: int = 0
+		for p2: Player in seller.players:
+			if primary in p2.positions and PlayerFactory.compute_overall(p2, primary) >= 70:
+				alts += 1
+		if ovr >= 75 or alts < 2:
+			extra_signings_allowed[seller.id] = int(extra_signings_allowed[seller.id]) + 1
 	# Actualiza summary
 	result.team_summary[buyer.id]["signings_count"] += 1
 	result.team_summary[buyer.id]["spend"] += transfer.fee_eur

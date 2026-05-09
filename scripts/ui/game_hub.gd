@@ -2858,14 +2858,24 @@ func _render_career_view() -> void:
 
 
 func _simulate_jornada(state: DivisionState) -> void:
-	# Curar lesiones (7 días entre jornadas) antes de empezar
-	InjurySystem.heal_after_days(all_teams, 7)
+	# Curar lesiones según días reales transcurridos desde la última jornada.
+	# Si tenemos calendario con fechas, calculamos diff exacto. Fallback: 7 días.
+	var days_since_last: int = 7
+	if state.current_jornada > 0:
+		var prev_j: Array = state.calendar[state.current_jornada - 1]
+		var curr_j: Array = state.calendar[state.current_jornada]
+		if not prev_j.is_empty() and not curr_j.is_empty() \
+				and prev_j[0].has("match_date") and curr_j[0].has("match_date"):
+			days_since_last = max(1, DateUtil.diff_days(prev_j[0]["match_date"], curr_j[0]["match_date"]))
+	InjurySystem.heal_after_days(all_teams, days_since_last)
 	var jornada: Array = state.calendar[state.current_jornada]
 	var team_index: Dictionary = {}
 	for t: Team in state.teams:
 		team_index[t.id] = t
 
 	state.last_jornada_results = []
+	# Acumulador de lesiones graves del usuario para modal post-jornada
+	var user_grave_injuries: Array = []
 	for fixture: Dictionary in jornada:
 		var home: Team = team_index[fixture["home_id"]]
 		var away: Team = team_index[fixture["away_id"]]
@@ -2907,6 +2917,22 @@ func _simulate_jornada(state: DivisionState) -> void:
 			# Registrar fecha del último partido (para recovery próximo)
 			ConditionRecovery.record_match_played(home_lineup, match_date)
 			ConditionRecovery.record_match_played(away_lineup, match_date)
+			# Detectar lesiones graves del equipo del usuario en este partido
+			if home.id == user_team_id or away.id == user_team_id:
+				for ev: MatchEvent in result.events:
+					if ev.type != MatchEvent.T_INJURY:
+						continue
+					var inj_player: Player = _find_player_globally(ev.player_id)
+					if inj_player == null or inj_player.injury == null:
+						continue
+					var dias: int = int(inj_player.injury.get("dias_restantes", 0))
+					if dias >= 21:  # media-larga o grave
+						user_grave_injuries.append({
+							"name": inj_player.name,
+							"tipo": String(inj_player.injury.get("tipo", "?")),
+							"dias": dias,
+							"match_date": match_date,
+						})
 			# Goles
 			for pid in result.scorers.keys():
 				var goals: int = int(result.scorers[pid])
@@ -2932,6 +2958,42 @@ func _simulate_jornada(state: DivisionState) -> void:
 					if passist != null:
 						passist.season_assists += 1
 	state.current_jornada += 1
+	# Modal de lesiones graves del usuario en esta jornada
+	if user_grave_injuries.size() > 0:
+		_show_grave_injuries_modal(user_grave_injuries)
+
+
+func _show_grave_injuries_modal(injuries: Array) -> void:
+	var popup := AcceptDialog.new()
+	popup.title = "🏥 Parte médico"
+	popup.size = Vector2(500, 280)
+	popup.ok_button_text = "Continuar"
+	add_child(popup)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 8)
+	popup.add_child(box)
+	var header := Label.new()
+	header.text = "%d lesión%s preocupante%s en tu equipo:" % [
+		injuries.size(),
+		"" if injuries.size() == 1 else "es",
+		"" if injuries.size() == 1 else "s",
+	]
+	header.add_theme_font_size_override("font_size", 14)
+	header.add_theme_color_override("font_color", Color(1.0, 0.7, 0.6))
+	box.add_child(header)
+	for inj in injuries:
+		var match_date: Dictionary = inj.get("match_date", {})
+		var return_date: Dictionary = DateUtil.add_days(match_date, int(inj.get("dias", 0))) if not match_date.is_empty() else {}
+		var return_str: String = DateUtil.format_short(return_date) if not return_date.is_empty() else "?"
+		var l := Label.new()
+		l.text = "  %s — lesión %s, %d días (vuelve aprox. %s)" % [
+			String(inj["name"]), String(inj["tipo"]), int(inj["dias"]), return_str,
+		]
+		l.add_theme_font_size_override("font_size", 12)
+		box.add_child(l)
+	popup.confirmed.connect(func() -> void: popup.queue_free())
+	popup.canceled.connect(func() -> void: popup.queue_free())
+	popup.popup_centered()
 
 
 func _set_buttons_disabled(d: bool) -> void:
