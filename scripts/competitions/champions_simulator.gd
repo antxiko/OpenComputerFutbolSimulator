@@ -41,7 +41,7 @@ static func run(spanish_top4: Array, european_teams: Array, season_year: int, se
 	# Simular fase de grupos
 	var match_seed: int = seed_value * 100000
 	for group: ChampionsBracket.Group in groups:
-		_simulate_group(group, teams_idx, match_seed)
+		_simulate_group(group, teams_idx, match_seed, season_year)
 		match_seed += 1000
 
 	# Generar Cuartos: top 2 de cada grupo cruza con otro grupo.
@@ -51,7 +51,7 @@ static func run(spanish_top4: Array, european_teams: Array, season_year: int, se
 	# Simular KO
 	while bracket.ko_rounds.size() > 0:
 		var current: ChampionsBracket.KORound = bracket.ko_rounds[-1]
-		_simulate_ko_round(current, teams_idx, match_seed)
+		_simulate_ko_round(current, teams_idx, match_seed, season_year)
 		match_seed += 1000
 		# Si era la final, terminamos
 		if current.fixtures.size() == 1:
@@ -124,7 +124,7 @@ static func _shuffle(arr: Array, rng: RandomNumberGenerator) -> void:
 # ----------------------------------------------------------------------
 # Fase de grupos
 # ----------------------------------------------------------------------
-static func _simulate_group(group: ChampionsBracket.Group, teams_idx: Dictionary, seed_base: int) -> void:
+static func _simulate_group(group: ChampionsBracket.Group, teams_idx: Dictionary, seed_base: int, season_year: int = 0) -> void:
 	# Calendario solo IDA. 4 equipos -> 3 jornadas, 6 partidos.
 	# Pairings (Berger simplificado para 4 equipos):
 	# J1: 0v1, 2v3
@@ -135,6 +135,15 @@ static func _simulate_group(group: ChampionsBracket.Group, teams_idx: Dictionary
 		[[0, 2], [3, 1]],
 		[[0, 3], [1, 2]],
 	]
+	# Fechas: martes/miércoles intercalados — Champions clásica.
+	# J1: martes 3ª semana septiembre, J2: miércoles 1ª oct, J3: martes 4ª oct.
+	var jornada_dates: Array = []
+	if season_year > 0:
+		jornada_dates = [
+			DateUtil.next_dow(DateUtil.make(season_year, 9, 15), DateUtil.DOW_MA),  # J1
+			DateUtil.next_dow(DateUtil.make(season_year, 10, 1), DateUtil.DOW_MI),  # J2
+			DateUtil.next_dow(DateUtil.make(season_year, 10, 22), DateUtil.DOW_MA), # J3
+		]
 	var match_seed: int = seed_base
 	for j_idx in 3:
 		for pair: Array in rotations[j_idx]:
@@ -148,6 +157,8 @@ static func _simulate_group(group: ChampionsBracket.Group, teams_idx: Dictionary
 			gm.away_id = away_id
 			gm.home_name = home.name
 			gm.away_name = away.name
+			if jornada_dates.size() > j_idx:
+				gm.match_date = jornada_dates[j_idx]
 			# Restaurar condition/sanciones (Champions tiene su propio rítmo)
 			for p: Player in home.players:
 				p.condition = 100.0
@@ -224,13 +235,23 @@ static func _build_next_ko(winner_ids: Array, teams_idx: Dictionary, round_index
 	return round_obj
 
 
-static func _simulate_ko_round(round_obj: ChampionsBracket.KORound, teams_idx: Dictionary, seed_base: int) -> void:
+static func _simulate_ko_round(round_obj: ChampionsBracket.KORound, teams_idx: Dictionary, seed_base: int, season_year: int = 0) -> void:
+	# Fechas KO: Cuartos feb, Semis abr, Final mayo (sábado).
+	var ko_date: Dictionary = {}
+	if season_year > 0:
+		match round_obj.name:
+			"Cuartos":      ko_date = DateUtil.next_dow(DateUtil.make(season_year + 1, 2, 17), DateUtil.DOW_MA)
+			"Semifinales":  ko_date = DateUtil.next_dow(DateUtil.make(season_year + 1, 4, 14), DateUtil.DOW_MA)
+			"Final":        ko_date = DateUtil.next_dow(DateUtil.make(season_year + 1, 5, 30), DateUtil.DOW_SA)
+			_:              ko_date = {}
 	var match_seed: int = seed_base
 	for fx: ChampionsBracket.KOFixture in round_obj.fixtures:
 		var home: Team = teams_idx[fx.home_id]
 		var away: Team = teams_idx[fx.away_id]
 		fx.home_name = home.name
 		fx.away_name = away.name
+		if not ko_date.is_empty():
+			fx.match_date = ko_date
 		# Restaurar condition
 		for p: Player in home.players:
 			p.condition = 100.0

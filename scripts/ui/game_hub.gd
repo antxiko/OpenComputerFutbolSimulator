@@ -1933,7 +1933,10 @@ func _render_european_bracket(vbox: VBoxContainer, bracket: ChampionsBracket, co
 				winner_short = " → " + fx.home_name
 			elif fx.winner_id == fx.away_id:
 				winner_short = " → " + fx.away_name
-			line.text = "  %s %s %s%s%s" % [fx.home_name, score, fx.away_name, winner_short, rep]
+			var date_str: String = ""
+			if fx.match_date.size() > 0:
+				date_str = "[%s] " % DateUtil.format_short(fx.match_date)
+			line.text = "  %s%s %s %s%s%s" % [date_str, fx.home_name, score, fx.away_name, winner_short, rep]
 			line.add_theme_font_size_override("font_size", 11)
 			vbox.add_child(line)
 

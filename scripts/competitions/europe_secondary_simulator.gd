@@ -61,7 +61,7 @@ static func run(spanish_qualifiers: Array, european_pool: Array, competition_nam
 	var match_seed: int = seed_value * 100000
 	while bracket.ko_rounds.size() > 0:
 		var current: ChampionsBracket.KORound = bracket.ko_rounds[-1]
-		_simulate_round(current, teams_idx, match_seed)
+		_simulate_round(current, teams_idx, match_seed, season_year)
 		match_seed += 1000
 		if current.fixtures.size() == 1:
 			var final_fx: ChampionsBracket.KOFixture = current.fixtures[0]
@@ -87,13 +87,25 @@ static func run(spanish_qualifiers: Array, european_pool: Array, competition_nam
 	return bracket
 
 
-static func _simulate_round(round_obj: ChampionsBracket.KORound, teams_idx: Dictionary, seed_base: int) -> void:
+static func _simulate_round(round_obj: ChampionsBracket.KORound, teams_idx: Dictionary, seed_base: int, season_year: int = 0) -> void:
+	# Europa/Conference: jueves intercalados.
+	# Octavos: octubre, Cuartos: febrero, Semis: marzo, Final: mayo.
+	var ko_date: Dictionary = {}
+	if season_year > 0:
+		match round_obj.name:
+			"Octavos":     ko_date = DateUtil.next_dow(DateUtil.make(season_year, 10, 22), DateUtil.DOW_JU)
+			"Cuartos":     ko_date = DateUtil.next_dow(DateUtil.make(season_year + 1, 2, 19), DateUtil.DOW_JU)
+			"Semifinales": ko_date = DateUtil.next_dow(DateUtil.make(season_year + 1, 4, 16), DateUtil.DOW_JU)
+			"Final":       ko_date = DateUtil.next_dow(DateUtil.make(season_year + 1, 5, 27), DateUtil.DOW_MI)
+			_:             ko_date = {}
 	var match_seed: int = seed_base
 	for fx: ChampionsBracket.KOFixture in round_obj.fixtures:
 		var home: Team = teams_idx[fx.home_id]
 		var away: Team = teams_idx[fx.away_id]
 		fx.home_name = home.name
 		fx.away_name = away.name
+		if not ko_date.is_empty():
+			fx.match_date = ko_date
 		for p: Player in home.players: p.condition = 100.0
 		for p: Player in away.players: p.condition = 100.0
 		var hl := AutoLineup.pick(home, home.tactics_default.formation)

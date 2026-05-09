@@ -30,6 +30,7 @@ class GroupMatch:
 	var home_name: String = ""
 	var away_name: String = ""
 	var result: MatchResult = null
+	var match_date: Dictionary = {}  # { year, month, day }
 
 
 class Group:
@@ -57,6 +58,7 @@ class KOFixture:
 	var result: MatchResult = null
 	var winner_id: String = ""
 	var won_by_reputation: bool = false
+	var match_date: Dictionary = {}  # { year, month, day }
 
 
 class KORound:
