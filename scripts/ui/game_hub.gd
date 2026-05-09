@@ -6134,7 +6134,7 @@ func _show_team_talk_modal(template: Dictionary) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "💚 MOMENTO TED LASSO — charla de vestuario"
 	popup.dialog_close_on_escape = false
-	popup.min_size = Vector2(640, 480)
+	popup.min_size = Vector2(640, 520)
 	add_child(popup)
 
 	var box := VBoxContainer.new()
@@ -6154,6 +6154,17 @@ func _show_team_talk_modal(template: Dictionary) -> void:
 	intro_l.add_theme_font_size_override("font_size", 14)
 	intro_l.add_theme_color_override("font_color", Color(0.85, 0.85, 1.0))
 	box.add_child(intro_l)
+
+	# Hint sutil: describe el lenguaje corporal de un líder de la plantilla.
+	# Da pistas sobre el TONO que espera el vestuario, sin marcar la opción.
+	var hint_text: String = _build_team_talk_hint(String(template.get("trigger", "")))
+	if hint_text != "":
+		var hint_l := Label.new()
+		hint_l.text = "✦ " + hint_text
+		hint_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		hint_l.add_theme_font_size_override("font_size", 12)
+		hint_l.add_theme_color_override("font_color", Color(0.95, 0.85, 0.55))
+		box.add_child(hint_l)
 
 	box.add_child(HSeparator.new())
 
@@ -6181,6 +6192,55 @@ func _show_team_talk_modal(template: Dictionary) -> void:
 	popup.popup_centered()
 	await popup.confirmed
 	popup.queue_free()
+
+
+# Devuelve un líder de la plantilla del usuario para usar en hints. Prioriza
+# capitán + líder; si no hay, cualquier líder; si no, el veterano (≥30 años).
+# null si no hay nadie destacable.
+func _get_team_leader_for_hint() -> Player:
+	var team := _find_team_by_id(user_team_id)
+	if team == null:
+		return null
+	# Prioridad 1: capitán + líder
+	for p: Player in team.players:
+		if p.captain and p.personality == "lider":
+			return p
+	# Prioridad 2: cualquier líder
+	for p: Player in team.players:
+		if p.personality == "lider":
+			return p
+	# Prioridad 3: el más veterano
+	var oldest: Player = null
+	var oldest_age: int = 0
+	for p: Player in team.players:
+		var a: int = p.age_at(year, 7, 1)
+		if a > oldest_age:
+			oldest_age = a
+			oldest = p
+	return oldest
+
+
+# Genera el texto del hint según el trigger. Apunta al tono que espera el
+# vestuario sin marcar literalmente cuál opción es la "correcta".
+func _build_team_talk_hint(trigger: String) -> String:
+	var leader: Player = _get_team_leader_for_hint()
+	if leader == null:
+		return ""
+	var ref: String = leader.name
+	# Si no es líder explícito, se referencia como "el veterano"
+	var role_word: String = "tu capitán" if leader.captain else ("tu líder del vestuario" if leader.personality == "lider" else "el veterano del vestuario")
+	match trigger:
+		"derrota_4_o_mas_diferencia":
+			return "%s (%s) mantiene la mirada baja. No quiere broncas. Necesita oír algo verdadero, no un sermón." % [ref, role_word]
+		"3_derrotas_seguidas":
+			return "%s (%s) cruza los brazos. Está cansado de discursos vacíos. Si vas a hablar, que sea de tú a tú." % [ref, role_word]
+		"morale_promedio_bajo":
+			return "%s (%s) te mira directamente. El vestuario espera una mano abierta, no un puño cerrado." % [ref, role_word]
+		"vs_top4", "antes_partido_vs_top4":
+			return "%s (%s) está nervioso pero no quiere parecerlo. Prefiere quitar presión a sumar exigencia." % [ref, role_word]
+		"victoria_vs_top4":
+			return "%s (%s) sonríe pero te observa: le importa que reconozcas el mérito de TODOS, no de ti mismo." % [ref, role_word]
+	return "%s (%s) te observa. Será sensible al tono que elijas." % [ref, role_word]
 
 
 func _on_team_talk_picked(idx: int, options: Array, feedback_label: Label, picked: Array) -> void:
