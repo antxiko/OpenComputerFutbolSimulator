@@ -498,7 +498,7 @@ func _advance_one_event() -> void:
 		if ev.type in [MatchEvent.T_SHOT_ON, MatchEvent.T_SHOT_OFF, MatchEvent.T_SHOT_BLOCKED,
 				MatchEvent.T_SAVE, MatchEvent.T_YELLOW, MatchEvent.T_RED, MatchEvent.T_SUBSTITUTION,
 				MatchEvent.T_HALFTIME, MatchEvent.T_FULLTIME, MatchEvent.T_KICKOFF,
-				MatchEvent.T_CORNER, MatchEvent.T_OFFSIDE]:
+				MatchEvent.T_CORNER, MatchEvent.T_OFFSIDE, MatchEvent.T_PENALTY]:
 			var color: Color = Color(0.85, 0.85, 0.85)
 			if ev.type == MatchEvent.T_RED:
 				color = Color(1.0, 0.4, 0.4)
@@ -508,6 +508,8 @@ func _advance_one_event() -> void:
 				color = Color(0.6, 0.8, 1.0)
 			elif ev.type == MatchEvent.T_SAVE:
 				color = Color(0.8, 0.8, 1.0)
+			elif ev.type == MatchEvent.T_PENALTY:
+				color = Color(1.0, 0.6, 0.4)
 			_log_event(ev, color)
 			_set_ball_for_event(ev)
 			# End playback en FULLTIME
@@ -564,6 +566,12 @@ func _set_ball_for_event(ev: MatchEvent) -> void:
 		return
 	if ev.type == MatchEvent.T_KICKOFF or ev.type == MatchEvent.T_HALFTIME:
 		ball_target = Vector2(0.50, 0.50)
+		_kick_off_ball_animation()
+		return
+	if ev.type == MatchEvent.T_PENALTY:
+		# Balón al punto de penalty del equipo defensor
+		var px: float = 0.88 if attacking_home else 0.12
+		ball_target = Vector2(px, 0.50)
 		_kick_off_ball_animation()
 		return
 	# Eventos granulares: balón hacia el receptor (pase) o actor (regate/intercept)

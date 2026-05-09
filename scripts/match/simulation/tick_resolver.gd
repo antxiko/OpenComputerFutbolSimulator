@@ -13,6 +13,11 @@ const FOUL_BASE_PROB: float = 0.17        # ~28-35 faltas por partido total
 const YELLOW_GIVEN_FOUL: float = 0.085    # base; modulado por aggression
 const RED_PROB_PER_TICK: float = 0.00008  # rojas muy raras (~0.15/partido total)
 const INJURY_BASE_PROB: float = 0.005     # ~0.7-1 lesión por partido en promedio
+# % de las faltas en zona "atk" del atacante (= dentro/cerca del área del defensor)
+# que se señalan como penalty. Real La Liga ~0.3 penalties/partido.
+const PENALTY_FROM_FOUL_ATK_PROB: float = 0.035
+# Conversión base de penalty (real ~78%). Modulada por habilidad del portero.
+const PENALTY_CONVERSION_BASE: float = 0.78
 
 
 static func resolve(state: MatchState) -> Array[MatchEvent]:
@@ -22,6 +27,11 @@ static func resolve(state: MatchState) -> Array[MatchEvent]:
 	# 1) Calcular fuerzas
 	var poss_lineup: Lineup = state.lineup_for(state.possession_team_id)
 	var def_lineup: Lineup = state.lineup_for(state.other_team_id(state.possession_team_id))
+	# Zona del balón al iniciar el tick — se preserva incluso si outcome la
+	# cambia (advance, lose, shot). _maybe_foul la usa para que la falta
+	# refleje el momento real en el que se cometió, no el post-outcome.
+	var initial_zone: String = state.zone
+	var initial_poss_team_id: String = state.possession_team_id
 	var atk_str: float = PositionContribution.zone_strength(poss_lineup, "attack", state.zone)
 	var def_str: float = PositionContribution.zone_strength(def_lineup, "defense", state.zone)
 	# Delta amplificado: la diferencia normalizada respecto al máximo.
@@ -62,7 +72,7 @@ static func resolve(state: MatchState) -> Array[MatchEvent]:
 			_resolve_turnover(state, false)
 
 	# 4) Eventos aleatorios independientes (faltas, tarjetas, lesiones)
-	_maybe_foul(state, def_lineup, events, rng)
+	_maybe_foul(state, def_lineup, events, rng, initial_zone, initial_poss_team_id)
 	_maybe_injury(state, events, rng)
 
 	# 5) Avanzar reloj
@@ -265,16 +275,31 @@ static func _resolve_shot(
 # ============================================================================
 # Faltas / tarjetas (eventos aleatorios secundarios)
 # ============================================================================
-static func _maybe_foul(state: MatchState, def_lineup: Lineup, events: Array[MatchEvent], rng: RandomNumberGenerator) -> void:
+static func _maybe_foul(state: MatchState, def_lineup: Lineup, events: Array[MatchEvent], rng: RandomNumberGenerator, initial_zone: String = "", initial_poss_id: String = "") -> void:
 	if rng.randf() >= FOUL_BASE_PROB:
 		return
-	# El defensor comete falta — selección ponderada por (presencia × aggression)
-	var fouler: Player = _pick_fouler(def_lineup, _inverse_zone(state.zone), rng)
+	# Zona y posesión cuando se cometió la falta — antes de aplicar el outcome
+	var foul_zone: String = initial_zone if initial_zone != "" else state.zone
+	# El defensor comete falta — selección ponderada por (presencia × aggression).
+	# Usa la zona del MOMENTO de la falta, no la actual (que puede haber
+	# cambiado por el outcome).
+	var fouler: Player = _pick_fouler(def_lineup, _inverse_zone(foul_zone), rng)
 	if fouler == null:
 		return
 	state.stats[def_lineup.team.id]["fouls"] += 1
 	events.append(_make_event_for_team(state, def_lineup.team.id, MatchEvent.T_FOUL,
 		fouler.id, "Falta de %s" % fouler.name))
+
+	# Penalty: si la falta es en zona "atk" del atacante original (= cerca del
+	# área del defensor), hay PENALTY_FROM_FOUL_ATK_PROB de prob de penalty.
+	if foul_zone == "atk" and rng.randf() < PENALTY_FROM_FOUL_ATK_PROB:
+		# Restaurar posesión al equipo atacante original (el que sufrió la falta)
+		# antes de resolver el penalty. Si outcome cambió possession, lo deshago.
+		if initial_poss_id != "":
+			state.possession_team_id = initial_poss_id
+			state.zone = "atk"
+		_resolve_penalty(state, def_lineup, fouler, events, rng)
+		return  # penalty consume el resto del tick — sin tarjetas extra
 
 	# ¿Tarjeta? Probabilidad escala con aggression del jugador.
 	# Factor: 0.75 (agg=10) a 1.30 (agg=99) — amplificación moderada.
@@ -481,6 +506,98 @@ static func _maybe_injury(state: MatchState, events: Array, rng: RandomNumberGen
 	events.append(MatchEvent.make(state.minute(), state.second_in_minute(),
 		MatchEvent.T_INJURY, String(pick["team_id"]), p.id, state.zone,
 		"Lesión %s de %s (%d días)" % [info["tipo"], p.name, int(info["dias_restantes"])]))
+
+
+# ============================================================================
+# Penalty (resolución completa — afecta marcador y stats)
+# ============================================================================
+static func _resolve_penalty(state: MatchState, def_lineup: Lineup, fouler: Player, events: Array[MatchEvent], rng: RandomNumberGenerator) -> void:
+	var atk_lineup: Lineup = state.lineup_for(state.possession_team_id)
+	var kicker: Player = _pick_penalty_kicker(atk_lineup)
+	if kicker == null:
+		return
+	# Tarjeta amarilla automática al fouler (penalty es siempre falta clara)
+	if not state.red_carded.get(fouler.id, false):
+		state.yellow_count[fouler.id] = state.yellow_count.get(fouler.id, 0) + 1
+		state.stats[def_lineup.team.id]["yellows"] += 1
+		events.append(_make_event_for_team(state, def_lineup.team.id, MatchEvent.T_YELLOW,
+			fouler.id, "Amarilla a %s (penalty)" % fouler.name))
+		# Doble amarilla → roja
+		if state.yellow_count[fouler.id] >= 2:
+			state.red_carded[fouler.id] = true
+			state.on_pitch[fouler.id] = false
+			state.stats[def_lineup.team.id]["reds"] += 1
+			events.append(_make_event_for_team(state, def_lineup.team.id, MatchEvent.T_RED,
+				fouler.id, "Roja por doble amarilla a %s" % fouler.name))
+
+	events.append(_make_event(state, MatchEvent.T_PENALTY, kicker.id,
+		"¡PENALTY a favor de %s! Lo lanza %s" % [atk_lineup.team.name, kicker.name]))
+
+	# Resolución del lanzamiento
+	state.stats[state.possession_team_id]["shots"] += 1
+	var keeper: Player = _find_goalkeeper(def_lineup)
+	var conversion: float = PENALTY_CONVERSION_BASE
+	if keeper != null:
+		var porteria: float = float(keeper.attributes.get("porteria", 50))
+		# Mejor portero baja la conversión moderadamente. Centro en porteria=70:
+		# porteria=70 → 0.82; 50 → 0.86; 90 → 0.78. Aim a ~78% promedio en la liga.
+		conversion = clampf(0.82 - (porteria - 70.0) / 100.0 * 0.20, 0.70, 0.92)
+	# Atributo "tiro" del lanzador modula también
+	var tiro: float = float(kicker.attributes.get("tiro", 50))
+	conversion += (tiro - 50.0) / 100.0 * 0.10  # +/- 0.04 por desviación de 40 pts
+	conversion = clampf(conversion, 0.55, 0.95)
+
+	if rng.randf() < conversion:
+		# GOL
+		state.stats[state.possession_team_id]["goals"] += 1
+		state.stats[state.possession_team_id]["shots_on_target"] += 1
+		state.goals_scored[kicker.id] = state.goals_scored.get(kicker.id, 0) + 1
+		if state.is_home(state.possession_team_id):
+			state.score_home += 1
+		else:
+			state.score_away += 1
+		events.append(_make_event(state, MatchEvent.T_GOAL, kicker.id,
+			"¡GOL DE PENALTY de %s!" % kicker.name))
+		# Saque de centro al rival
+		state.possession_team_id = state.other_team_id(state.possession_team_id)
+		state.zone = "mid"
+	else:
+		# Parada o fuera (70/30)
+		if rng.randf() < 0.70 and keeper != null:
+			state.stats[state.possession_team_id]["shots_on_target"] += 1
+			state.stats[def_lineup.team.id]["saves"] += 1
+			events.append(_make_event_for_team(state, def_lineup.team.id, MatchEvent.T_SAVE, keeper.id,
+				"¡Parada de %s al penalty!" % keeper.name))
+		else:
+			state.stats[state.possession_team_id]["shots_off_target"] += 1
+			events.append(_make_event(state, MatchEvent.T_SHOT_OFF, kicker.id,
+				"%s falla el penalty" % kicker.name))
+		# Turnover (saque de portería del defensor)
+		_resolve_turnover(state, true)
+
+
+# Mejor lanzador de penalty del equipo: prioriza atacantes con buen "tiro" + "mentalidad".
+static func _pick_penalty_kicker(lineup: Lineup) -> Player:
+	var best: Player = null
+	var best_score: float = -1.0
+	for i in lineup.starting_eleven.size():
+		var p: Player = lineup.starting_eleven[i]
+		var slot: String = lineup.slot_assignments[i]
+		# GK no lanzan penaltys (asumimos)
+		if slot == "GK":
+			continue
+		var tiro: float = float(p.attributes.get("tiro", 50))
+		var mental: float = float(p.attributes.get("mentalidad", 50))
+		var score: float = tiro * 0.7 + mental * 0.3
+		# Bonus a delanteros y atacantes
+		if slot in ["ST", "CF", "LW", "RW"]:
+			score += 8.0
+		elif slot in ["CAM", "LM", "RM"]:
+			score += 4.0
+		if score > best_score:
+			best_score = score
+			best = p
+	return best
 
 
 # ============================================================================

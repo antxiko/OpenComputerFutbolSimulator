@@ -27,6 +27,17 @@ const T_TACKLE       := "tackle"        # entrada limpia de defensor (no falta)
 const T_TACKLE_FAIL  := "tackle_fail"   # regate fallido — el regateador cae sin falta
 const T_INTERCEPT    := "intercept"     # intercepción de pase
 const T_TACTICAL_FOUL := "tactical_foul" # falta táctica para cortar contra (decorativa)
+const T_PENALTY      := "penalty"        # penalty señalado (afecta resultado)
+const T_FREE_KICK    := "free_kick"      # tiro libre directo (puede convertirse en shot)
+const T_THROW_IN     := "throw_in"       # saque de banda (decorativo)
+const T_GK_DIST      := "gk_distribution" # portero saca el balón en juego (decorativo)
+const T_HEADER       := "header"         # remate de cabeza
+const T_VOLLEY       := "volley"         # volea
+const T_PRESSURE     := "pressure"       # presión coordinada antes de turnover
+const T_CLEARANCE    := "clearance"      # despeje del defensor
+const T_BACK_PASS    := "back_pass"      # pase atrás al portero
+const T_RUN          := "run"            # carrera sin balón (desmarque)
+const T_OVERLAP      := "overlap"        # lateral sobrepasa al extremo
 
 @export var minute: int = 0
 @export var second_in_minute: int = 0
