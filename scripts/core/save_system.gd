@@ -196,6 +196,7 @@ static func _team_to_dict(t: Team) -> Dictionary:
 		"tactics_default": _tactics_to_dict(t.tactics_default),
 		"finances": _finances_to_dict(t.finances),
 		"staff": _staff_to_dict(t.staff),
+		"organigrama": t.organigrama.to_dict() if t.organigrama else {},
 		"players": t.players.map(func(p: Player) -> Dictionary: return _player_to_dict(p)),
 	}
 

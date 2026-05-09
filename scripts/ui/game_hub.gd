@@ -37,6 +37,7 @@ const VIEW_FINANCES := "finances"
 const VIEW_CALENDAR := "calendar"
 const VIEW_RIVAL := "rival"
 const VIEW_DECISIONS := "decisions"
+const VIEW_EMPLOYEES := "employees"
 
 
 # --------------------------------------------------------------------------- #
@@ -345,6 +346,10 @@ func _load_data() -> void:
 		# Staff por defecto si no viene en el JSON
 		if t.staff == null:
 			t.staff = StaffInfo.new()
+		# Organigrama: generar si no existe (a partir de plantilla por tamaño)
+		if t.organigrama == null:
+			t.organigrama = OrganigramaFactory.generate(t, year)
+			OrganigramaFactory.sync_staff_info(t)
 	status_label.text = "Cargados %d equipos, %d jugadores." % [
 		all_teams.size(), loaded.player_id_index.size()]
 
@@ -2920,6 +2925,7 @@ func _refresh_ui() -> void:
 		VIEW_CALENDAR: _render_calendar_view()
 		VIEW_RIVAL: _render_rival_view()
 		VIEW_DECISIONS: _render_decisions_view()
+		VIEW_EMPLOYEES: _render_employees_view()
 
 
 # --------------------------------------------------------------------------- #
@@ -3044,7 +3050,7 @@ func _render_hub_view() -> void:
 	left_col.add_child(_make_quadrant("MERCADO", Color(0.75, 0.25, 0.25), [
 		["💸", "FICHAR", "Mercado de fichajes", _on_select_view.bind(VIEW_MARKET)],
 		["👥", "PLANTILLA", "Tu plantilla con stats", _on_select_view.bind(VIEW_TEAM)],
-		["👔", "EMPLEADOS", "Cuerpo técnico", _on_select_view.bind(VIEW_FINANCES)],
+		["👔", "EMPLEADOS", "Organigrama del club (cuerpo técnico, ojeo, médico, cantera, dirección)", _on_select_view.bind(VIEW_EMPLOYEES)],
 	]))
 
 	# Columna central — escudo grande + próximo rival
@@ -3443,8 +3449,130 @@ func _view_title_for(view: String) -> String:
 		VIEW_CALENDAR:  return "📅 Calendario"
 		VIEW_RIVAL:     return "🔍 Ver rival"
 		VIEW_DECISIONS: return "⚖ Decisiones"
+		VIEW_EMPLOYEES: return "👔 Empleados"
 		VIEW_MATCH:     return "📺 Detalle de partido"
 		_: return ""
+
+
+# =========================================================================== #
+# Vista: 👔 EMPLEADOS — organigrama del club
+# =========================================================================== #
+func _render_employees_view() -> void:
+	var team := _find_team_by_id(user_team_id)
+	if team == null:
+		var l := Label.new()
+		l.text = "Sin club seleccionado."
+		content_area.add_child(l)
+		return
+	if team.organigrama == null:
+		team.organigrama = OrganigramaFactory.generate(team, year)
+
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content_area.add_child(scroll)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 12)
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(box)
+
+	# Header con resumen
+	var size_label: String = OrganigramaFactory.size_for(team)
+	var pretty_size: String = "GRANDE" if size_label == "grande" else ("MEDIANO" if size_label == "mediano" else "PEQUEÑO")
+	var header := Label.new()
+	header.text = "👔 Organigrama de %s — Club %s (%d empleados, %s €/año en salarios)" % [
+		team.name, pretty_size,
+		team.organigrama.employees.size(),
+		TransferMarket._fmt_eur(team.organigrama.total_salary()),
+	]
+	header.add_theme_font_size_override("font_size", 14)
+	header.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+	header.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(header)
+
+	# Secciones
+	var sections := [
+		["direccion", "🏛 Dirección", Color(1.0, 0.85, 0.4)],
+		["tecnico", "🎯 Cuerpo técnico", Color(0.5, 0.85, 1.0)],
+		["ojeo", "🔍 Ojeo / Scouting", Color(0.7, 1.0, 0.7)],
+		["medico", "⚕ Servicios médicos", Color(1.0, 0.7, 0.7)],
+		["cantera", "🌱 Cantera", Color(0.85, 1.0, 0.5)],
+	]
+	for sec_data in sections:
+		var sec_id: String = String(sec_data[0])
+		var sec_label: String = String(sec_data[1])
+		var sec_color: Color = sec_data[2]
+		var sec_employees: Array = team.organigrama.by_section(sec_id)
+		if sec_employees.is_empty():
+			continue
+		# Cabecera
+		var sec_header := Label.new()
+		sec_header.text = "%s (%d)" % [sec_label, sec_employees.size()]
+		sec_header.add_theme_font_size_override("font_size", 13)
+		sec_header.add_theme_color_override("font_color", sec_color)
+		box.add_child(sec_header)
+		# Tabla
+		var grid := GridContainer.new()
+		grid.columns = 5
+		grid.add_theme_constant_override("h_separation", 16)
+		box.add_child(grid)
+		for h in ["Nombre", "Rol", "Calidad", "Salario", "Acción"]:
+			var hl := Label.new()
+			hl.text = h
+			hl.add_theme_font_size_override("font_size", 11)
+			hl.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+			grid.add_child(hl)
+		for emp: Employee in sec_employees:
+			var l_name := Label.new()
+			l_name.text = emp.name
+			l_name.add_theme_font_size_override("font_size", 11)
+			grid.add_child(l_name)
+			var l_role := Label.new()
+			l_role.text = emp.role_label
+			l_role.add_theme_font_size_override("font_size", 11)
+			l_role.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+			grid.add_child(l_role)
+			var l_q := Label.new()
+			l_q.text = "★".repeat(emp.quality) + "☆".repeat(5 - emp.quality)
+			l_q.add_theme_font_size_override("font_size", 11)
+			l_q.add_theme_color_override("font_color", Color(1.0, 0.95, 0.4))
+			grid.add_child(l_q)
+			var l_sal := Label.new()
+			l_sal.text = "%s €" % TransferMarket._fmt_eur(emp.salary_eur_year)
+			l_sal.add_theme_font_size_override("font_size", 11)
+			grid.add_child(l_sal)
+			# Acción: subir calidad si <5
+			if emp.quality >= 5:
+				var maxed := Label.new()
+				maxed.text = "MAX"
+				maxed.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+				grid.add_child(maxed)
+			else:
+				var btn := Button.new()
+				var upgrade_cost: int = (emp.quality + 1) * (emp.quality + 1) * 100_000
+				btn.text = "↑ %s" % TransferMarket._fmt_eur(upgrade_cost)
+				btn.tooltip_text = "Mejorar a calidad %d" % (emp.quality + 1)
+				btn.disabled = team.finances == null or team.finances.cash_balance < upgrade_cost
+				btn.pressed.connect(func() -> void: _on_upgrade_employee(team, emp, upgrade_cost))
+				grid.add_child(btn)
+
+
+func _on_upgrade_employee(team: Team, emp: Employee, cost: int) -> void:
+	if team.finances == null or team.finances.cash_balance < cost:
+		status_label.text = "❌ Sin caja para mejorar a %s." % emp.name
+		return
+	team.finances.cash_balance -= cost
+	emp.quality += 1
+	# Reajustar salario al nuevo nivel
+	# emp.salary = factor × calidad²; reconstruir factor
+	var old_q: int = emp.quality - 1
+	if old_q > 0:
+		var factor: int = emp.salary_eur_year / (old_q * old_q * 10_000)
+		emp.salary_eur_year = factor * emp.quality * emp.quality * 10_000
+	# Sincronizar StaffInfo (compatible con el sistema antiguo)
+	OrganigramaFactory.sync_staff_info(team)
+	status_label.text = "✅ %s mejorado a calidad %d." % [emp.name, emp.quality]
+	_refresh_ui()
 
 
 func _make_spacer(h: int) -> Control:
