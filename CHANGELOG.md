@@ -4,6 +4,16 @@ Todas las versiones publicadas, qué se hizo y qué queda. Formato basado en [Ke
 
 ## [En desarrollo (sin tag)]
 
+### Añadido (v0.4.0 candidato)
+- **🎬 Eventos granulares en el motor**: nuevos tipos `T_PASS`, `T_LONG_BALL`, `T_DRIBBLE`, `T_INTERCEPT`, `T_TACKLE`. `TickResolver._emit_decorative_chain` genera cadenas de pases/regates/intercepciones según el outcome (advance/keep/lose/shot/corner). Usan `state.visual_rng` (RNG separado, seed = seed ^ 0x5A5A5A5A) para no contaminar la calibración del motor.
+- **Visor 2D más fluido**: el balón viaja a la posición exacta del receptor del pase (`_get_player_field_pos` por id), oscila junto al regateador, va al interceptor. `PASS_TRANSIT_TIME=0.28s` (más rápido que el normal 0.55s). Delay reducido al 45% entre granulares. Modo highlights_only los salta. Se rellena el tiempo entre eventos clave con movimiento real del balón.
+- **⭐ Camera A2 light — jugador protagonista**: `Lineup.protagonist_id` (solo seteado en el lineup del usuario). En `_pick_actor`/`_pick_assistant` con `role="attack"`, el protagonista recibe +30% peso → más probable que sea shooter/creator. UI: selector encima de la plantilla del equipo del usuario. Visor: anillo amarillo pulsante + nombre sobre el jugador. Persiste en save.
+- Calibración intacta tras los cambios: 2.35 g/p, 25.10 tiros/p, 9.11 córners/p (target ~2.5 / ~25 / ~10).
+
+### Pendiente (v0.4.0+)
+- Camera mode A2 full (control directo del jugador con teclado — refactor enorme)
+- Más variedad de eventos granulares (faltas tácticas, regates frustrados con caída)
+
 ### Añadido (v0.3.0 candidato)
 - **Tracking europeo en histórico de carrera**: cada temporada guarda progreso en Champions, Europa y Conference (Campeón / Subcampeón / Pasó X / Eliminado en X / Fase de grupos). Vista Carrera con 11 columnas.
 - **Recuperación parcial de condition entre partidos**: nueva clase `ConditionRecovery`. Antes reset a 100; ahora según días desde el último partido del jugador (1 día → 55, 3 días → 82, ≥5 → 100). Se beneficia de calendario real.
@@ -14,7 +24,6 @@ Todas las versiones publicadas, qué se hizo y qué queda. Formato basado en [Ke
 - **🔍 Validador automático de plantillas**: nuevo `tools/validate_squads.gd`. Comprueba en los 42 JSON: tamaño de plantilla, cobertura por slot (GK ≥2, DEF ≥6, MID ≥5, ATK ≥4), duplicados de player_id, contratos (until_year, salario), edades en rango, posiciones válidas, tiers conocidos. Encontró y corrigió 3 contratos vencidos (Carlos Albarrán @ Córdoba, Mario Maroto y Chuki @ Valladolid). 34 plantillas con _draft_note genérico marcadas como "validadas estructuralmente"; 8 hand-curadas (Athletic, Atlético, Barça, Betis, R. Sociedad, Sevilla, Villarreal, Las Palmas) conservan su note específico para refinamiento manual posterior.
 
 ### Pendiente (v0.4.0+)
-- Camera mode A2 (control directo de jugador en partido)
 - Mejoras visuales del visor 2D (sprites, animaciones)
 
 
