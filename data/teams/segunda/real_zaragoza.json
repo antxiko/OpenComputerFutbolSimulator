@@ -1,5 +1,5 @@
 {
-  "_draft_note": "Plantilla scrapeada de Wikipedia ES (2026-27). Tiers asignados por heurística — verificar y refinar manualmente.",
+  "_draft_note": "Plantilla scrapeada de Wikipedia ES (2026-27). Validada estructuralmente con tools/validate_squads.gd. Tiers/skills siguen siendo heurísticos.",
   "city": "Zaragoza",
   "colors": {
     "primary": "#003F87",

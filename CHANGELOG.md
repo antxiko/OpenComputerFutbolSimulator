@@ -11,9 +11,7 @@ Todas las versiones publicadas, qué se hizo y qué queda. Formato basado en [Ke
 - **Reemplazo automático tras vender titular**: si un equipo vende a un jugador con overall ≥75 o que era core de su slot, gana 1 fichaje extra de slot para reemplazarlo en rondas posteriores del mercado.
 - **📝 Renovación manual de contratos**: nueva clase `ContractNegotiation`. Al final de temporada, modal que lista todos los jugadores del usuario con contrato vencido. Por jugador: [Renovar] (sub-modal con SpinBox para salario y años, evalúa oferta con probabilidad de aceptación según ratio salario/justo y rango de años por edad; counter-offer si rechazo) o [Liberar] (va al pool de free agents). Los demás clubes siguen flujo automático.
 - **💸 Pujas múltiples / contraofertas en mercado**: si el club vendedor rechaza pero la oferta estaba en zona seria (≥70% del MV), emite contraoferta pidiendo +15-25% según cuán cerca quedó. CPU acepta la counter si tiene budget y no excede 1.3x. El usuario ve modal "Contraoferta — pide X€ para aceptar la venta" con botones [Pagar X€] [Rechazar].
-
-### Pendiente (v0.3.0)
-- Verificar plantillas hand-curadas (los 7 con `_draft_note`)
+- **🔍 Validador automático de plantillas**: nuevo `tools/validate_squads.gd`. Comprueba en los 42 JSON: tamaño de plantilla, cobertura por slot (GK ≥2, DEF ≥6, MID ≥5, ATK ≥4), duplicados de player_id, contratos (until_year, salario), edades en rango, posiciones válidas, tiers conocidos. Encontró y corrigió 3 contratos vencidos (Carlos Albarrán @ Córdoba, Mario Maroto y Chuki @ Valladolid). 34 plantillas con _draft_note genérico marcadas como "validadas estructuralmente"; 8 hand-curadas (Athletic, Atlético, Barça, Betis, R. Sociedad, Sevilla, Villarreal, Las Palmas) conservan su note específico para refinamiento manual posterior.
 
 ### Pendiente (v0.4.0+)
 - Camera mode A2 (control directo de jugador en partido)
