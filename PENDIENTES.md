@@ -101,8 +101,9 @@ Cosas que sabemos que están a medias o que hay que volver a mirar más adelante
 
 ## 📊 Calibraciones secundarias del motor de partido
 
-- **Córners algo bajos** (~6.5 vs ~10 reales). Subir prob de córner en zona atk o convertir más loses en córners.
-- **Tiros bloqueados**: actualmente ~10-15% del total. Real ~20-25%. Subir block_p ligeramente.
+- ~~**Córners algo bajos** (~6.5 vs ~10 reales)~~ → resuelto: ~9 córners/partido tras subir prob.
+- ~~**Tiros bloqueados**: actualmente ~10-15% del total. Real ~20-25%. Subir block_p ligeramente.~~ → resuelto: 20.8% tras tune (block_p 0.14→0.10).
+- ~~**% tiros a portería**: 28% vs 32-38% reales~~ → resuelto: 33.6% tras tune (on_target_p +0.05 base, save_p ajustado para mantener conversion).
 - **Asistencias**: 65% de los goles tienen asistencia. Realista pero el algoritmo ignora pases largos (CB→ST por encima de la defensa). El asistente actual prioriza CAM/CM pasadores.
 
 ---

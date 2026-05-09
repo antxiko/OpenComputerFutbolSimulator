@@ -221,15 +221,18 @@ static func _resolve_shot(
 	var mentalidad: int = int(shooter.attributes.get("mentalidad", 50))
 
 	# 1) ¿Es a portería? Modulado por tiro+composure (target ~32-38% on-target)
-	var on_target_p: float = 0.09 + (float(tiro) / 100.0) * 0.35 + (float(mentalidad) / 100.0) * 0.05
+	# on_target_p: probabilidad de que el tiro vaya a portería (de los no
+	# bloqueados). Calibrado a ~42% promedio para que tras descontar bloqueos
+	# (~22%) llegue al ~33% del total real La Liga.
+	var on_target_p: float = 0.14 + (float(tiro) / 100.0) * 0.36 + (float(mentalidad) / 100.0) * 0.05
 	if from_set_piece:
 		on_target_p *= 0.85  # ángulos más cerrados desde córner
 
 	# 2) ¿Es bloqueado por defensores?
 	var def_str: float = PositionContribution.zone_strength(defense, "defense", "def")
 	var atk_str: float = PositionContribution.zone_strength(poss, "attack", "atk")
-	# block_p calibrado a ~22-25% promedio (real La Liga: 20-25% de tiros bloqueados).
-	var block_p: float = 0.14 + clampf((def_str - atk_str) / maxf(atk_str + def_str, 1.0), -0.08, 0.14)
+	# block_p calibrado a ~22% promedio (real La Liga: 20-25% de tiros bloqueados).
+	var block_p: float = 0.10 + clampf((def_str - atk_str) / maxf(atk_str + def_str, 1.0), -0.06, 0.12)
 
 	var roll1: float = rng.randf()
 	if roll1 < block_p:
@@ -253,11 +256,12 @@ static func _resolve_shot(
 	if keeper != null:
 		var porteria: int = int(keeper.attributes.get("porteria", 50))
 		var keeper_mental: int = int(keeper.attributes.get("mentalidad", 50))
-		# Calibrado para ~62-68% de paradas (target ~2.5-2.8 goles/partido)
-		save_p = 0.30 + (float(porteria) / 100.0) * 0.50 + (float(keeper_mental) / 100.0) * 0.05
+		# Calibrado para ~70% paradas (conversion ~29%, target La Liga ~30%)
+		# tras subir on_target_p y bajar block_p (más tiros llegan a portería).
+		save_p = 0.40 + (float(porteria) / 100.0) * 0.45 + (float(keeper_mental) / 100.0) * 0.05
 		# Tiro del shooter rebaja la chance de parada
 		save_p -= (float(tiro) / 100.0) * 0.10
-		save_p = clampf(save_p, 0.22, 0.93)
+		save_p = clampf(save_p, 0.30, 0.93)
 
 	if rng.randf() < save_p and keeper != null:
 		state.stats[state.other_team_id(state.possession_team_id)]["saves"] += 1
