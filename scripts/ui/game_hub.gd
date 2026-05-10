@@ -5849,6 +5849,11 @@ func _render_agents_view() -> void:
 	for a: Agent in sorted:
 		content_area.add_child(_make_agent_row(a))
 
+	# Spacer al final para que el último agente no quede pegado al footer
+	var bottom_spacer := Control.new()
+	bottom_spacer.custom_minimum_size = Vector2(0, 80)
+	content_area.add_child(bottom_spacer)
+
 
 func _count_represented_players() -> int:
 	var c: int = 0
@@ -5859,6 +5864,7 @@ func _count_represented_players() -> int:
 
 func _make_agent_row(a: Agent) -> Control:
 	var panel := PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 4)
 	panel.add_child(box)
