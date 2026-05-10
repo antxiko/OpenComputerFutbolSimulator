@@ -36,7 +36,7 @@ class SaveData:
 	var board_expectations_dict: Dictionary = {}  # serialized BoardExpectations o {}
 	# v0.3.2 — agentes (pool persistido para mantener relations + asignaciones)
 	var agents_pool: Array = []  # Array[Agent] (deserializados)
-	# v0.3.2 — histórico ligero para detectar rachas (Ted Lasso 3 derrotas seguidas)
+	# v0.3.2 — histórico ligero para detectar rachas (TED 3 derrotas seguidas)
 	var user_recent_results: Array = []
 
 

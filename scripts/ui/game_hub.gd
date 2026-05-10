@@ -93,14 +93,14 @@ var talk_templates: Array = []
 # Modifier transitorio: si el usuario hizo speech persuasivo, este número se
 # aplica a la siguiente acceptance (y se resetea). Solo aplica a una operación.
 var pending_persuasion_modifier: float = 0.0
-# v0.3.2 — Ted Lasso: team talks en momentos de crisis
+# v0.3.2 — TED: team talks en momentos de crisis
 var team_talk_templates: Array = []  # cargadas de data/talks/team_talks.json
 var last_team_talk_jornada: int = -10  # cooldown — no team talks consecutivas
 # Bonus temporal para el próximo partido del usuario tras team talk exitosa.
 # Se consume al simular el partido y se resetea.
 var team_talk_form_bonus: float = 0.0
 # Histórico ligero: últimos 5 resultados del usuario {won, lost, diff, jornada}
-# para detectar rachas de derrotas (trigger Ted Lasso).
+# para detectar rachas de derrotas (trigger TED).
 var user_recent_results: Array = []
 # Alineación personalizada del usuario, dict con keys:
 #   formation, eleven_ids (Array[String]), slot_assignments (Array[String]),
@@ -1297,7 +1297,7 @@ func _do_advance_jornada() -> void:
 			_on_open_2d_viewer(user_result)
 		else:
 			_show_post_match_modal(user_result)
-	# v0.3.2 Ted Lasso: detectar momentos de crisis y disparar team talk
+	# v0.3.2 TED: detectar momentos de crisis y disparar team talk
 	await _maybe_trigger_team_talk(true)
 	_refresh_ui()
 
@@ -3240,7 +3240,7 @@ func _simulate_jornada(state: DivisionState) -> void:
 			home_lineup = AutoLineup.pick(home, home.tactics_default.formation)
 		if away_lineup == null:
 			away_lineup = AutoLineup.pick(away, away.tactics_default.formation)
-		# v0.3.2 Ted Lasso: aplicar form_bonus temporal a los titulares del usuario
+		# v0.3.2 TED: aplicar form_bonus temporal a los titulares del usuario
 		# si hubo team talk con efecto. Se consume al simular.
 		if team_talk_form_bonus != 0.0:
 			var user_lineup: Lineup = home_lineup if home.id == user_team_id else (away_lineup if away.id == user_team_id else null)
@@ -3253,7 +3253,7 @@ func _simulate_jornada(state: DivisionState) -> void:
 		if result != null:
 			state.league_table.record_match(result)
 			state.last_jornada_results.append(result)
-			# v0.3.2: histórico de resultados del usuario para Ted Lasso (rachas)
+			# v0.3.2: histórico de resultados del usuario para TED (rachas)
 			if result.home_team_id == user_team_id or result.away_team_id == user_team_id:
 				var is_h: bool = result.home_team_id == user_team_id
 				var u_s: int = result.score_home if is_h else result.score_away
@@ -5948,7 +5948,7 @@ func _agent_personality_color(personality: String) -> Color:
 
 
 # --------------------------------------------------------------------------- #
-# Talks: speech persuasivo (pre-fichaje) + team talks Ted Lasso (crisis)
+# Talks: speech persuasivo (pre-fichaje) + team talks TED (crisis)
 # --------------------------------------------------------------------------- #
 func _load_talk_templates() -> void:
 	var path := "res://data/talks/templates.json"
@@ -6058,7 +6058,7 @@ func _on_persuasion_picked(idx: int, options: Array, feedback_label: Label, pick
 		feedback_label.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
 
 
-# Team talks (Ted Lasso): detecta momentos de crisis y dispara modal.
+# Team talks (TED): detecta momentos de crisis y dispara modal.
 # Se llama tras cada jornada con post_match=true.
 func _maybe_trigger_team_talk(post_match: bool = true) -> void:
 	if user_team_id == "" or team_talk_templates.is_empty():
@@ -6132,7 +6132,7 @@ func _find_team_talk_template(trigger: String) -> Dictionary:
 
 func _show_team_talk_modal(template: Dictionary) -> void:
 	var popup := AcceptDialog.new()
-	popup.title = "💚 MOMENTO TED LASSO — charla de vestuario"
+	popup.title = "💚 CHARLA DEL VESTUARIO — momento corazón abierto"
 	popup.dialog_close_on_escape = false
 	popup.min_size = Vector2(640, 520)
 	add_child(popup)
@@ -6142,7 +6142,7 @@ func _show_team_talk_modal(template: Dictionary) -> void:
 	popup.add_child(box)
 
 	var note := Label.new()
-	note.text = "Estás en un momento difícil. Tienes una oportunidad. Elige tus palabras: una de las opciones es lo que haría Ted Lasso — sincero, humilde, abierto de corazón."
+	note.text = "Estás en un momento difícil. Tienes una oportunidad. Elige tus palabras: una de las opciones es la más sincera y humana — sin gritar ni exigir, hablando de tú a tú."
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.add_theme_font_size_override("font_size", 11)
 	note.add_theme_color_override("font_color", Color(0.6, 0.95, 0.7))

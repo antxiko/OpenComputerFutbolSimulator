@@ -1,5 +1,5 @@
 {
-  "_doc": "Templates de 'momento Ted Lasso' — charlas de vestuario en momentos clave. Cada plantilla está asociada a un trigger (mala_racha, humillacion, vs_top, vestuario_tenso). Cada opción tiene tone (good/neutral/bad) y effects sobre morale plantilla y form_bonus para el próximo partido.",
+  "_doc": "Templates de 'charla del vestuario en momentos clave' (TED — feature interna). Cada plantilla está asociada a un trigger (mala_racha, humillacion, vs_top, vestuario_tenso). Cada opción tiene tone (good/neutral/bad) y effects sobre morale plantilla y form_bonus para el próximo partido. La opción 'good' es la más sincera/humilde/abierta de corazón.",
   "templates": [
     {
       "id": "mala_racha",
