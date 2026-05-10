@@ -2,6 +2,44 @@
 
 Todas las versiones publicadas, qué se hizo y qué queda. Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 
+## [v0.3.2] - 2026-05-10
+
+### Añadido — Profundidad de los jugadores
+
+- **🤝 Agentes como entidad real**: 45 agentes con personalidad (tough/flexible/greedy/balanced), reputación 1-5★, lista de clientes y relaciones por club. Distribución no uniforme: 5 super-agentes (5★) representan al 30% de jugadores top (Mendes ~90 clientes, Zahavi ~77, Barnett ~67, Pimenta ~53, Sosa ~46), 15 medianos al 50%, 25 pequeños al 20%. Vista 🤝 AGENTES en hub: lista ordenada por rep + nº clientes con clientes top 8 visibles. La personalidad afecta a TODOS sus clientes en negociación: tough resta -0.15 a accept_prob, greedy pide +15% sobre el justo, etc. Comisiones automáticas en cada fichaje (2-5% del fee según ★). Si rechazas una contraoferta, el agente baja su relación contigo (-10) y todos sus clientes son más difíciles para ti.
+- **📈 Forma del jugador (`form: float` 0.70-1.30)**: multiplicador de rendimiento que oscila tras cada partido. `FormTracker.compute_rating` da rating -3..+5 según goles/asistencias/tarjetas/resultado, y `update_after_match` modifica form (delta = rating × 0.04 × volatilidad). Aplicado en `TickResolver._pick_actor` con role="attack": un jugador en gran forma tiene más probabilidad de ser shooter/asistente. Suplentes que no juegan tienen regresión lenta a 1.0. UI: nueva columna "Form" en plantilla con icono ↑↑/↑/=/↓/↓↓.
+- **🧠 Personalidad del jugador**: `lider`/`equilibrado`/`temperamental`/`flojo`. Asignada al cargar datos según tier (S/A más líderes, C/Y más flojos). Modula la volatilidad de form (líder ×1.20, temperamental ×1.40, flojo ×0.60) y la amplificación de las charlas de vestuario.
+- **🏋️ Training focus por equipo**: nuevo selector en vista Tactics (general/ataque/defensa/fisico/porteria). Aging.age_team aplica +1 al atributo focus a cada jugador tras avanzar de temporada. Un equipo con focus "ataque" durante 3 temporadas tiene 3 puntos extra en ataque sobre lo natural.
+
+### Añadido — Decisiones humanas que afectan al equipo
+
+- **💬 Speech persuasivo pre-fichaje**: nuevo botón "💬 Convencer primero" en el modal de oferta. Abre un sub-modal con 3 opciones de discurso random-ordered (proyecto, rol, salario, europa, fans, personal). La opción buena (sincera/humilde) da +0.10 a accept_prob, la mala (-0.08), la neutra 0. El modifier se consume en la siguiente oferta. Botón visible solo si no se cancela el modal.
+- **💚 Charla del vestuario en momentos clave (TED)**: la "concha azul" del simulador. Solo dispara cuando vas mal — humillación (derrota ≥4 goles), 3 derrotas seguidas (con histórico ligero `user_recent_results` persistido), o morale promedio plantilla <50%. Cooldown 4 jornadas. Modal **"💚 CHARLA DEL VESTUARIO — momento corazón abierto"** con intro narrativa, hint sutil sobre el lenguaje corporal del capitán/líder ("mantiene la mirada baja. No quiere broncas. Necesita oír algo verdadero, no un sermón."), y 3 opciones random-ordered. La opción sincera/humilde da morale +8/+12 + form_bonus +0.04/+0.07 al próximo partido. La dura/agresiva los hunde aún más. Personalities amplifican: líderes ×1.20, temperamentales ×1.40, flojos ×0.70. Solo aplica al equipo del usuario — los CPU no tienen este sistema.
+
+### Archivos
+
+- **NUEVO** `scripts/data/agent.gd` (Resource: id, name, personality, country, reputation, client_ids, relations) con métodos `accept_prob_modifier`, `salary_demand_multiplier`, `commission_percentage`, `adjust_relation`.
+- **NUEVO** `scripts/data/agent_factory.gd` (genera pool + asigna a jugadores con distribución no uniforme).
+- **NUEVO** `scripts/progression/form_tracker.gd` (compute_rating + update_after_match + update_no_play + icon_for con personality_volatility).
+- **NUEVO** `data/talks/templates.json` (6 plantillas de speech persuasivo).
+- **NUEVO** `data/talks/team_talks.json` (5 plantillas de charla de vestuario).
+- `scripts/data/player.gd` — `+form`, `+personality`, `+agent_id`.
+- `scripts/data/team.gd` — `+training_focus`.
+- `scripts/transfers/contract_negotiation.gd` — `evaluate_offer` acepta agent + team_id (modifiers).
+- `scripts/match/simulation/tick_resolver.gd` — `_pick_actor` aplica `p.form` en role="attack".
+- `scripts/progression/aging.gd` — `_apply_training_focus_bonus`.
+- `scripts/ui/game_hub.gd` — VIEW_AGENTS + modales (persuasion + team_talk) + hooks (post-match update form + detect crisis + Ted talk + commission al fichar) + UI form en plantilla + selector training en Tactics + hint sutil con leader del vestuario.
+- `scripts/core/save_system.gd` — `agents_pool` + `user_recent_results` persistidos.
+
+### Notas
+
+- **Aviso IP**: el espíritu de la TED está inspirado en una serie de TV con copyright. El nombre comercial NO se usa en el código (UI, comments, JSON). Internamente se llama "TED" / "charla del vestuario".
+
+### Calibración intacta
+
+- 2.62 g/p (target ~2.5), 25.43 tiros/p, 20.6% bloqueados ✓, 34.4% a portería ✓, 8.63 córners/p, 0.30 penalties/p con 78% conversión.
+
+
 ## [v0.3.1] - 2026-05-09
 
 ### Añadido — Profundidad del rol mánager (FM-feel)
