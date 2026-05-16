@@ -154,6 +154,11 @@ var advance_all_button: Button
 var reset_button: Button
 var save_button: Button
 var load_button: Button
+# v0.4.0 Fase B — nuevo shell
+var sidebar_nav: SidebarNav
+var balance_label: Label
+var next_match_button: Button
+var header_subtitle: Label
 
 
 func _ready() -> void:
@@ -196,173 +201,221 @@ func _show_welcome_message() -> void:
 
 
 # =========================================================================== #
-# UI: construcción
+# UI: construcción (v0.4.0 Fase B — shell con sidebar + main_area)
 # =========================================================================== #
 func _build_ui() -> void:
 	anchor_right = 1.0
 	anchor_bottom = 1.0
+	var th: UITheme = UIThemeManager.get_current()
 
-	var margin := MarginContainer.new()
-	margin.anchor_right = 1.0
-	margin.anchor_bottom = 1.0
-	margin.add_theme_constant_override("margin_left", 16)
-	margin.add_theme_constant_override("margin_right", 16)
-	margin.add_theme_constant_override("margin_top", 16)
-	margin.add_theme_constant_override("margin_bottom", 16)
-	add_child(margin)
+	# Background del root
+	var bg := ColorRect.new()
+	bg.color = th.bg_primary
+	bg.anchor_right = 1.0
+	bg.anchor_bottom = 1.0
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bg)
 
-	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 10)
-	margin.add_child(vbox)
+	# Layout raíz: HBox sidebar + main_area
+	var root_hbox := HBoxContainer.new()
+	root_hbox.anchor_right = 1.0
+	root_hbox.anchor_bottom = 1.0
+	root_hbox.add_theme_constant_override("separation", 0)
+	add_child(root_hbox)
 
-	# --- Header ---
-	top_header_box = HBoxContainer.new()
-	top_header_box.add_theme_constant_override("separation", 24)
-	vbox.add_child(top_header_box)
-	var header := top_header_box
+	# === SIDEBAR ===
+	sidebar_nav = SidebarNav.new()
+	sidebar_nav.view_selected.connect(_on_sidebar_view_selected)
+	root_hbox.add_child(sidebar_nav)
 
-	# Botón "🏠 Hub" para volver al dashboard principal
-	var hub_btn := Button.new()
-	hub_btn.text = "🏠 Hub"
-	hub_btn.tooltip_text = "Volver al menú principal"
-	hub_btn.pressed.connect(_on_select_view.bind(VIEW_HUB))
-	header.add_child(hub_btn)
+	# === MAIN AREA ===
+	var main_area := VBoxContainer.new()
+	main_area.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	main_area.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	main_area.add_theme_constant_override("separation", 0)
+	root_hbox.add_child(main_area)
 
+	# --- Header del main_area ---
+	var header_panel := PanelContainer.new()
+	var header_sb := StyleBoxFlat.new()
+	header_sb.bg_color = th.bg_secondary
+	header_sb.border_width_bottom = 1
+	header_sb.border_color = th.border_subtle
+	header_sb.content_margin_left = 24
+	header_sb.content_margin_right = 24
+	header_sb.content_margin_top = 14
+	header_sb.content_margin_bottom = 14
+	header_panel.add_theme_stylebox_override("panel", header_sb)
+	main_area.add_child(header_panel)
+
+	var header_h := HBoxContainer.new()
+	header_h.add_theme_constant_override("separation", 12)
+	header_panel.add_child(header_h)
+
+	var title_box := VBoxContainer.new()
+	title_box.add_theme_constant_override("separation", 2)
+	title_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header_h.add_child(title_box)
 	view_title_label = Label.new()
-	view_title_label.text = ""
-	view_title_label.add_theme_font_size_override("font_size", 18)
-	view_title_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
-	header.add_child(view_title_label)
+	view_title_label.text = "Dashboard"
+	view_title_label.add_theme_font_size_override("font_size", 22)
+	view_title_label.add_theme_color_override("font_color", th.text_primary)
+	title_box.add_child(view_title_label)
+	header_subtitle = Label.new()
+	header_subtitle.text = ""
+	header_subtitle.add_theme_font_size_override("font_size", 12)
+	header_subtitle.add_theme_color_override("font_color", th.text_secondary)
+	title_box.add_child(header_subtitle)
 
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	header.add_child(spacer)
-
+	# Year / Jornada (compactos, junto al subtítulo en el header pero como vars
+	# separadas para que el resto del código siga setando .text como antes)
 	year_label = Label.new()
-	year_label.add_theme_font_size_override("font_size", 16)
-	header.add_child(year_label)
-
+	year_label.visible = false
+	header_h.add_child(year_label)
 	jornada_label = Label.new()
-	jornada_label.add_theme_font_size_override("font_size", 16)
-	header.add_child(jornada_label)
+	jornada_label.visible = false
+	header_h.add_child(jornada_label)
 
-	vbox.add_child(HSeparator.new())
+	# Notif (campana → Inbox)
+	var notif_btn := Button.new()
+	notif_btn.text = "🔔"
+	notif_btn.flat = true
+	notif_btn.tooltip_text = "Inbox"
+	notif_btn.pressed.connect(_on_select_view.bind(VIEW_INBOX))
+	header_h.add_child(notif_btn)
 
-	# --- División tabs ---
-	div_tabs_box = HBoxContainer.new()
-	div_tabs_box.add_theme_constant_override("separation", 4)
-	vbox.add_child(div_tabs_box)
-	var div_tabs := div_tabs_box
+	# Balance pill
+	balance_label = Label.new()
+	balance_label.text = "€ —"
+	balance_label.add_theme_font_size_override("font_size", 14)
+	balance_label.add_theme_color_override("font_color", th.accent_warning)
+	header_h.add_child(balance_label)
 
-	primera_div_button = _make_tab_button("Primera", _on_select_division.bind("primera"))
-	div_tabs.add_child(primera_div_button)
-	segunda_div_button = _make_tab_button("Segunda", _on_select_division.bind("segunda"))
-	div_tabs.add_child(segunda_div_button)
+	# Next match button (acción primaria)
+	next_match_button = Button.new()
+	next_match_button.text = "▶ Sgte. partido"
+	next_match_button.add_theme_font_size_override("font_size", 13)
+	next_match_button.pressed.connect(_on_advance_jornada)
+	var nm_sb := StyleBoxFlat.new()
+	nm_sb.bg_color = th.accent_primary
+	nm_sb.corner_radius_top_left = 6
+	nm_sb.corner_radius_top_right = 6
+	nm_sb.corner_radius_bottom_left = 6
+	nm_sb.corner_radius_bottom_right = 6
+	nm_sb.content_margin_left = 16
+	nm_sb.content_margin_right = 16
+	nm_sb.content_margin_top = 8
+	nm_sb.content_margin_bottom = 8
+	next_match_button.add_theme_stylebox_override("normal", nm_sb)
+	next_match_button.add_theme_stylebox_override("hover", nm_sb)
+	next_match_button.add_theme_stylebox_override("pressed", nm_sb)
+	next_match_button.add_theme_color_override("font_color", th.text_on_accent)
+	next_match_button.add_theme_color_override("font_hover_color", th.text_on_accent)
+	header_h.add_child(next_match_button)
 
-	# --- View tabs ---
-	view_tabs_box = HBoxContainer.new()
-	view_tabs_box.add_theme_constant_override("separation", 4)
-	vbox.add_child(view_tabs_box)
-	var view_tabs := view_tabs_box
+	# --- Content area (cambia por vista) ---
+	var content_scroll := ScrollContainer.new()
+	content_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	main_area.add_child(content_scroll)
 
-	view_table_button = _make_tab_button("Clasificación", _on_select_view.bind(VIEW_TABLE))
-	view_tabs.add_child(view_table_button)
-	view_fixtures_button = _make_tab_button("Última jornada", _on_select_view.bind(VIEW_FIXTURES))
-	view_tabs.add_child(view_fixtures_button)
-	view_team_button = _make_tab_button("Plantilla", _on_select_view.bind(VIEW_TEAM))
-	view_tabs.add_child(view_team_button)
-	view_tactics_button = _make_tab_button("Mi alineación", _on_select_view.bind(VIEW_TACTICS))
-	view_tabs.add_child(view_tactics_button)
-	view_market_button = _make_tab_button("Mercado", _on_select_view.bind(VIEW_MARKET))
-	view_tabs.add_child(view_market_button)
-	var view_career_button := _make_tab_button("📈 Carrera", _on_select_view.bind(VIEW_CAREER))
-	view_career_button.name = "ViewCareerButton"
-	view_tabs.add_child(view_career_button)
-	var view_champions_button := _make_tab_button("🏆 Champions", _on_select_view.bind(VIEW_CHAMPIONS))
-	view_champions_button.name = "ViewChampionsButton"
-	view_tabs.add_child(view_champions_button)
-	var view_finances_button := _make_tab_button("💰 Finanzas", _on_select_view.bind(VIEW_FINANCES))
-	view_tabs.add_child(view_finances_button)
-	var view_calendar_button := _make_tab_button("📅 Calendario", _on_select_view.bind(VIEW_CALENDAR))
-	view_tabs.add_child(view_calendar_button)
-
-	# Indicador de "Mi club" (solo lectura — el club se elige en Nueva partida)
-	var spacer2 := Control.new()
-	spacer2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	view_tabs.add_child(spacer2)
-	user_team_label = Label.new()
-	user_team_label.add_theme_font_size_override("font_size", 12)
-	user_team_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
-	view_tabs.add_child(user_team_label)
-
-	top_header_separator = HSeparator.new()
-	vbox.add_child(top_header_separator)
-
-	# --- Content area (cambia según la vista) ---
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
-	vbox.add_child(scroll)
+	var content_pad := MarginContainer.new()
+	content_pad.add_theme_constant_override("margin_left", 24)
+	content_pad.add_theme_constant_override("margin_right", 24)
+	content_pad.add_theme_constant_override("margin_top", 18)
+	content_pad.add_theme_constant_override("margin_bottom", 18)
+	content_pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content_scroll.add_child(content_pad)
 
 	content_area = VBoxContainer.new()
 	content_area.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(content_area)
+	content_area.add_theme_constant_override("separation", 10)
+	content_pad.add_child(content_area)
 
-	vbox.add_child(HSeparator.new())
+	# --- Status bar (footer mínimo: solo status_label + acciones extra) ---
+	var status_panel := PanelContainer.new()
+	var status_sb := StyleBoxFlat.new()
+	status_sb.bg_color = th.bg_secondary
+	status_sb.border_width_top = 1
+	status_sb.border_color = th.border_subtle
+	status_sb.content_margin_left = 24
+	status_sb.content_margin_right = 24
+	status_sb.content_margin_top = 6
+	status_sb.content_margin_bottom = 6
+	status_panel.add_theme_stylebox_override("panel", status_sb)
+	main_area.add_child(status_panel)
 
-	# --- Footer: status + botones ---
-	footer_global_box = HBoxContainer.new()
-	footer_global_box.add_theme_constant_override("separation", 12)
-	vbox.add_child(footer_global_box)
-	var footer := footer_global_box
+	var status_h := HBoxContainer.new()
+	status_h.add_theme_constant_override("separation", 8)
+	status_panel.add_child(status_h)
 
 	status_label = Label.new()
 	status_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	status_label.add_theme_color_override("font_color", Color(0.7, 0.85, 0.7))
-	footer.add_child(status_label)
+	status_label.add_theme_color_override("font_color", th.text_secondary)
+	status_label.add_theme_font_size_override("font_size", 11)
+	status_h.add_child(status_label)
 
-	advance_button = Button.new()
-	advance_button.text = "▶ Jornada"
-	advance_button.tooltip_text = "Simular siguiente jornada (con modal pre-partido si juega tu equipo)"
-	advance_button.pressed.connect(_on_advance_jornada)
-	footer.add_child(advance_button)
-
+	# Acciones secundarias: ▶▶ Temporada, 🔁 Nueva temp.
 	advance_all_button = Button.new()
 	advance_all_button.text = "▶▶ Temporada"
+	advance_all_button.flat = true
+	advance_all_button.add_theme_font_size_override("font_size", 11)
 	advance_all_button.tooltip_text = "Simular toda la temporada sin pausas"
 	advance_all_button.pressed.connect(_on_advance_full_season)
-	footer.add_child(advance_all_button)
+	status_h.add_child(advance_all_button)
 
 	reset_button = Button.new()
 	reset_button.text = "🔁 Nueva temp."
-	reset_button.tooltip_text = "Aplicar asc/desc + aging + cantera + mercado IA, empezar nueva temporada"
+	reset_button.flat = true
+	reset_button.add_theme_font_size_override("font_size", 11)
+	reset_button.tooltip_text = "Cerrar temporada y empezar la siguiente"
 	reset_button.pressed.connect(_on_reset_season)
-	footer.add_child(reset_button)
+	status_h.add_child(reset_button)
 
 	save_button = Button.new()
 	save_button.text = "💾"
-	save_button.tooltip_text = "Guardar partida (multi-slot)"
+	save_button.flat = true
+	save_button.tooltip_text = "Guardar partida"
 	save_button.pressed.connect(_on_save_game)
-	footer.add_child(save_button)
+	status_h.add_child(save_button)
 
 	load_button = Button.new()
 	load_button.text = "📂"
-	load_button.tooltip_text = "Cargar partida (multi-slot)"
+	load_button.flat = true
+	load_button.tooltip_text = "Cargar partida"
 	load_button.pressed.connect(_on_load_game)
-	footer.add_child(load_button)
+	status_h.add_child(load_button)
 
-	var settings_button := Button.new()
-	settings_button.text = "Ajustes"
-	settings_button.tooltip_text = "Ajustes (tema claro/oscuro)"
-	settings_button.pressed.connect(_on_select_view.bind(VIEW_SETTINGS))
-	footer.add_child(settings_button)
+	var menu_btn := Button.new()
+	menu_btn.text = "🚪"
+	menu_btn.flat = true
+	menu_btn.tooltip_text = "Volver al menú principal"
+	menu_btn.pressed.connect(_on_back_to_menu)
+	status_h.add_child(menu_btn)
 
-	var menu_button := Button.new()
-	menu_button.text = "🏠"
-	menu_button.tooltip_text = "Volver al menú principal"
-	menu_button.pressed.connect(_on_back_to_menu)
-	footer.add_child(menu_button)
+	# === DUMMY: variables del layout viejo (mantenerlas para no romper _refresh_ui) ===
+	# Estas vars siguen siendo referenciadas por _refresh_ui y otras funciones.
+	# Son nodos sin parent (sí se garbage-collect-able) con visible=false donde aplica.
+	top_header_box = HBoxContainer.new()
+	top_header_box.visible = false
+	div_tabs_box = HBoxContainer.new()
+	div_tabs_box.visible = false
+	view_tabs_box = HBoxContainer.new()
+	view_tabs_box.visible = false
+	top_header_separator = HSeparator.new()
+	top_header_separator.visible = false
+	footer_global_box = HBoxContainer.new()
+	footer_global_box.visible = false
+	primera_div_button = Button.new()
+	segunda_div_button = Button.new()
+	view_table_button = Button.new()
+	view_fixtures_button = Button.new()
+	view_team_button = Button.new()
+	view_tactics_button = Button.new()
+	view_market_button = Button.new()
+	user_team_label = Label.new()
+	user_team_label.visible = false
+	advance_button = Button.new()  # reemplazado por next_match_button
 
 
 func _make_tab_button(text: String, callback: Callable) -> Button:
@@ -3491,6 +3544,61 @@ func _on_select_view(view: String) -> void:
 	_refresh_ui()
 
 
+# v0.4.0 Fase B: handler de selección desde la sidebar
+func _on_sidebar_view_selected(view: String) -> void:
+	_on_select_view(view)
+
+
+# v0.4.0 Fase B: rebuild de items de la sidebar según user_team_id
+func _refresh_sidebar() -> void:
+	if sidebar_nav == null:
+		return
+	var club_name: String = ""
+	var club_short: String = ""
+	if user_team_id != "":
+		var t := _find_team_by_id(user_team_id)
+		if t != null:
+			club_name = t.name
+			club_short = t.short_name
+	var items: Array = [
+		{"icon": "📊", "label": "Dashboard", "view": VIEW_HUB},
+		{"icon": "👥", "label": "Plantilla", "view": VIEW_TEAM},
+		{"icon": "🎯", "label": "Tácticas", "view": VIEW_TACTICS},
+		{"icon": "💸", "label": "Mercado", "view": VIEW_MARKET},
+		{"icon": "🤝", "label": "Agentes", "view": VIEW_AGENTS},
+		{"icon": "👔", "label": "Empleados", "view": VIEW_EMPLOYEES},
+		{"icon": "📅", "label": "Calendario", "view": VIEW_CALENDAR},
+		{"icon": "🏆", "label": "Clasificación", "view": VIEW_TABLE},
+		{"icon": "🏅", "label": "Champions", "view": VIEW_CHAMPIONS},
+		{"icon": "📬", "label": "Inbox", "view": VIEW_INBOX, "badge_count": _inbox_unread_count()},
+		{"icon": "📈", "label": "Carrera", "view": VIEW_CAREER},
+		{"icon": "💰", "label": "Finanzas", "view": VIEW_FINANCES},
+		{"icon": "⚙", "label": "Ajustes", "view": VIEW_SETTINGS},
+	]
+	sidebar_nav.setup(club_name, club_short, items, "Mánager")
+	sidebar_nav.set_active(current_view)
+
+
+# v0.4.0 Fase B: sincroniza header (título, subtítulo, balance) con la vista
+func _refresh_header() -> void:
+	if view_title_label == null:
+		return
+	view_title_label.text = _view_title_for(current_view)
+	if header_subtitle != null:
+		var jornada_text: String = ""
+		if primera_state != null and primera_state.calendar != null:
+			jornada_text = "Jornada %d / %d" % [primera_state.current_jornada, primera_state.calendar.size()]
+		header_subtitle.text = "Temporada %d-%d  ·  %s" % [year, year + 1, jornada_text]
+	# Balance
+	if balance_label != null:
+		var balance_text: String = "€ —"
+		if user_team_id != "":
+			var t := _find_team_by_id(user_team_id)
+			if t != null and t.finances != null:
+				balance_text = "€ %s" % _fmt_eur(t.finances.cash_balance)
+		balance_label.text = balance_text
+
+
 func _current_state() -> DivisionState:
 	return primera_state if selected_division == "primera" else segunda_state
 
@@ -3503,6 +3611,10 @@ func _refresh_ui() -> void:
 	var st := _current_state()
 	jornada_label.text = "Jornada %d / %d (%s)" % [
 		st.current_jornada, st.calendar.size(), selected_division.capitalize()]
+
+	# v0.4.0 Fase B: actualizar sidebar + header del nuevo layout
+	_refresh_sidebar()
+	_refresh_header()
 
 	# Modo HUB: ocultar TODA la chrome antigua (header, tabs, footer global)
 	# — el hub tiene su propia cabecera/centro/footer.
