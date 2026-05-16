@@ -3803,6 +3803,7 @@ func _render_hub_view() -> void:
 		["💾 GUARDAR", _on_save_game],
 		["📂 CARGAR", _on_load_game],
 		["📰 NOTICIAS", _on_select_view.bind(VIEW_CAREER)],
+		["AJUSTES", _on_select_view.bind(VIEW_SETTINGS)],
 	]:
 		var b := Button.new()
 		b.text = String(b_data[0])
