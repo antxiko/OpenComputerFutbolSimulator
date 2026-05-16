@@ -24,6 +24,13 @@ func _ready() -> void:
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_apply_panel_style()
 	_rebuild()
+	queue_redraw()
+
+
+func _notification(what: int) -> void:
+	# Si el card se redimensiona, redibujar la banda accent + highlight
+	if what == NOTIFICATION_RESIZED:
+		queue_redraw()
 
 
 func setup(title: String, value: String, subtitle: String = "", trend: String = "", trend_dir: String = "flat", icon: String = "") -> void:
@@ -42,26 +49,56 @@ func set_accent_color(c: Color) -> void:
 	if is_inside_tree():
 		_apply_panel_style()
 		_rebuild()
+		queue_redraw()
+
+
+# Pinta la banda accent vertical a la izquierda + brillo sutil arriba.
+# Se llama después del StyleBoxFlat del panel, antes de los children.
+func _draw() -> void:
+	# Banda accent gruesa pegada al borde izq. 6px de ancho con corners
+	# redondeados arriba+abajo (mismo radius que el card) para que se integre.
+	var band_w: float = 6.0
+	var band_rect := Rect2(0, 4, band_w, size.y - 8)
+	draw_rect(band_rect, _accent, true)
+	# Glow expandiéndose hacia el centro del card (3 líneas con alpha decreciente)
+	for i in range(1, 5):
+		var glow: Color = _accent
+		glow.a = 0.30 - i * 0.06
+		var glow_rect := Rect2(band_w + (i - 1) * 3, 4, 3, size.y - 8)
+		draw_rect(glow_rect, glow, true)
+	# Highlight superior: línea 1px translúcida blanca arriba (inner-light glass)
+	var hl: Color = Color(1, 1, 1, 0.14)
+	draw_line(Vector2(8, 1), Vector2(size.x - 8, 1), hl, 1.0)
+	# Highlight inferior muy tenue para reforzar profundidad
+	var hl_bot: Color = Color(0, 0, 0, 0.20)
+	draw_line(Vector2(8, size.y - 1), Vector2(size.x - 8, size.y - 1), hl_bot, 1.0)
 
 
 func _apply_panel_style() -> void:
 	var theme: UITheme = UIThemeManager.get_current()
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = theme.bg_card
-	sb.corner_radius_top_left = 10
-	sb.corner_radius_top_right = 10
-	sb.corner_radius_bottom_left = 10
-	sb.corner_radius_bottom_right = 10
-	sb.border_width_left = 3
-	sb.border_color = _accent
-	sb.content_margin_left = 16
+	# Glass: card semi-translúcido sobre el bg oscuro del dashboard
+	var glass: Color = theme.bg_card
+	glass.a = 0.72
+	sb.bg_color = glass
+	sb.corner_radius_top_left = 12
+	sb.corner_radius_top_right = 12
+	sb.corner_radius_bottom_left = 12
+	sb.corner_radius_bottom_right = 12
+	# Borde glow tenue alrededor (1px todos los lados, alpha bajo)
+	# La banda accent fuerte de la izquierda se dibuja con un ColorRect overlay
+	# en _rebuild() para tener control independiente del color.
+	var border: Color = Color(1, 1, 1, 0.06)
+	sb.border_color = border
+	sb.set_border_width_all(1)
+	sb.content_margin_left = 24  # banda accent 6px + glow 12px = 18px, +6 de respiro
 	sb.content_margin_right = 16
 	sb.content_margin_top = 14
 	sb.content_margin_bottom = 14
-	# Sombra muy sutil para dar profundidad
-	sb.shadow_color = Color(0, 0, 0, 0.18)
-	sb.shadow_size = 4
-	sb.shadow_offset = Vector2(0, 2)
+	# Sombra generosa y suave para sensación de capa flotante
+	sb.shadow_color = Color(0, 0, 0, 0.35)
+	sb.shadow_size = 10
+	sb.shadow_offset = Vector2(0, 4)
 	add_theme_stylebox_override("panel", sb)
 
 
@@ -91,14 +128,23 @@ func _rebuild() -> void:
 	top.add_child(title_lbl)
 
 	# === Valor grande ===
+	# Auto-shrink: si el value es muy largo, bajamos font_size para no romper el card.
 	var value_lbl := Label.new()
 	value_lbl.text = _value
-	value_lbl.add_theme_font_size_override("font_size", 32)
+	var value_font_size: int = 32
+	if _value.length() > 14:
+		value_font_size = 18
+	elif _value.length() > 10:
+		value_font_size = 22
+	elif _value.length() > 7:
+		value_font_size = 26
+	value_lbl.add_theme_font_size_override("font_size", value_font_size)
 	value_lbl.add_theme_color_override("font_color", theme.text_primary)
-	value_lbl.add_theme_constant_override("outline_size", 0)
-	# Negrita visual: aumentamos peso simulado con outline del mismo color
+	# Negrita visual: outline 1px del mismo color (Godot no tiene font_weight directo)
 	value_lbl.add_theme_color_override("font_outline_color", theme.text_primary)
 	value_lbl.add_theme_constant_override("outline_size", 1)
+	value_lbl.clip_text = true
+	value_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vbox.add_child(value_lbl)
 
 	# === Línea inferior: subtitle (izq, expand) + trend (der) ===

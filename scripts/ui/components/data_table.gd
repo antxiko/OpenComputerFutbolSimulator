@@ -39,18 +39,7 @@ func setup(columns: Array, rows: Array, title: String = "", max_rows: int = 0) -
 
 
 func _apply_panel_style() -> void:
-	var theme: UITheme = UIThemeManager.get_current()
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = theme.bg_card
-	sb.corner_radius_top_left = 8
-	sb.corner_radius_top_right = 8
-	sb.corner_radius_bottom_left = 8
-	sb.corner_radius_bottom_right = 8
-	sb.content_margin_left = 12
-	sb.content_margin_right = 12
-	sb.content_margin_top = 10
-	sb.content_margin_bottom = 10
-	add_theme_stylebox_override("panel", sb)
+	add_theme_stylebox_override("panel", UIThemeManager.glass_panel_style())
 
 
 func _rebuild() -> void:

@@ -39,14 +39,10 @@ func _draw() -> void:
 	var theme: UITheme = UIThemeManager.get_current()
 	var rect := Rect2(Vector2.ZERO, size)
 
-	# Fondo del chart
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = theme.bg_card
-	sb.corner_radius_top_left = 8
-	sb.corner_radius_top_right = 8
-	sb.corner_radius_bottom_left = 8
-	sb.corner_radius_bottom_right = 8
-	draw_style_box(sb, rect)
+	# Fondo glass del chart — mismo look que el resto de paneles del dashboard
+	draw_style_box(UIThemeManager.glass_panel_style(), rect)
+	# Highlight superior fino (efecto inner-light glass)
+	draw_line(Vector2(8, 1), Vector2(size.x - 8, 1), Color(1, 1, 1, 0.14), 1.0)
 
 	var font := ThemeDB.fallback_font
 	var pad_top: float = 14.0

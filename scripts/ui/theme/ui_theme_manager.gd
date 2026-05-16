@@ -94,6 +94,38 @@ static func dark_theme() -> UITheme:
 	return t
 
 
+# ============================================================================
+# Helpers de estilo (glassmorphism — usados por componentes del Dashboard)
+# ============================================================================
+#
+# Crea un StyleBoxFlat con look "glass" — fondo semi-translúcido, esquinas
+# redondeadas, sombra suave, borde tenue. Pensado para PanelContainers del
+# Dashboard (mini-pitch, chart, tabla, shortlist).
+#
+# accent: si es != Color(0,0,0,0), se usa para el borde izquierdo (banda accent
+# tipo "indicador"). Si es default, el panel queda sin banda lateral.
+static func glass_panel_style(accent: Color = Color(0, 0, 0, 0)) -> StyleBoxFlat:
+	var t: UITheme = get_current()
+	var sb := StyleBoxFlat.new()
+	var glass: Color = t.bg_card
+	glass.a = 0.72
+	sb.bg_color = glass
+	sb.corner_radius_top_left = 12
+	sb.corner_radius_top_right = 12
+	sb.corner_radius_bottom_left = 12
+	sb.corner_radius_bottom_right = 12
+	sb.border_color = Color(1, 1, 1, 0.06)
+	sb.set_border_width_all(1)
+	sb.content_margin_left = 16
+	sb.content_margin_right = 16
+	sb.content_margin_top = 14
+	sb.content_margin_bottom = 14
+	sb.shadow_color = Color(0, 0, 0, 0.35)
+	sb.shadow_size = 10
+	sb.shadow_offset = Vector2(0, 4)
+	return sb
+
+
 static func light_theme() -> UITheme:
 	var t := UITheme.new()
 	# Backgrounds

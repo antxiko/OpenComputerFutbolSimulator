@@ -3799,7 +3799,9 @@ func _render_dashboard_view() -> void:
 	if team != null:
 		var rival: Team = _find_next_rival(team)
 		if rival != null:
-			rival_name = rival.name
+			# Recortar sufijos/prefijos genéricos para tener un nombre corto
+			# pero LEGIBLE en lugar del code de 3 letras.
+			rival_name = _trim_club_name(rival.name)
 			rival_short = "Rep %d" % rival.reputation
 	var kpi_rival := KpiCard.new()
 	kpi_row.add_child(kpi_rival)
@@ -3812,19 +3814,9 @@ func _render_dashboard_view() -> void:
 	mid_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	root.add_child(mid_row)
 
-	# Mini pitch con titulares
+	# Mini pitch con titulares — glass panel
 	var pitch_panel := PanelContainer.new()
-	var pp_sb := StyleBoxFlat.new()
-	pp_sb.bg_color = theme.bg_card
-	pp_sb.corner_radius_top_left = 8
-	pp_sb.corner_radius_top_right = 8
-	pp_sb.corner_radius_bottom_left = 8
-	pp_sb.corner_radius_bottom_right = 8
-	pp_sb.content_margin_left = 14
-	pp_sb.content_margin_right = 14
-	pp_sb.content_margin_top = 12
-	pp_sb.content_margin_bottom = 12
-	pitch_panel.add_theme_stylebox_override("panel", pp_sb)
+	pitch_panel.add_theme_stylebox_override("panel", UIThemeManager.glass_panel_style())
 	pitch_panel.custom_minimum_size = Vector2(420, 260)
 	mid_row.add_child(pitch_panel)
 	var pitch_box := VBoxContainer.new()
@@ -3919,20 +3911,10 @@ func _render_dashboard_view() -> void:
 		liga_label = "Clasificación %s" % ("Primera" if team.division == "primera" else "Segunda")
 	table_widget.setup(columns, rows, liga_label, 7)
 
-	# Shortlist — más espacio horizontal que la tabla (filas con info densa)
+	# Shortlist — glass panel, más espacio horizontal que la tabla
 	var shortlist_panel := PanelContainer.new()
 	shortlist_panel.size_flags_stretch_ratio = 1.4
-	var sl_sb := StyleBoxFlat.new()
-	sl_sb.bg_color = theme.bg_card
-	sl_sb.corner_radius_top_left = 8
-	sl_sb.corner_radius_top_right = 8
-	sl_sb.corner_radius_bottom_left = 8
-	sl_sb.corner_radius_bottom_right = 8
-	sl_sb.content_margin_left = 14
-	sl_sb.content_margin_right = 14
-	sl_sb.content_margin_top = 12
-	sl_sb.content_margin_bottom = 12
-	shortlist_panel.add_theme_stylebox_override("panel", sl_sb)
+	shortlist_panel.add_theme_stylebox_override("panel", UIThemeManager.glass_panel_style())
 	shortlist_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bot_row.add_child(shortlist_panel)
 	var sl_vbox := VBoxContainer.new()
@@ -4000,6 +3982,46 @@ func _short_name(full: String) -> String:
 	if parts.size() <= 1:
 		return full
 	return parts[parts.size() - 1]
+
+
+# Helper: limpia sufijos/prefijos genéricos del nombre oficial de un club
+# para mostrarlo en el Dashboard. Mejor que short_name 3-letras y mejor que
+# nombre completo largo.
+#   "Villarreal Club de Fútbol"     -> "Villarreal"
+#   "Real Club Deportivo Mallorca"  -> "Real Mallorca"  (corta solo "Club Deportivo")
+#   "Fútbol Club Barcelona"         -> "Barcelona"
+#   "Real Madrid Club de Fútbol"    -> "Real Madrid"
+#   "Athletic Club"                 -> "Athletic Club"  (no toca, ya es corto)
+#   "Club Atlético de Madrid"       -> "Atlético Madrid"
+func _trim_club_name(full: String) -> String:
+	if full.length() <= 16:
+		return full
+	var trimmed: String = full
+	# Sufijos comunes (orden importa: probar el más largo primero)
+	var suffixes: Array = [
+		" Club de Fútbol", " Fútbol Club",
+		" Club Deportivo", " Club Atlético",
+		" CF", " CD", " FC",
+	]
+	for sfx: String in suffixes:
+		if trimmed.ends_with(sfx):
+			trimmed = trimmed.substr(0, trimmed.length() - sfx.length()).strip_edges()
+			break
+	# Prefijos comunes
+	var prefixes: Array = [
+		"Fútbol Club ", "Club Atlético de ",
+		"Club Deportivo ",
+	]
+	for pfx: String in prefixes:
+		if trimmed.begins_with(pfx):
+			trimmed = trimmed.substr(pfx.length()).strip_edges()
+			break
+	# Caso especial: "Real Club Deportivo X" -> "Real X" (más compacto)
+	if trimmed.begins_with("Real Club Deportivo "):
+		trimmed = "Real " + trimmed.substr("Real Club Deportivo ".length())
+	# Fallback: si después de todo sigue siendo absurdamente largo, dejar como está
+	# (el auto-shrink del font_size de KpiCard se encarga).
+	return trimmed
 
 
 # Legacy hub view (mantenida temporalmente como reserva — no se renderiza)

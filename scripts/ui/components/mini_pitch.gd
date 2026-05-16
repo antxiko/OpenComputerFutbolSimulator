@@ -95,8 +95,11 @@ func _draw() -> void:
 		if n == 1:
 			offsets_by_idx[idx_list[0]] = Vector2.ZERO
 		else:
-			# Reparto vertical: spread total 0.30 (15% arriba + 15% abajo)
-			var spread: float = 0.30
+			# Reparto vertical entre jugadores con mismo slot (típicamente 2 CBs o 2 CMs
+			# en 4-3-3). Spread amplio para separación visual clara — sin esto los
+			# círculos se solapan y solo se ve uno con dos números pegados.
+			# Spread 0.48 = ±24% del campo en Y → CBs van a y=0.16 y y=0.64.
+			var spread: float = 0.48
 			for j in n:
 				var t: float = float(j) / float(n - 1)  # 0..1
 				var dy: float = (t - 0.5) * spread
