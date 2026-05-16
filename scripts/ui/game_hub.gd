@@ -103,6 +103,12 @@ var team_talk_form_bonus: float = 0.0
 # Histórico ligero: últimos 5 resultados del usuario {won, lost, diff, jornada}
 # para detectar rachas de derrotas (trigger TED).
 var user_recent_results: Array = []
+# v0.4.0 — Dashboard data
+# Puntos acumulados por jornada (paralelo a primera_jornada del user). Crece tras
+# cada simulación de jornada para el line chart del Dashboard.
+var user_points_per_jornada: Array = []  # Array[int]
+# Lista de player_ids marcados por el user desde Mercado (Scout Shortlist).
+var user_shortlist: Array = []  # Array[String]
 # Alineación personalizada del usuario, dict con keys:
 #   formation, eleven_ids (Array[String]), slot_assignments (Array[String]),
 #   tactics: { mentality, tempo, pressing, width }
@@ -466,6 +472,8 @@ func _start_season() -> void:
 	selected_match = null
 	winter_market_done = false  # se podrá abrir el mercado invernal otra vez
 	last_coach_award_jornada = 0
+	# v0.4.0: reset puntos por jornada del Dashboard (cada temporada acumula desde 0)
+	user_points_per_jornada = []
 	user_points_at_last_award = 0
 	# Generar objetivo del club para esta temporada
 	if user_team_id != "":
@@ -3343,6 +3351,10 @@ func _simulate_jornada(state: DivisionState) -> void:
 				})
 				while user_recent_results.size() > 5:
 					user_recent_results.pop_front()
+				# v0.4.0 Dashboard: puntos acumulados por jornada del user
+				var prev_points: int = user_points_per_jornada.back() if not user_points_per_jornada.is_empty() else 0
+				var pts_this: int = 3 if u_s > r_s else (1 if u_s == r_s else 0)
+				user_points_per_jornada.append(prev_points + pts_this)
 			# Procesar tarjetas → posibles sanciones para el próximo partido
 			CardSystem.process_match(result, all_teams)
 			# Stats de jugador por temporada: matches + minutos (titulares = 90 min)
@@ -3469,7 +3481,8 @@ func _save_to_slot(slot: String) -> void:
 		primera_state.current_jornada, segunda_state.current_jornada,
 		primera_state.league_table, segunda_state.league_table,
 		user_team_id, user_lineup_template, user_career_history, user_protagonist_id,
-		user_inbox, manager_reputation, board_expectations, agents_pool, user_recent_results)
+		user_inbox, manager_reputation, board_expectations, agents_pool, user_recent_results,
+		user_points_per_jornada, user_shortlist)
 	if result.get("ok", false):
 		status_label.text = "Partida guardada en '%s' — %s" % [slot, result["saved_at"]]
 	else:
@@ -3528,6 +3541,9 @@ func _load_from_slot(slot: String) -> void:
 	# lo regenerará al volver a _load_data)
 	agents_pool = save_data.agents_pool.duplicate()
 	user_recent_results = save_data.user_recent_results.duplicate(true)
+	# v0.4.0 — Dashboard data
+	user_points_per_jornada = save_data.user_points_per_jornada.duplicate()
+	user_shortlist = save_data.user_shortlist.duplicate()
 	# Si la save está mid-season tras la jornada 19, asumimos que el winter
 	# market ya se ejecutó. Evita disparo duplicado al avanzar jornadas.
 	winter_market_done = (save_data.primera_jornada >= 19)
@@ -3677,7 +3693,7 @@ func _refresh_ui() -> void:
 		c.queue_free()
 
 	match current_view:
-		VIEW_HUB: _render_hub_view()
+		VIEW_HUB: _render_dashboard_view()
 		VIEW_TABLE: _render_table_view()
 		VIEW_FIXTURES: _render_fixtures_view()
 		VIEW_TEAM: _render_team_view()
@@ -3700,12 +3716,297 @@ func _refresh_ui() -> void:
 # Vista: Clasificación
 # --------------------------------------------------------------------------- #
 # =========================================================================== #
-# Vista: 🏠 HUB principal estilo PC Manager
+# Vista: Dashboard (v0.4.0) — NUEVO estilo dashboard moderno
 # =========================================================================== #
-# 4 cuadrantes: Seguimiento (verde) | Entrenador (azul)
-#               Mercado    (rojo)   | Finanzas   (marrón)
-# Centro: tu equipo + próximo rival
-func _render_hub_view() -> void:
+# Layout:
+#   - Fila superior: 4 KPI cards (Posición liga, Forma 5 últimos, Morale, Próximo rival)
+#   - Fila media: MiniPitch (once) | LineChart (puntos por jornada)
+#   - Fila inferior: DataTable (top 5 Liga) | Shortlist
+func _render_dashboard_view() -> void:
+	var team := _find_team_by_id(user_team_id) if user_team_id != "" else null
+	var theme: UITheme = UIThemeManager.get_current()
+
+	var root := VBoxContainer.new()
+	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	root.add_theme_constant_override("separation", 14)
+	content_area.add_child(root)
+
+	# ============ FILA 1: 4 KPI cards ============
+	var kpi_row := HBoxContainer.new()
+	kpi_row.add_theme_constant_override("separation", 12)
+	kpi_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.add_child(kpi_row)
+
+	# KPI 1: Posición liga
+	var liga_pos: int = 0
+	var liga_pts: int = 0
+	if team != null:
+		var st: DivisionState = primera_state if team.division == "primera" else segunda_state
+		if st.league_table != null:
+			var sorted_rows: Array = st.league_table.sorted_rows()
+			for i in sorted_rows.size():
+				var r: LeagueTable.TeamRow = sorted_rows[i]
+				if r.team_id == team.id:
+					liga_pos = i + 1
+					liga_pts = r.won * 3 + r.drawn
+					break
+	var kpi_liga := KpiCard.new()
+	kpi_row.add_child(kpi_liga)
+	kpi_liga.set_accent_color(theme.accent_primary)
+	kpi_liga.setup("Posición Liga", "%dº" % liga_pos if liga_pos > 0 else "—",
+			"%d pts" % liga_pts, "", "flat", "📊")
+
+	# KPI 2: Forma últimos 5
+	var form_str: String = ""
+	var form_wins: int = 0
+	var form_losses: int = 0
+	for r: Dictionary in user_recent_results:
+		if bool(r.get("won", false)):
+			form_str += "V"; form_wins += 1
+		elif bool(r.get("lost", false)):
+			form_str += "D"; form_losses += 1
+		else:
+			form_str += "E"
+	if form_str.is_empty():
+		form_str = "—"
+	var form_trend_dir: String = "up" if form_wins > form_losses else ("down" if form_losses > form_wins else "flat")
+	var form_trend: String = "+%dV" % form_wins if form_wins > 0 else ""
+	var kpi_form := KpiCard.new()
+	kpi_row.add_child(kpi_form)
+	kpi_form.set_accent_color(theme.accent_success)
+	kpi_form.setup("Forma últimos 5", form_str, "%d V · %d D" % [form_wins, form_losses],
+			form_trend, form_trend_dir, "📈")
+
+	# KPI 3: Morale promedio
+	var morale_avg: float = 0.0
+	if team != null and team.players.size() > 0:
+		var total: float = 0.0
+		for p: Player in team.players:
+			total += p.morale
+		morale_avg = total / float(team.players.size())
+	var morale_str: String = "%d%%" % int(round(morale_avg))
+	var morale_dir: String = "up" if morale_avg >= 70 else ("flat" if morale_avg >= 50 else "down")
+	var kpi_morale := KpiCard.new()
+	kpi_row.add_child(kpi_morale)
+	kpi_morale.set_accent_color(theme.accent_warning)
+	kpi_morale.setup("Morale plantilla", morale_str, "Promedio %d jugadores" % (team.players.size() if team else 0),
+			"", morale_dir, "🟢" if morale_avg >= 70 else ("🟡" if morale_avg >= 50 else "🔴"))
+
+	# KPI 4: Próximo rival
+	var rival_name: String = "—"
+	var rival_short: String = ""
+	if team != null:
+		var rival: Team = _find_next_rival(team)
+		if rival != null:
+			rival_name = rival.name
+			rival_short = "Rep %d" % rival.reputation
+	var kpi_rival := KpiCard.new()
+	kpi_row.add_child(kpi_rival)
+	kpi_rival.set_accent_color(theme.accent_info)
+	kpi_rival.setup("Próximo rival", rival_name, rival_short, "", "flat", "⚽")
+
+	# ============ FILA 2: MiniPitch | LineChart ============
+	var mid_row := HBoxContainer.new()
+	mid_row.add_theme_constant_override("separation", 12)
+	mid_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.add_child(mid_row)
+
+	# Mini pitch con titulares
+	var pitch_panel := PanelContainer.new()
+	var pp_sb := StyleBoxFlat.new()
+	pp_sb.bg_color = theme.bg_card
+	pp_sb.corner_radius_top_left = 8
+	pp_sb.corner_radius_top_right = 8
+	pp_sb.corner_radius_bottom_left = 8
+	pp_sb.corner_radius_bottom_right = 8
+	pp_sb.content_margin_left = 14
+	pp_sb.content_margin_right = 14
+	pp_sb.content_margin_top = 12
+	pp_sb.content_margin_bottom = 12
+	pitch_panel.add_theme_stylebox_override("panel", pp_sb)
+	pitch_panel.custom_minimum_size = Vector2(420, 260)
+	mid_row.add_child(pitch_panel)
+	var pitch_box := VBoxContainer.new()
+	pitch_box.add_theme_constant_override("separation", 6)
+	pitch_panel.add_child(pitch_box)
+	var pitch_title := Label.new()
+	pitch_title.text = "STARTING XI"
+	pitch_title.add_theme_font_size_override("font_size", 11)
+	pitch_title.add_theme_color_override("font_color", theme.text_secondary)
+	pitch_box.add_child(pitch_title)
+	var mini_pitch := MiniPitch.new()
+	mini_pitch.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mini_pitch.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	pitch_box.add_child(mini_pitch)
+	var pitch_players: Array = []
+	if team != null and not user_lineup_template.is_empty():
+		var eleven_ids: Array = user_lineup_template.get("eleven_ids", [])
+		var slot_assigns: Array = user_lineup_template.get("slot_assignments", [])
+		for i in eleven_ids.size():
+			var p: Player = team.find_player(String(eleven_ids[i]))
+			if p == null:
+				continue
+			var slot: String = String(slot_assigns[i]) if i < slot_assigns.size() else "CM"
+			pitch_players.append({
+				"slot": slot,
+				"number": str(p.shirt_number) if p.shirt_number > 0 else "",
+				"short_name": _short_name(p.name),
+				"is_gk": slot == "GK",
+			})
+	# Si no hay user lineup, intentar AutoLineup
+	if pitch_players.is_empty() and team != null:
+		var auto: Lineup = AutoLineup.pick(team, team.tactics_default.formation)
+		if auto != null:
+			for i in auto.starting_eleven.size():
+				var p: Player = auto.starting_eleven[i]
+				var slot: String = auto.slot_assignments[i] if i < auto.slot_assignments.size() else "CM"
+				pitch_players.append({
+					"slot": slot,
+					"number": str(p.shirt_number) if p.shirt_number > 0 else "",
+					"short_name": _short_name(p.name),
+					"is_gk": slot == "GK",
+				})
+	mini_pitch.setup(pitch_players, true)
+
+	# Line chart: puntos por jornada
+	var chart := LineChart.new()
+	chart.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	chart.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	mid_row.add_child(chart)
+	var labels: Array = []
+	for i in user_points_per_jornada.size():
+		labels.append("J%d" % (i + 1))
+	chart.setup(user_points_per_jornada, labels, "Puntos acumulados (Liga)", "Pts")
+
+	# ============ FILA 3: Tabla Liga (top 5) | Shortlist ============
+	var bot_row := HBoxContainer.new()
+	bot_row.add_theme_constant_override("separation", 12)
+	bot_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.add_child(bot_row)
+
+	# Tabla Liga top 5 — menos peso horizontal que el shortlist
+	var table_widget := DataTable.new()
+	table_widget.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	table_widget.size_flags_stretch_ratio = 1.0
+	bot_row.add_child(table_widget)
+	var columns: Array = [
+		{"key": "pos", "label": "#", "width": 30, "align": "right"},
+		{"key": "team", "label": "Equipo"},
+		{"key": "pj", "label": "PJ", "width": 36, "align": "right"},
+		{"key": "pts", "label": "Pts", "width": 44, "align": "right"},
+		{"key": "dif", "label": "DG", "width": 40, "align": "right"},
+	]
+	var rows: Array = []
+	if team != null:
+		var st_t: DivisionState = primera_state if team.division == "primera" else segunda_state
+		if st_t.league_table != null:
+			var sorted_rows: Array = st_t.league_table.sorted_rows()
+			var max_n: int = min(7, sorted_rows.size())
+			for i in range(max_n):
+				var r: LeagueTable.TeamRow = sorted_rows[i]
+				var t_obj: Team = _find_team_by_id(r.team_id)
+				rows.append({
+					"pos": "%d" % (i + 1),
+					"team": t_obj.name if t_obj else r.team_id,
+					"pj": "%d" % r.played,
+					"pts": "%d" % (r.won * 3 + r.drawn),
+					"dif": "%+d" % (r.goals_for - r.goals_against),
+					"highlight": r.team_id == user_team_id,
+				})
+	var liga_label: String = "Clasificación Liga"
+	if team != null:
+		liga_label = "Clasificación %s" % ("Primera" if team.division == "primera" else "Segunda")
+	table_widget.setup(columns, rows, liga_label, 7)
+
+	# Shortlist — más espacio horizontal que la tabla (filas con info densa)
+	var shortlist_panel := PanelContainer.new()
+	shortlist_panel.size_flags_stretch_ratio = 1.4
+	var sl_sb := StyleBoxFlat.new()
+	sl_sb.bg_color = theme.bg_card
+	sl_sb.corner_radius_top_left = 8
+	sl_sb.corner_radius_top_right = 8
+	sl_sb.corner_radius_bottom_left = 8
+	sl_sb.corner_radius_bottom_right = 8
+	sl_sb.content_margin_left = 14
+	sl_sb.content_margin_right = 14
+	sl_sb.content_margin_top = 12
+	sl_sb.content_margin_bottom = 12
+	shortlist_panel.add_theme_stylebox_override("panel", sl_sb)
+	shortlist_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bot_row.add_child(shortlist_panel)
+	var sl_vbox := VBoxContainer.new()
+	sl_vbox.add_theme_constant_override("separation", 6)
+	shortlist_panel.add_child(sl_vbox)
+	var sl_title := Label.new()
+	sl_title.text = "SCOUT SHORTLIST"
+	sl_title.add_theme_font_size_override("font_size", 11)
+	sl_title.add_theme_color_override("font_color", theme.text_secondary)
+	sl_vbox.add_child(sl_title)
+	if user_shortlist.is_empty():
+		var empty_lbl := Label.new()
+		empty_lbl.text = "Sin jugadores marcados.\nVe al Mercado y pulsa el ✚ para añadir."
+		empty_lbl.add_theme_font_size_override("font_size", 12)
+		empty_lbl.add_theme_color_override("font_color", theme.text_muted)
+		sl_vbox.add_child(empty_lbl)
+	else:
+		var count_shown: int = 0
+		for pid: String in user_shortlist:
+			if count_shown >= 8:
+				break
+			var info: Dictionary = _find_player_dashboard_info(pid)
+			if info.is_empty():
+				continue
+			var row := ShortlistRow.new()
+			row.setup(info)
+			row.remove_requested.connect(_on_shortlist_remove)
+			sl_vbox.add_child(row)
+			count_shown += 1
+
+
+# Devuelve {id, name, pos, age, club, value_eur, tier} para shortlist row
+func _find_player_dashboard_info(player_id: String) -> Dictionary:
+	for t: Team in all_teams:
+		for p: Player in t.players:
+			if p.id != player_id:
+				continue
+			var age: int = p.age_at(year, 7, 1)
+			var pos: String = String(p.positions[0]) if p.positions.size() > 0 else "?"
+			var val: int = MarketValue.compute(p, year, "")
+			return {
+				"id": p.id, "name": p.name, "pos": pos, "age": age,
+				"club": t.short_name, "value_eur": val, "tier": p.tier,
+			}
+	return {}
+
+
+func _on_shortlist_remove(player_id: String) -> void:
+	user_shortlist.erase(player_id)
+	_refresh_ui()
+
+
+# Toggle: añade o quita el player_id de user_shortlist. Llamado desde Mercado.
+func _on_toggle_shortlist(player_id: String) -> void:
+	if player_id in user_shortlist:
+		user_shortlist.erase(player_id)
+	else:
+		user_shortlist.append(player_id)
+	_refresh_ui()
+
+
+# Helper: nombre corto "Lionel Messi" -> "Messi"
+func _short_name(full: String) -> String:
+	var parts: PackedStringArray = full.split(" ")
+	if parts.size() <= 1:
+		return full
+	return parts[parts.size() - 1]
+
+
+# Legacy hub view (mantenida temporalmente como reserva — no se renderiza)
+# =========================================================================== #
+# Vista: 🏠 HUB principal estilo PC Manager (LEGACY — pre-v0.4.0)
+# =========================================================================== #
+func _render_hub_view_legacy() -> void:
 	var team := _find_team_by_id(user_team_id) if user_team_id != "" else null
 
 	# Layout principal: VBox con header + (HBox con cuadrantes) + footer
@@ -5222,11 +5523,21 @@ func _render_market_view() -> void:
 		_market_add_label(buy_grid, _position_label(p), _position_color(p.positions[0] if p.positions.size() > 0 else ""))
 		_market_add_label(buy_grid, str(age), _player_color(p))
 		_market_add_label(buy_grid, str(ovr), _player_color(p))
+		var action_box := HBoxContainer.new()
+		action_box.add_theme_constant_override("separation", 4)
 		var btn := Button.new()
 		btn.text = "Ofertar %s" % TransferMarket._fmt_eur(value)
 		btn.disabled = (value > budget)
 		btn.pressed.connect(_on_attempt_buy.bind(p, t, value))
-		buy_grid.add_child(btn)
+		action_box.add_child(btn)
+		var sl_btn := Button.new()
+		var in_shortlist: bool = p.id in user_shortlist
+		sl_btn.text = "✓" if in_shortlist else "✚"
+		sl_btn.tooltip_text = "Quitar de Shortlist" if in_shortlist else "Añadir a Shortlist"
+		sl_btn.custom_minimum_size = Vector2(28, 0)
+		sl_btn.pressed.connect(_on_toggle_shortlist.bind(p.id))
+		action_box.add_child(sl_btn)
+		buy_grid.add_child(action_box)
 
 	content_area.add_child(HSeparator.new())
 
