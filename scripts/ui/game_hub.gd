@@ -40,6 +40,7 @@ const VIEW_DECISIONS := "decisions"
 const VIEW_EMPLOYEES := "employees"
 const VIEW_INBOX := "inbox"
 const VIEW_AGENTS := "agents"
+const VIEW_SETTINGS := "settings"
 
 
 # --------------------------------------------------------------------------- #
@@ -158,6 +159,8 @@ var load_button: Button
 func _ready() -> void:
 	primera_state.division = "primera"
 	segunda_state.division = "segunda"
+	# v0.4.0 Fase A: cargar tema persistido antes de construir UI
+	UIThemeManager.apply(UserSettings.get_theme_name())
 	_build_ui()
 	_load_data()
 	_load_press_templates()
@@ -348,6 +351,12 @@ func _build_ui() -> void:
 	load_button.tooltip_text = "Cargar partida (multi-slot)"
 	load_button.pressed.connect(_on_load_game)
 	footer.add_child(load_button)
+
+	var settings_button := Button.new()
+	settings_button.text = "⚙"
+	settings_button.tooltip_text = "Ajustes (tema claro/oscuro)"
+	settings_button.pressed.connect(_on_select_view.bind(VIEW_SETTINGS))
+	footer.add_child(settings_button)
 
 	var menu_button := Button.new()
 	menu_button.text = "🏠"
@@ -3556,6 +3565,7 @@ func _refresh_ui() -> void:
 		VIEW_EMPLOYEES: _render_employees_view()
 		VIEW_INBOX: _render_inbox_view()
 		VIEW_AGENTS: _render_agents_view()
+		VIEW_SETTINGS: _render_settings_view()
 
 
 # --------------------------------------------------------------------------- #
@@ -4086,6 +4096,7 @@ func _view_title_for(view: String) -> String:
 		VIEW_EMPLOYEES: return "👔 Empleados"
 		VIEW_INBOX: return "📬 Inbox"
 		VIEW_AGENTS: return "🤝 Agentes"
+		VIEW_SETTINGS: return "⚙ Settings"
 		VIEW_MATCH:     return "📺 Detalle de partido"
 		_: return ""
 
@@ -6356,3 +6367,72 @@ func _update_form_for_match(home_lineup: Lineup, away_lineup: Lineup, result: Ma
 		# Suplentes que NO entraron: leve regresión a la media
 		for p2: Player in lineup.subs_available:
 			FormTracker.update_no_play(p2)
+
+
+# =========================================================================== #
+# v0.4.0 Fase A — Vista Settings (toggle dark/light)
+# =========================================================================== #
+func _render_settings_view() -> void:
+	var header := Label.new()
+	header.text = "⚙ Ajustes"
+	header.add_theme_font_size_override("font_size", 18)
+	content_area.add_child(header)
+	content_area.add_child(HSeparator.new())
+
+	# Sección: Tema visual
+	var theme_section := Label.new()
+	theme_section.text = "Tema visual"
+	theme_section.add_theme_font_size_override("font_size", 14)
+	theme_section.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
+	content_area.add_child(theme_section)
+
+	var theme_hint := Label.new()
+	theme_hint.text = "Elige entre tema oscuro (default, mejor para sesiones largas) o tema claro (estilo dashboard moderno)."
+	theme_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	theme_hint.add_theme_font_size_override("font_size", 11)
+	theme_hint.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
+	content_area.add_child(theme_hint)
+
+	var theme_row := HBoxContainer.new()
+	theme_row.add_theme_constant_override("separation", 10)
+	content_area.add_child(theme_row)
+
+	var current_name: String = UIThemeManager.get_current_name()
+
+	var dark_btn := Button.new()
+	dark_btn.text = "🌙 Oscuro" + ("  ✓" if current_name == UIThemeManager.THEME_DARK else "")
+	dark_btn.toggle_mode = true
+	dark_btn.button_pressed = (current_name == UIThemeManager.THEME_DARK)
+	dark_btn.pressed.connect(_on_theme_selected.bind(UIThemeManager.THEME_DARK))
+	theme_row.add_child(dark_btn)
+
+	var light_btn := Button.new()
+	light_btn.text = "☀ Claro" + ("  ✓" if current_name == UIThemeManager.THEME_LIGHT else "")
+	light_btn.toggle_mode = true
+	light_btn.button_pressed = (current_name == UIThemeManager.THEME_LIGHT)
+	light_btn.pressed.connect(_on_theme_selected.bind(UIThemeManager.THEME_LIGHT))
+	theme_row.add_child(light_btn)
+
+	content_area.add_child(HSeparator.new())
+
+	# Sección: persistencia
+	var note := Label.new()
+	note.text = "Los ajustes se guardan en user://settings.json y persisten al reiniciar el juego."
+	note.add_theme_font_size_override("font_size", 11)
+	note.add_theme_color_override("font_color", UIThemeManager.get_current().text_muted)
+	content_area.add_child(note)
+
+	# v0.4.0 fases B-E: aquí irán más opciones (volumen, idioma, etc.)
+	content_area.add_child(HSeparator.new())
+	var future := Label.new()
+	future.text = "Más opciones disponibles en próximas versiones (volumen, idioma, animaciones)."
+	future.add_theme_font_size_override("font_size", 11)
+	future.add_theme_color_override("font_color", UIThemeManager.get_current().text_muted)
+	content_area.add_child(future)
+
+
+func _on_theme_selected(theme_name: String) -> void:
+	if UIThemeManager.apply(theme_name):
+		UserSettings.set_theme_name(theme_name)
+		status_label.text = "Tema cambiado a '%s'. Recarga la partida o reabre el juego para ver los cambios completos." % theme_name
+	_refresh_ui()
