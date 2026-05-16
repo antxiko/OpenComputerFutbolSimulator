@@ -527,7 +527,7 @@ func _run_preseason_friendlies() -> void:
 func _show_preseason_modal(user_team: Team, results: Array) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "🟢 Pre-temporada %d-%d" % [year, year + 1]
-	popup.size = Vector2(560, 380)
+	popup.min_size = Vector2(560, 380)
 	popup.ok_button_text = "Empezar Liga"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -581,7 +581,7 @@ func _show_preseason_modal(user_team: Team, results: Array) -> void:
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(560, 380))
 
 
 # =========================================================================== #
@@ -608,7 +608,7 @@ func _run_winter_market() -> void:
 func _show_winter_market_modal(market_result: TransferMarket.MarketResult) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "❄️ Mercado de invierno %d" % year
-	popup.size = Vector2(620, 420)
+	popup.min_size = Vector2(620, 420)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -673,7 +673,7 @@ func _show_winter_market_modal(market_result: TransferMarket.MarketResult) -> vo
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(620, 420))
 
 
 # Modal de resumen del mercado de verano (incluye renovaciones, free agents,
@@ -681,7 +681,7 @@ func _show_winter_market_modal(market_result: TransferMarket.MarketResult) -> vo
 func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "☀ Mercado de verano %d" % year
-	popup.size = Vector2(700, 540)
+	popup.min_size = Vector2(700, 540)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var scroll := ScrollContainer.new()
@@ -823,7 +823,7 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(700, 540))
 
 
 # =========================================================================== #
@@ -915,7 +915,7 @@ func _show_renewals_view_modal(team: Team, pending: Array, season_year: int) -> 
 		list_box.add_child(row)
 
 	popup.ok_button_text = "Aplicar y continuar al verano"
-	popup.popup_centered()
+	popup.popup_centered(Vector2(720, 540))
 	# Espera a que el usuario confirme. dialog_close_on_escape deshabilitado
 	# y sin botón cancel — el único exit es la señal confirmed.
 	await popup.confirmed
@@ -983,7 +983,7 @@ func _open_renewal_offer_modal(player: Player, season_year: int, decisions: Dict
 	popup.ok_button_text = "Cerrar sin oferta"
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(440, 320))
 
 
 func _fmt_eur(amount: int) -> String:
@@ -1192,7 +1192,7 @@ func _show_objective_evaluation_modal(eval: Dictionary) -> void:
 			int(eval.get("actual_position", 0))])
 	var popup := AcceptDialog.new()
 	popup.title = "🎯 Evaluación del objetivo"
-	popup.size = Vector2(540, 320)
+	popup.min_size = Vector2(540, 320)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -1229,7 +1229,7 @@ func _show_objective_evaluation_modal(eval: Dictionary) -> void:
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(540, 320))
 
 
 # Premio "Entrenador del mes": cada 4 jornadas chequeamos cuántos puntos
@@ -1262,7 +1262,7 @@ func _evaluate_coach_of_the_month() -> void:
 func _show_coach_award_modal(verdict: String, points: int, prize: int) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "🏅 Entrenador del mes"
-	popup.size = Vector2(420, 220)
+	popup.min_size = Vector2(420, 220)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -1281,7 +1281,7 @@ func _show_coach_award_modal(verdict: String, points: int, prize: int) -> void:
 	box.add_child(detail)
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(420, 220))
 	# v0.3.1: registrar en inbox
 	_inbox_add("coach_award", "🏅 Entrenador del mes",
 		"%s — %d puntos en las últimas 4 jornadas. Premio: %s€." % [
@@ -1378,7 +1378,7 @@ func _find_user_result_in_last_jornada() -> MatchResult:
 func _show_post_match_modal(r: MatchResult) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "Resultado de tu partido"
-	popup.size = Vector2(560, 460)
+	popup.min_size = Vector2(560, 460)
 	popup.ok_button_text = "Continuar"
 	# Botón extra: Ver en 2D (replay del partido del usuario)
 	var view_2d_btn: Button = popup.add_button("🎬 Ver replay en 2D", true, "view_2d")
@@ -1484,7 +1484,7 @@ func _show_post_match_modal(r: MatchResult) -> void:
 			popup.queue_free()
 			_on_open_2d_viewer(r)
 	)
-	popup.popup_centered()
+	popup.popup_centered(Vector2(560, 460))
 
 
 # Calcula el MVP del partido. Heurística simple:
@@ -1546,7 +1546,7 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 
 	var popup := ConfirmationDialog.new()
 	popup.title = "Pre-partido — Jornada %d (%s)" % [user_fx_data["jornada_num"], String(user_fx_data["division"]).capitalize()]
-	popup.size = Vector2(560, 420)
+	popup.min_size = Vector2(560, 420)
 	popup.ok_button_text = "▶ Jugar (resultado directo)"
 	popup.cancel_button_text = "Configurar alineación"
 	# Botón extra: jugar y abrir visor 2D automáticamente al terminar
@@ -1659,7 +1659,7 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 			auto_open_2d_after_match = true
 			_do_advance_jornada()
 	)
-	popup.popup_centered()
+	popup.popup_centered(Vector2(560, 420))
 
 
 func _on_advance_full_season() -> void:
@@ -1880,7 +1880,7 @@ func _close_finances_for_all(cup_bracket: CupBracket, summer_result: TransferMar
 func _show_playoff_modal(movement: PromotionRelegation.Movement) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "🎟 Playoff de ascenso a Primera"
-	popup.size = Vector2(540, 360)
+	popup.min_size = Vector2(540, 360)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -1943,13 +1943,13 @@ func _show_playoff_modal(movement: PromotionRelegation.Movement) -> void:
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(540, 360))
 
 
 func _show_supercopa_modal(sc: SupercopaSimulator.SupercopaResult) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "🏆 Supercopa de España %d" % sc.year
-	popup.size = Vector2(520, 360)
+	popup.min_size = Vector2(520, 360)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -1989,7 +1989,7 @@ func _show_supercopa_modal(sc: SupercopaSimulator.SupercopaResult) -> void:
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(520, 360))
 
 
 # =========================================================================== #
@@ -2101,7 +2101,7 @@ func _show_manager_offers_modal(current_team: Team, offers: Array, score: int) -
 			"Tras tu temporada en %s, te buscan: %s." % [current_team.short_name, ", ".join(offer_names)])
 	var popup := AcceptDialog.new()
 	popup.title = "📨 Ofertas de mánager"
-	popup.size = Vector2(640, 480)
+	popup.min_size = Vector2(640, 480)
 	popup.ok_button_text = "Quedarme en %s" % current_team.short_name
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -2137,7 +2137,7 @@ func _show_manager_offers_modal(current_team: Team, offers: Array, score: int) -
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(640, 480))
 
 
 func _make_offer_row(current_team: Team, offer_team: Team, popup: AcceptDialog) -> Control:
@@ -2491,7 +2491,7 @@ func _make_label(text: String, font_size: int, color: Color) -> Label:
 func _show_champions_modal(bracket: ChampionsBracket) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "🏆 Champions League %d" % bracket.season_year
-	popup.size = Vector2(560, 380)
+	popup.min_size = Vector2(560, 380)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -2528,7 +2528,7 @@ func _show_champions_modal(bracket: ChampionsBracket) -> void:
 	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	box.add_child(hint)
 
-	popup.popup_centered()
+	popup.popup_centered(Vector2(560, 380))
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
 
@@ -2955,7 +2955,7 @@ func _on_search_sponsor(team: Team) -> void:
 func _show_finance_balance_modal(summary: Dictionary) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "💰 Balance temporada %d-%d" % [int(summary.get("year", 0)), int(summary.get("year", 0)) + 1]
-	popup.size = Vector2(620, 460)
+	popup.min_size = Vector2(620, 460)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -3006,7 +3006,7 @@ func _show_finance_balance_modal(summary: Dictionary) -> void:
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(620, 460))
 
 
 func _finances_row(grid: GridContainer, label: String, amount: int) -> void:
@@ -3396,7 +3396,7 @@ func _simulate_jornada(state: DivisionState) -> void:
 func _show_grave_injuries_modal(injuries: Array) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "🏥 Parte médico"
-	popup.size = Vector2(500, 280)
+	popup.min_size = Vector2(500, 280)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -3423,7 +3423,7 @@ func _show_grave_injuries_modal(injuries: Array) -> void:
 		box.add_child(l)
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(500, 280))
 
 
 func _set_buttons_disabled(d: bool) -> void:
@@ -4905,7 +4905,7 @@ func _on_pick_user_team() -> void:
 	# Para v1 simple, abrimos un Popup con OptionButton.
 	var popup := AcceptDialog.new()
 	popup.title = "Elige tu club"
-	popup.size = Vector2(320, 180)
+	popup.min_size = Vector2(320, 180)
 	add_child(popup)
 	var vbox := VBoxContainer.new()
 	popup.add_child(vbox)
@@ -4937,7 +4937,7 @@ func _on_pick_user_team() -> void:
 		popup.queue_free()
 	)
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(320, 180))
 
 
 func _initialize_user_lineup() -> void:
@@ -5281,7 +5281,7 @@ func _on_attempt_buy(player: Player, seller_team: Team, fee: int) -> void:
 	var accept_p: float = TransferMarket._seller_acceptance_prob(player, seller_team, fee, year)
 	var popup := ConfirmationDialog.new()
 	popup.title = "Oferta por %s" % player.name
-	popup.size = Vector2(420, 200)
+	popup.min_size = Vector2(420, 200)
 	add_child(popup)
 	var box := VBoxContainer.new()
 	popup.add_child(box)
@@ -5328,7 +5328,7 @@ func _on_attempt_buy(player: Player, seller_team: Team, fee: int) -> void:
 		if String(action) == "talk_first":
 			popup.queue_free()
 			_run_persuasion_then_retry_buy(player, seller_team, fee))
-	popup.popup_centered()
+	popup.popup_centered(Vector2(420, 200))
 
 
 func _run_persuasion_then_retry_buy(player: Player, seller_team: Team, fee: int) -> void:
@@ -5393,7 +5393,7 @@ func _show_counter_offer_modal(player: Player, seller_team: Team, original_fee: 
 		return
 	var popup := ConfirmationDialog.new()
 	popup.title = "Contraoferta de %s" % seller_team.short_name
-	popup.size = Vector2(440, 220)
+	popup.min_size = Vector2(440, 220)
 	add_child(popup)
 	var box := VBoxContainer.new()
 	popup.add_child(box)
@@ -5415,7 +5415,7 @@ func _show_counter_offer_modal(player: Player, seller_team: Team, original_fee: 
 	popup.cancel_button_text = "Rechazar"
 	popup.confirmed.connect(_on_accept_counter_offer.bind(player, seller_team, counter_fee, popup))
 	popup.canceled.connect(_on_reject_counter_offer.bind(player, seller_team, popup))
-	popup.popup_centered()
+	popup.popup_centered(Vector2(440, 220))
 
 
 func _on_accept_counter_offer(player: Player, seller_team: Team, counter_fee: int, popup: ConfirmationDialog) -> void:
@@ -5465,7 +5465,7 @@ func _on_reject_counter_offer(player: Player, seller_team: Team, popup: Confirma
 func _on_attempt_sell(player: Player, fee: int) -> void:
 	var popup := ConfirmationDialog.new()
 	popup.title = "Vender a %s" % player.name
-	popup.size = Vector2(380, 160)
+	popup.min_size = Vector2(380, 160)
 	add_child(popup)
 	var box := VBoxContainer.new()
 	popup.add_child(box)
@@ -5478,7 +5478,7 @@ func _on_attempt_sell(player: Player, fee: int) -> void:
 		popup.queue_free()
 		_resolve_sell(player, fee))
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(380, 160))
 
 
 func _resolve_sell(player: Player, fee: int) -> void:
@@ -5503,7 +5503,7 @@ func _on_change_slot_player(slot_idx: int, slot: String, team: Team) -> void:
 	# Diálogo con candidatos compatibles
 	var popup := AcceptDialog.new()
 	popup.title = "Elige jugador para slot %s" % slot
-	popup.size = Vector2(420, 240)
+	popup.min_size = Vector2(420, 240)
 	add_child(popup)
 	var vbox := VBoxContainer.new()
 	popup.add_child(vbox)
@@ -5539,7 +5539,7 @@ func _on_change_slot_player(slot_idx: int, slot: String, team: Team) -> void:
 		popup.queue_free()
 	)
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(420, 240))
 
 
 # =========================================================================== #
@@ -5762,7 +5762,7 @@ func _show_press_conference_modal() -> bool:
 	box.add_child(feedback_label)
 
 	popup.ok_button_text = "Cerrar"
-	popup.popup_centered()
+	popup.popup_centered(Vector2(560, 360))
 	await popup.confirmed
 	popup.queue_free()
 	return true
@@ -6166,7 +6166,7 @@ func _show_persuasion_modal(player: Player) -> void:
 	box.add_child(feedback_label)
 
 	popup.ok_button_text = "Continuar"
-	popup.popup_centered()
+	popup.popup_centered(Vector2(560, 400))
 	await popup.confirmed
 	popup.queue_free()
 
@@ -6320,7 +6320,7 @@ func _show_team_talk_modal(template: Dictionary) -> void:
 	box.add_child(feedback_label)
 
 	popup.ok_button_text = "Cerrar"
-	popup.popup_centered()
+	popup.popup_centered(Vector2(640, 520))
 	await popup.confirmed
 	popup.queue_free()
 
