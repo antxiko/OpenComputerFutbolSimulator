@@ -528,6 +528,7 @@ func _show_preseason_modal(user_team: Team, results: Array) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "🟢 Pre-temporada %d-%d" % [year, year + 1]
 	popup.min_size = Vector2(560, 380)
+	popup.max_size = Vector2(840, 570)
 	popup.ok_button_text = "Empezar Liga"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -609,6 +610,7 @@ func _show_winter_market_modal(market_result: TransferMarket.MarketResult) -> vo
 	var popup := AcceptDialog.new()
 	popup.title = "❄️ Mercado de invierno %d" % year
 	popup.min_size = Vector2(620, 420)
+	popup.max_size = Vector2(930, 630)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -682,6 +684,7 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "☀ Mercado de verano %d" % year
 	popup.min_size = Vector2(700, 540)
+	popup.max_size = Vector2(1050, 810)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var scroll := ScrollContainer.new()
@@ -841,6 +844,7 @@ func _show_renewals_view_modal(team: Team, pending: Array, season_year: int) -> 
 	popup.dialog_close_on_escape = false
 	popup.unresizable = false
 	popup.min_size = Vector2(720, 540)
+	popup.max_size = Vector2(1080, 810)
 	add_child(popup)
 
 	var root := VBoxContainer.new()
@@ -933,6 +937,7 @@ func _open_renewal_offer_modal(player: Player, season_year: int, decisions: Dict
 	var popup := AcceptDialog.new()
 	popup.title = "Oferta de renovación — %s" % player.name
 	popup.min_size = Vector2(440, 320)
+	popup.max_size = Vector2(660, 480)
 	add_child(popup)
 
 	var box := VBoxContainer.new()
@@ -1193,6 +1198,7 @@ func _show_objective_evaluation_modal(eval: Dictionary) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "🎯 Evaluación del objetivo"
 	popup.min_size = Vector2(540, 320)
+	popup.max_size = Vector2(810, 480)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -1263,6 +1269,7 @@ func _show_coach_award_modal(verdict: String, points: int, prize: int) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "🏅 Entrenador del mes"
 	popup.min_size = Vector2(420, 220)
+	popup.max_size = Vector2(630, 330)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -1379,6 +1386,7 @@ func _show_post_match_modal(r: MatchResult) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "Resultado de tu partido"
 	popup.min_size = Vector2(560, 460)
+	popup.max_size = Vector2(840, 690)
 	popup.ok_button_text = "Continuar"
 	# Botón extra: Ver en 2D (replay del partido del usuario)
 	var view_2d_btn: Button = popup.add_button("🎬 Ver replay en 2D", true, "view_2d")
@@ -1547,6 +1555,7 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 	var popup := ConfirmationDialog.new()
 	popup.title = "Pre-partido — Jornada %d (%s)" % [user_fx_data["jornada_num"], String(user_fx_data["division"]).capitalize()]
 	popup.min_size = Vector2(560, 420)
+	popup.max_size = Vector2(840, 630)
 	popup.ok_button_text = "▶ Jugar (resultado directo)"
 	popup.cancel_button_text = "Configurar alineación"
 	# Botón extra: jugar y abrir visor 2D automáticamente al terminar
@@ -1881,6 +1890,7 @@ func _show_playoff_modal(movement: PromotionRelegation.Movement) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "🎟 Playoff de ascenso a Primera"
 	popup.min_size = Vector2(540, 360)
+	popup.max_size = Vector2(810, 540)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -1950,6 +1960,7 @@ func _show_supercopa_modal(sc: SupercopaSimulator.SupercopaResult) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "🏆 Supercopa de España %d" % sc.year
 	popup.min_size = Vector2(520, 360)
+	popup.max_size = Vector2(780, 540)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -2102,6 +2113,7 @@ func _show_manager_offers_modal(current_team: Team, offers: Array, score: int) -
 	var popup := AcceptDialog.new()
 	popup.title = "📨 Ofertas de mánager"
 	popup.min_size = Vector2(640, 480)
+	popup.max_size = Vector2(960, 720)
 	popup.ok_button_text = "Quedarme en %s" % current_team.short_name
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -2492,6 +2504,7 @@ func _show_champions_modal(bracket: ChampionsBracket) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "🏆 Champions League %d" % bracket.season_year
 	popup.min_size = Vector2(560, 380)
+	popup.max_size = Vector2(840, 570)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -2956,6 +2969,7 @@ func _show_finance_balance_modal(summary: Dictionary) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "💰 Balance temporada %d-%d" % [int(summary.get("year", 0)), int(summary.get("year", 0)) + 1]
 	popup.min_size = Vector2(620, 460)
+	popup.max_size = Vector2(930, 690)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -3397,6 +3411,7 @@ func _show_grave_injuries_modal(injuries: Array) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "🏥 Parte médico"
 	popup.min_size = Vector2(500, 280)
+	popup.max_size = Vector2(750, 420)
 	popup.ok_button_text = "Continuar"
 	add_child(popup)
 	var box := VBoxContainer.new()
@@ -4906,6 +4921,7 @@ func _on_pick_user_team() -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "Elige tu club"
 	popup.min_size = Vector2(320, 180)
+	popup.max_size = Vector2(480, 270)
 	add_child(popup)
 	var vbox := VBoxContainer.new()
 	popup.add_child(vbox)
@@ -5282,6 +5298,7 @@ func _on_attempt_buy(player: Player, seller_team: Team, fee: int) -> void:
 	var popup := ConfirmationDialog.new()
 	popup.title = "Oferta por %s" % player.name
 	popup.min_size = Vector2(420, 200)
+	popup.max_size = Vector2(630, 300)
 	add_child(popup)
 	var box := VBoxContainer.new()
 	popup.add_child(box)
@@ -5394,6 +5411,7 @@ func _show_counter_offer_modal(player: Player, seller_team: Team, original_fee: 
 	var popup := ConfirmationDialog.new()
 	popup.title = "Contraoferta de %s" % seller_team.short_name
 	popup.min_size = Vector2(440, 220)
+	popup.max_size = Vector2(660, 330)
 	add_child(popup)
 	var box := VBoxContainer.new()
 	popup.add_child(box)
@@ -5466,6 +5484,7 @@ func _on_attempt_sell(player: Player, fee: int) -> void:
 	var popup := ConfirmationDialog.new()
 	popup.title = "Vender a %s" % player.name
 	popup.min_size = Vector2(380, 160)
+	popup.max_size = Vector2(570, 240)
 	add_child(popup)
 	var box := VBoxContainer.new()
 	popup.add_child(box)
@@ -5504,6 +5523,7 @@ func _on_change_slot_player(slot_idx: int, slot: String, team: Team) -> void:
 	var popup := AcceptDialog.new()
 	popup.title = "Elige jugador para slot %s" % slot
 	popup.min_size = Vector2(420, 240)
+	popup.max_size = Vector2(630, 360)
 	add_child(popup)
 	var vbox := VBoxContainer.new()
 	popup.add_child(vbox)
@@ -5726,6 +5746,7 @@ func _show_press_conference_modal() -> bool:
 	popup.title = "🎤 Rueda de prensa"
 	popup.dialog_close_on_escape = false
 	popup.min_size = Vector2(560, 360)
+	popup.max_size = Vector2(840, 540)
 	add_child(popup)
 
 	var box := VBoxContainer.new()
@@ -6133,6 +6154,7 @@ func _show_persuasion_modal(player: Player) -> void:
 	popup.title = "💬 Convencer a %s" % player.name
 	popup.dialog_close_on_escape = false
 	popup.min_size = Vector2(560, 400)
+	popup.max_size = Vector2(840, 600)
 	add_child(popup)
 
 	var box := VBoxContainer.new()
@@ -6266,6 +6288,7 @@ func _show_team_talk_modal(template: Dictionary) -> void:
 	popup.title = "💚 CHARLA DEL VESTUARIO — momento corazón abierto"
 	popup.dialog_close_on_escape = false
 	popup.min_size = Vector2(640, 520)
+	popup.max_size = Vector2(960, 780)
 	add_child(popup)
 
 	var box := VBoxContainer.new()
