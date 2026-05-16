@@ -22,6 +22,11 @@ window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/stretch/mode="canvas_items"
 
+[gui]
+
+theme/default_font_subpixel_positioning=1
+theme/default_theme_scale=1.15
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

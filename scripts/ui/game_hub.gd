@@ -263,7 +263,7 @@ func _build_ui() -> void:
 	title_box.add_child(view_title_label)
 	header_subtitle = Label.new()
 	header_subtitle.text = ""
-	header_subtitle.add_theme_font_size_override("font_size", 12)
+	header_subtitle.add_theme_font_size_override("font_size", 13)
 	header_subtitle.add_theme_color_override("font_color", th.text_secondary)
 	title_box.add_child(header_subtitle)
 
@@ -352,14 +352,14 @@ func _build_ui() -> void:
 	status_label = Label.new()
 	status_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	status_label.add_theme_color_override("font_color", th.text_secondary)
-	status_label.add_theme_font_size_override("font_size", 11)
+	status_label.add_theme_font_size_override("font_size", 13)
 	status_h.add_child(status_label)
 
 	# Acciones secundarias: ▶▶ Temporada, 🔁 Nueva temp.
 	advance_all_button = Button.new()
 	advance_all_button.text = "▶▶ Temporada"
 	advance_all_button.flat = true
-	advance_all_button.add_theme_font_size_override("font_size", 11)
+	advance_all_button.add_theme_font_size_override("font_size", 13)
 	advance_all_button.tooltip_text = "Simular toda la temporada sin pausas"
 	advance_all_button.pressed.connect(_on_advance_full_season)
 	status_h.add_child(advance_all_button)
@@ -367,7 +367,7 @@ func _build_ui() -> void:
 	reset_button = Button.new()
 	reset_button.text = "🔁 Nueva temp."
 	reset_button.flat = true
-	reset_button.add_theme_font_size_override("font_size", 11)
+	reset_button.add_theme_font_size_override("font_size", 13)
 	reset_button.tooltip_text = "Cerrar temporada y empezar la siguiente"
 	reset_button.pressed.connect(_on_reset_season)
 	status_h.add_child(reset_button)
@@ -545,7 +545,7 @@ func _show_preseason_modal(user_team: Team, results: Array) -> void:
 	var subtitle := Label.new()
 	subtitle.text = "Sin efecto en la clasificación, pero te dan ritmo de cara al primer partido."
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle.add_theme_font_size_override("font_size", 11)
+	subtitle.add_theme_font_size_override("font_size", 13)
 	subtitle.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
 	box.add_child(subtitle)
 
@@ -576,7 +576,7 @@ func _show_preseason_modal(user_team: Team, results: Array) -> void:
 	var summary := Label.new()
 	summary.text = "Balance: %d V · %d E · %d D" % [won, drawn, lost]
 	summary.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	summary.add_theme_font_size_override("font_size", 12)
+	summary.add_theme_font_size_override("font_size", 13)
 	summary.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
 	box.add_child(summary)
 
@@ -658,7 +658,7 @@ func _show_winter_market_modal(market_result: TransferMarket.MarketResult) -> vo
 		return a.fee_eur > b.fee_eur)
 	var others_label := Label.new()
 	others_label.text = "Top fichajes de la ventana:"
-	others_label.add_theme_font_size_override("font_size", 12)
+	others_label.add_theme_font_size_override("font_size", 13)
 	others_label.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
 	box.add_child(others_label)
 	var shown: int = 0
@@ -669,7 +669,7 @@ func _show_winter_market_modal(market_result: TransferMarket.MarketResult) -> vo
 			continue
 		var l := Label.new()
 		l.text = "  %s · %s → %s · %s €" % [tr.player_name, tr.from_team_name, tr.to_team_name, TransferMarket._fmt_eur(tr.fee_eur)]
-		l.add_theme_font_size_override("font_size", 11)
+		l.add_theme_font_size_override("font_size", 13)
 		box.add_child(l)
 		shown += 1
 
@@ -705,7 +705,7 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 		market.renewals.size(),
 		market.released.size() - market.free_agent_signings.size(),
 	]
-	stats_label.add_theme_font_size_override("font_size", 12)
+	stats_label.add_theme_font_size_override("font_size", 13)
 	stats_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
 	box.add_child(stats_label)
 
@@ -765,7 +765,7 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 			continue
 		var l := Label.new()
 		l.text = "  %s · %s → %s · %s €" % [tr.player_name, tr.from_team_name, tr.to_team_name, TransferMarket._fmt_eur(tr.fee_eur)]
-		l.add_theme_font_size_override("font_size", 11)
+		l.add_theme_font_size_override("font_size", 13)
 		box.add_child(l)
 		shown += 1
 
@@ -789,7 +789,7 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 				String(fa["player_name"]), int(fa["overall"]),
 				String(fa["prev_team_name"]), String(fa["signing_team_name"]),
 			]
-			l.add_theme_font_size_override("font_size", 11)
+			l.add_theme_font_size_override("font_size", 13)
 			box.add_child(l)
 			shown += 1
 
@@ -820,7 +820,7 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 				String(r["player_name"]), int(r["ovr"]),
 				int(r.get("age", 0)), String(r["team_name"]),
 			]
-			l.add_theme_font_size_override("font_size", 11)
+			l.add_theme_font_size_override("font_size", 13)
 			box.add_child(l)
 			shown += 1
 
@@ -889,13 +889,13 @@ func _show_renewals_view_modal(team: Team, pending: Array, season_year: int) -> 
 		var current_salary: int = p.contract.salary_eur_year if p.contract else 0
 		var detail_l := Label.new()
 		detail_l.text = "Salario actual: %s€/año · Justo estimado: %s€/año" % [_fmt_eur(current_salary), _fmt_eur(fair)]
-		detail_l.add_theme_font_size_override("font_size", 11)
+		detail_l.add_theme_font_size_override("font_size", 13)
 		detail_l.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 		info.add_child(detail_l)
 
 		var status_l := Label.new()
 		status_l.text = "⏳ Pendiente"
-		status_l.add_theme_font_size_override("font_size", 11)
+		status_l.add_theme_font_size_override("font_size", 13)
 		status_l.add_theme_color_override("font_color", Color(0.9, 0.8, 0.4))
 		info.add_child(status_l)
 		status_labels[p.id] = status_l
@@ -949,7 +949,7 @@ func _open_renewal_offer_modal(player: Player, season_year: int, decisions: Dict
 
 	var info := Label.new()
 	info.text = "Salario justo estimado: %s€/año\nAños aceptables: %d–%d" % [_fmt_eur(fair), int(year_range[0]), int(year_range[1])]
-	info.add_theme_font_size_override("font_size", 12)
+	info.add_theme_font_size_override("font_size", 13)
 	box.add_child(info)
 
 	# Salario propuesto en €/año (en miles de €)
@@ -976,7 +976,7 @@ func _open_renewal_offer_modal(player: Player, season_year: int, decisions: Dict
 	var feedback := Label.new()
 	feedback.text = ""
 	feedback.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	feedback.add_theme_font_size_override("font_size", 12)
+	feedback.add_theme_font_size_override("font_size", 13)
 	box.add_child(feedback)
 
 	# Botón de envío
@@ -1125,7 +1125,7 @@ func _show_season_objective_modal() -> void:
 	hint.text = "Si lo cumples, la directiva incrementará el presupuesto.\nSi te quedas muy lejos, podrías recibir críticas."
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.add_theme_font_size_override("font_size", 11)
+	hint.add_theme_font_size_override("font_size", 13)
 	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	box.add_child(hint)
 
@@ -1481,7 +1481,7 @@ func _show_post_match_modal(r: MatchResult) -> void:
 			int(s.get("corners", 0)), int(s.get("fouls", 0)),
 			int(s.get("yellows", 0)), int(s.get("reds", 0)),
 		]
-		stats_label.add_theme_font_size_override("font_size", 11)
+		stats_label.add_theme_font_size_override("font_size", 13)
 		box.add_child(stats_label)
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
@@ -1617,7 +1617,7 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 	var l_eleven := Label.new()
 	l_eleven.text = "Once: " + ", ".join(lineup_text)
 	l_eleven.autowrap_mode = TextServer.AUTOWRAP_WORD
-	l_eleven.add_theme_font_size_override("font_size", 11)
+	l_eleven.add_theme_font_size_override("font_size", 13)
 	content.add_child(l_eleven)
 
 	# v0.3.1: team news (lesionados/sancionados) + manager rep
@@ -1642,12 +1642,12 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 		news_l.text = "Bajas (%d lesionados, %d sancionados):\n  " % [inj_count, susp_count] + "\n  ".join(news_text)
 		news_l.add_theme_color_override("font_color", Color(1.0, 0.7, 0.5))
 	news_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	news_l.add_theme_font_size_override("font_size", 11)
+	news_l.add_theme_font_size_override("font_size", 13)
 	content.add_child(news_l)
 
 	var rep_l := Label.new()
 	rep_l.text = "Tu reputación de mánager: %d  ·  Reputación del club: %d" % [manager_reputation, user_team.reputation]
-	rep_l.add_theme_font_size_override("font_size", 11)
+	rep_l.add_theme_font_size_override("font_size", 13)
 	rep_l.add_theme_color_override("font_color", Color(0.85, 0.85, 0.4))
 	content.add_child(rep_l)
 
@@ -1943,7 +1943,7 @@ func _show_playoff_modal(movement: PromotionRelegation.Movement) -> void:
 			String(r.get("winner_name", "?")),
 			rep,
 		]
-		line.add_theme_font_size_override("font_size", 11)
+		line.add_theme_font_size_override("font_size", 13)
 		# Marcar partidos del usuario
 		var is_user_match: bool = String(r.get("home_name", "")) == user_name \
 				or String(r.get("away_name", "")) == user_name
@@ -2129,7 +2129,7 @@ func _show_manager_offers_modal(current_team: Team, offers: Array, score: int) -
 
 	var subheader := Label.new()
 	subheader.text = "Puntuación de tu temporada: %d. Cuanto mayor, mejores ofertas." % score
-	subheader.add_theme_font_size_override("font_size", 11)
+	subheader.add_theme_font_size_override("font_size", 13)
 	subheader.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
 	box.add_child(subheader)
 
@@ -2143,7 +2143,7 @@ func _show_manager_offers_modal(current_team: Team, offers: Array, score: int) -
 	var hint := Label.new()
 	hint.text = "Si aceptas una oferta, dirigirás al nuevo club desde la próxima temporada.\nSi pulsas 'Quedarme', sigues en %s." % current_team.name
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.add_theme_font_size_override("font_size", 10)
+	hint.add_theme_font_size_override("font_size", 13)
 	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	box.add_child(hint)
 
@@ -2182,7 +2182,7 @@ func _make_offer_row(current_team: Team, offer_team: Team, popup: AcceptDialog) 
 	var details := Label.new()
 	details.text = "%s · %s · Reputación %d %s" % [
 		offer_team.city, offer_team.division.capitalize(), offer_team.reputation, stars]
-	details.add_theme_font_size_override("font_size", 11)
+	details.add_theme_font_size_override("font_size", 13)
 	details.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
 	info.add_child(details)
 
@@ -2191,7 +2191,7 @@ func _make_offer_row(current_team: Team, offer_team: Team, popup: AcceptDialog) 
 			"(%d rep)" % rep_diff if rep_diff < 0 else "(misma rep)")
 	var diff_label := Label.new()
 	diff_label.text = "vs tu club actual: %s" % diff_str
-	diff_label.add_theme_font_size_override("font_size", 10)
+	diff_label.add_theme_font_size_override("font_size", 13)
 	diff_label.add_theme_color_override("font_color",
 			Color(0.7, 1.0, 0.7) if rep_diff > 0 else (Color(1.0, 0.7, 0.7) if rep_diff < 0 else Color(0.85, 0.85, 0.85)))
 	info.add_child(diff_label)
@@ -2443,7 +2443,7 @@ func _render_european_bracket(vbox: VBoxContainer, bracket: ChampionsBracket, co
 			for h_text in ["Pos", "Equipo", "PJ", "Pts", "GF", "GC"]:
 				var hl := Label.new()
 				hl.text = h_text
-				hl.add_theme_font_size_override("font_size", 11)
+				hl.add_theme_font_size_override("font_size", 13)
 				hl.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
 				grid.add_child(hl)
 			var standings: Array = g.sorted_standings()
@@ -2487,7 +2487,7 @@ func _render_european_bracket(vbox: VBoxContainer, bracket: ChampionsBracket, co
 			if fx.match_date.size() > 0:
 				date_str = "[%s] " % DateUtil.format_short(fx.match_date)
 			line.text = "  %s%s %s %s%s%s" % [date_str, fx.home_name, score, fx.away_name, winner_short, rep]
-			line.add_theme_font_size_override("font_size", 11)
+			line.add_theme_font_size_override("font_size", 13)
 			vbox.add_child(line)
 
 
@@ -2537,7 +2537,7 @@ func _show_champions_modal(bracket: ChampionsBracket) -> void:
 	var hint := Label.new()
 	hint.text = "Pulsa la pestaña 🏆 Champions para ver el bracket completo."
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hint.add_theme_font_size_override("font_size", 11)
+	hint.add_theme_font_size_override("font_size", 13)
 	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	box.add_child(hint)
 
@@ -2659,7 +2659,7 @@ func _render_finances_view() -> void:
 					parts.append("%s: %s" % [k.capitalize(), TransferMarket._fmt_eur(v)])
 			if parts.size() > 0:
 				pb_label.text = "  Premios: " + " · ".join(parts)
-				pb_label.add_theme_font_size_override("font_size", 11)
+				pb_label.add_theme_font_size_override("font_size", 13)
 				pb_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
 				box.add_child(pb_label)
 
@@ -2709,7 +2709,7 @@ func _render_finances_view() -> void:
 			for proj in team.finances.ongoing_projects:
 				var pl := Label.new()
 				pl.text = "  • %s (termina %d)" % [String(proj.get("type", "?")), int(proj.get("completes_year", 0))]
-				pl.add_theme_font_size_override("font_size", 11)
+				pl.add_theme_font_size_override("font_size", 13)
 				box.add_child(pl)
 
 	# Personal técnico
@@ -2723,7 +2723,7 @@ func _render_finances_view() -> void:
 		for h in ["Rol", "Calidad", "Salario", "Mejorar"]:
 			var hl := Label.new()
 			hl.text = h
-			hl.add_theme_font_size_override("font_size", 11)
+			hl.add_theme_font_size_override("font_size", 13)
 			hl.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
 			staff_grid.add_child(hl)
 		var roles := [
@@ -2738,16 +2738,16 @@ func _render_finances_view() -> void:
 			var q: int = int(r[2])
 			var rl := Label.new()
 			rl.text = role_label
-			rl.add_theme_font_size_override("font_size", 11)
+			rl.add_theme_font_size_override("font_size", 13)
 			staff_grid.add_child(rl)
 			var ql := Label.new()
 			ql.text = "★".repeat(q) + "☆".repeat(5 - q) + "  (%d/5)" % q
-			ql.add_theme_font_size_override("font_size", 11)
+			ql.add_theme_font_size_override("font_size", 13)
 			ql.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
 			staff_grid.add_child(ql)
 			var sl := Label.new()
 			sl.text = "%s €/año" % TransferMarket._fmt_eur(StaffInfo.salary_for_quality(q))
-			sl.add_theme_font_size_override("font_size", 11)
+			sl.add_theme_font_size_override("font_size", 13)
 			staff_grid.add_child(sl)
 			if q >= 5:
 				var maxed := Label.new()
@@ -2779,7 +2779,7 @@ func _render_finances_view() -> void:
 				TransferMarket._fmt_eur(int(sp.get("amount_per_year", 0))),
 				int(sp.get("until_year", 0)),
 			]
-			sl.add_theme_font_size_override("font_size", 11)
+			sl.add_theme_font_size_override("font_size", 13)
 			box.add_child(sl)
 	# Botón buscar patrocinador
 	if team.finances.sponsors.size() < 4:
@@ -2821,7 +2821,7 @@ func _finances_section_header(box: VBoxContainer, text: String) -> void:
 func _make_subheader(grid: GridContainer, text: String, color: Color) -> void:
 	var l := Label.new()
 	l.text = text
-	l.add_theme_font_size_override("font_size", 12)
+	l.add_theme_font_size_override("font_size", 13)
 	l.add_theme_color_override("font_color", color)
 	grid.add_child(l)
 
@@ -2829,11 +2829,11 @@ func _make_subheader(grid: GridContainer, text: String, color: Color) -> void:
 func _simple_row(grid: GridContainer, label: String, value: String) -> void:
 	var l1 := Label.new()
 	l1.text = label
-	l1.add_theme_font_size_override("font_size", 12)
+	l1.add_theme_font_size_override("font_size", 13)
 	grid.add_child(l1)
 	var l2 := Label.new()
 	l2.text = value
-	l2.add_theme_font_size_override("font_size", 12)
+	l2.add_theme_font_size_override("font_size", 13)
 	l2.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
 	grid.add_child(l2)
 
@@ -2842,21 +2842,21 @@ func _finance_pair(grid: GridContainer, label_in: String, amount_in: int, label_
 	# 4 columnas: label_in | amount_in | label_out | amount_out
 	var l1 := Label.new()
 	l1.text = label_in
-	l1.add_theme_font_size_override("font_size", 11)
+	l1.add_theme_font_size_override("font_size", 13)
 	grid.add_child(l1)
 	var l2 := Label.new()
 	l2.text = "%s €" % TransferMarket._fmt_eur(amount_in) if amount_in > 0 else ""
-	l2.add_theme_font_size_override("font_size", 11)
+	l2.add_theme_font_size_override("font_size", 13)
 	l2.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
 	l2.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	grid.add_child(l2)
 	var l3 := Label.new()
 	l3.text = label_out
-	l3.add_theme_font_size_override("font_size", 11)
+	l3.add_theme_font_size_override("font_size", 13)
 	grid.add_child(l3)
 	var l4 := Label.new()
 	l4.text = "%s €" % TransferMarket._fmt_eur(amount_out) if amount_out > 0 else ""
-	l4.add_theme_font_size_override("font_size", 11)
+	l4.add_theme_font_size_override("font_size", 13)
 	l4.add_theme_color_override("font_color", Color(1.0, 0.7, 0.7))
 	l4.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	grid.add_child(l4)
@@ -3003,7 +3003,7 @@ func _show_finance_balance_modal(summary: Dictionary) -> void:
 		var v: int = int(income.get(String(k[1]), 0))
 		var l := Label.new()
 		l.text = "    %s: %s €" % [String(k[0]), TransferMarket._fmt_eur(v)]
-		l.add_theme_font_size_override("font_size", 11)
+		l.add_theme_font_size_override("font_size", 13)
 		box.add_child(l)
 
 	var expense_label := Label.new()
@@ -3015,7 +3015,7 @@ func _show_finance_balance_modal(summary: Dictionary) -> void:
 		var v: int = int(expense.get(String(k[1]), 0))
 		var l := Label.new()
 		l.text = "    %s: %s €" % [String(k[0]), TransferMarket._fmt_eur(v)]
-		l.add_theme_font_size_override("font_size", 11)
+		l.add_theme_font_size_override("font_size", 13)
 		box.add_child(l)
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
@@ -3026,11 +3026,11 @@ func _show_finance_balance_modal(summary: Dictionary) -> void:
 func _finances_row(grid: GridContainer, label: String, amount: int) -> void:
 	var l1 := Label.new()
 	l1.text = label
-	l1.add_theme_font_size_override("font_size", 12)
+	l1.add_theme_font_size_override("font_size", 13)
 	grid.add_child(l1)
 	var l2 := Label.new()
 	l2.text = "%s €" % TransferMarket._fmt_eur(amount)
-	l2.add_theme_font_size_override("font_size", 12)
+	l2.add_theme_font_size_override("font_size", 13)
 	l2.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7) if amount >= 0 else Color(1.0, 0.7, 0.7))
 	l2.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	grid.add_child(l2)
@@ -3109,7 +3109,7 @@ func _render_calendar_user_only(vbox: VBoxContainer, st: DivisionState, user_tea
 			rival_name.left(20) if is_home else user_team.short_name,
 			loc, status,
 		]
-		line.add_theme_font_size_override("font_size", 12)
+		line.add_theme_font_size_override("font_size", 13)
 		var color: Color = Color(0.85, 0.9, 1.0)
 		if j_idx == st.current_jornada:
 			color = Color(1.0, 0.95, 0.5)
@@ -3156,7 +3156,7 @@ func _render_calendar_full(vbox: VBoxContainer, st: DivisionState) -> void:
 			if fixture.has("match_date"):
 				date_str = "[%s] " % DateUtil.format_short(fixture["match_date"])
 			line.text = "  %s%-28s vs %-28s" % [date_str, home.name.left(28), away.name.left(28)]
-			line.add_theme_font_size_override("font_size", 11)
+			line.add_theme_font_size_override("font_size", 13)
 			if played:
 				line.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 			vbox.add_child(line)
@@ -3238,7 +3238,7 @@ func _render_career_view() -> void:
 		var l := Label.new()
 		l.text = h
 		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
-		l.add_theme_font_size_override("font_size", 11)
+		l.add_theme_font_size_override("font_size", 13)
 		grid.add_child(l)
 	# Ordenar por año descendente
 	var sorted_history: Array = user_career_history.duplicate()
@@ -3270,7 +3270,7 @@ func _render_career_view() -> void:
 			var l := Label.new()
 			l.text = c
 			l.add_theme_color_override("font_color", color)
-			l.add_theme_font_size_override("font_size", 10)
+			l.add_theme_font_size_override("font_size", 13)
 			grid.add_child(l)
 
 
@@ -3434,7 +3434,7 @@ func _show_grave_injuries_modal(injuries: Array) -> void:
 		l.text = "  %s — lesión %s, %d días (vuelve aprox. %s)" % [
 			String(inj["name"]), String(inj["tipo"]), int(inj["dias"]), return_str,
 		]
-		l.add_theme_font_size_override("font_size", 12)
+		l.add_theme_font_size_override("font_size", 13)
 		box.add_child(l)
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
@@ -3791,7 +3791,7 @@ func _render_hub_view() -> void:
 	var year_lbl := Label.new()
 	year_lbl.text = "Temporada %d-%d" % [year, year + 1]
 	year_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	year_lbl.add_theme_font_size_override("font_size", 11)
+	year_lbl.add_theme_font_size_override("font_size", 13)
 	year_lbl.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
 	info_v.add_child(year_lbl)
 
@@ -3852,7 +3852,7 @@ func _render_hub_view() -> void:
 			var vs_label := Label.new()
 			vs_label.text = "── próximo rival%s ──" % (" · " + next_date_str if next_date_str != "" else "")
 			vs_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			vs_label.add_theme_font_size_override("font_size", 11)
+			vs_label.add_theme_font_size_override("font_size", 13)
 			vs_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 			center_col.add_child(vs_label)
 			var rival_logo := _make_team_logo(rival, 64)
@@ -3862,7 +3862,7 @@ func _render_hub_view() -> void:
 			var rival_name := Label.new()
 			rival_name.text = rival.short_name
 			rival_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			rival_name.add_theme_font_size_override("font_size", 12)
+			rival_name.add_theme_font_size_override("font_size", 13)
 			center_col.add_child(rival_name)
 		# Caja
 		if team.finances != null:
@@ -3906,7 +3906,7 @@ func _render_hub_view() -> void:
 	root.add_child(status_panel)
 	var status_mirror := Label.new()
 	status_mirror.text = status_label.text if status_label != null else ""
-	status_mirror.add_theme_font_size_override("font_size", 11)
+	status_mirror.add_theme_font_size_override("font_size", 13)
 	status_mirror.add_theme_color_override("font_color", Color(0.7, 0.85, 0.7))
 	status_panel.add_child(status_mirror)
 
@@ -4144,7 +4144,7 @@ func _render_rival_view() -> void:
 		var ovr: int = PlayerFactory.compute_overall(p, "")
 		var line := Label.new()
 		line.text = "  %s — %s — ovr %d (%s)" % [p.name, _position_label(p), ovr, p.tier]
-		line.add_theme_font_size_override("font_size", 12)
+		line.add_theme_font_size_override("font_size", 13)
 		box.add_child(line)
 
 
@@ -4188,7 +4188,7 @@ func _render_decisions_view() -> void:
 				TransferMarket._fmt_eur(int(sp.get("amount_per_year", 0))),
 				int(sp.get("until_year", 0)),
 			]
-			l.add_theme_font_size_override("font_size", 11)
+			l.add_theme_font_size_override("font_size", 13)
 			box.add_child(l)
 		if team.finances.sponsors.size() < 4:
 			var find_btn := Button.new()
@@ -4295,23 +4295,23 @@ func _render_employees_view() -> void:
 		for h in ["Nombre", "Rol", "Calidad", "Salario", "Acción"]:
 			var hl := Label.new()
 			hl.text = h
-			hl.add_theme_font_size_override("font_size", 11)
+			hl.add_theme_font_size_override("font_size", 13)
 			hl.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
 			grid.add_child(hl)
 		for emp: Employee in sec_employees:
 			var l_name := Label.new()
 			l_name.text = emp.name if emp.count == 1 else "%s ×%d" % [emp.role_label, emp.count]
-			l_name.add_theme_font_size_override("font_size", 11)
+			l_name.add_theme_font_size_override("font_size", 13)
 			grid.add_child(l_name)
 			var l_role := Label.new()
 			# Si es individual, mostrar el rol; si es grupal, mostrar "—"
 			l_role.text = emp.role_label if emp.count == 1 else "—"
-			l_role.add_theme_font_size_override("font_size", 11)
+			l_role.add_theme_font_size_override("font_size", 13)
 			l_role.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
 			grid.add_child(l_role)
 			var l_q := Label.new()
 			l_q.text = "★".repeat(emp.quality) + "☆".repeat(5 - emp.quality)
-			l_q.add_theme_font_size_override("font_size", 11)
+			l_q.add_theme_font_size_override("font_size", 13)
 			l_q.add_theme_color_override("font_color", Color(1.0, 0.95, 0.4))
 			grid.add_child(l_q)
 			var l_sal := Label.new()
@@ -4322,7 +4322,7 @@ func _render_employees_view() -> void:
 					TransferMarket._fmt_eur(emp.salary_eur_year), emp.count,
 					TransferMarket._fmt_eur(emp.total_salary()),
 				]
-			l_sal.add_theme_font_size_override("font_size", 11)
+			l_sal.add_theme_font_size_override("font_size", 13)
 			grid.add_child(l_sal)
 			# Acción: subir calidad si <5
 			if emp.quality >= 5:
@@ -4376,7 +4376,7 @@ func _render_table_view() -> void:
 		var l := Label.new()
 		l.text = headers[i]
 		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
-		l.add_theme_font_size_override("font_size", 12)
+		l.add_theme_font_size_override("font_size", 13)
 		# Header de Equipo alineado izquierda; resto centrado/derecha
 		if i == 0 or i >= 2:
 			l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -4426,7 +4426,7 @@ func _add_table_row(grid: GridContainer, pos: int, row: LeagueTable.TeamRow, n_t
 	team_button.tooltip_text = _table_row_tooltip(pos, n_teams, is_primera)
 	team_button.flat = true
 	team_button.add_theme_color_override("font_color", color)
-	team_button.add_theme_font_size_override("font_size", 12)
+	team_button.add_theme_font_size_override("font_size", 13)
 	team_button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	team_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	team_button.custom_minimum_size = Vector2(220, 0)  # ancho fijo: nombre cabe pero no domina
@@ -4442,7 +4442,7 @@ func _add_table_row(grid: GridContainer, pos: int, row: LeagueTable.TeamRow, n_t
 	var l_pos := Label.new()
 	l_pos.text = str(pos)
 	l_pos.add_theme_color_override("font_color", color)
-	l_pos.add_theme_font_size_override("font_size", 12)
+	l_pos.add_theme_font_size_override("font_size", 13)
 	l_pos.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	l_pos.custom_minimum_size = Vector2(28, 0)
 	grid.add_child(l_pos)
@@ -4453,7 +4453,7 @@ func _add_table_row(grid: GridContainer, pos: int, row: LeagueTable.TeamRow, n_t
 		var l := Label.new()
 		l.text = c
 		l.add_theme_color_override("font_color", color)
-		l.add_theme_font_size_override("font_size", 12)
+		l.add_theme_font_size_override("font_size", 13)
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		l.custom_minimum_size = Vector2(32, 0)
 		grid.add_child(l)
@@ -4553,7 +4553,7 @@ func _render_fixtures_view() -> void:
 	var hint := Label.new()
 	hint.text = "(Pulsa cualquier partido para ver eventos y abrir el visor 2D)"
 	hint.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
-	hint.add_theme_font_size_override("font_size", 12)
+	hint.add_theme_font_size_override("font_size", 13)
 	content_area.add_child(hint)
 	content_area.add_child(HSeparator.new())
 
@@ -4642,7 +4642,7 @@ func _render_match_view() -> void:
 			int(s.get("corners", 0)), int(s.get("fouls", 0)),
 			int(s.get("yellows", 0)), int(s.get("reds", 0)),
 		]
-		stats_label.add_theme_font_size_override("font_size", 12)
+		stats_label.add_theme_font_size_override("font_size", 13)
 		content_area.add_child(stats_label)
 
 	content_area.add_child(HSeparator.new())
@@ -4736,7 +4736,7 @@ func _render_team_view() -> void:
 		var l := Label.new()
 		l.text = h
 		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
-		l.add_theme_font_size_override("font_size", 12)
+		l.add_theme_font_size_override("font_size", 13)
 		grid.add_child(l)
 
 	# Ordenar por overall descendente
@@ -4845,7 +4845,7 @@ func _render_protagonist_selector() -> void:
 	var info := Label.new()
 	info.text = "  +30%% probabilidad de ser shooter/asistente · destacado en visor 2D"
 	info.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-	info.add_theme_font_size_override("font_size", 11)
+	info.add_theme_font_size_override("font_size", 13)
 	hbox.add_child(info)
 
 
@@ -5084,7 +5084,7 @@ func _render_tactics_view() -> void:
 	var focus_hint := Label.new()
 	focus_hint.text = "Entrenamiento aplica +1 al atributo focus de cada jugador (titulares y suplentes) al avanzar de temporada."
 	focus_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	focus_hint.add_theme_font_size_override("font_size", 10)
+	focus_hint.add_theme_font_size_override("font_size", 13)
 	focus_hint.add_theme_color_override("font_color", Color(0.65, 0.65, 0.65))
 	content_area.add_child(focus_hint)
 
@@ -5192,7 +5192,7 @@ func _render_market_view() -> void:
 		var l := Label.new()
 		l.text = h
 		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
-		l.add_theme_font_size_override("font_size", 12)
+		l.add_theme_font_size_override("font_size", 13)
 		buy_grid.add_child(l)
 
 	# Recopilar candidatos: top 30 por overall (filtrado por posición si aplica)
@@ -5245,7 +5245,7 @@ func _render_market_view() -> void:
 		var l := Label.new()
 		l.text = h
 		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
-		l.add_theme_font_size_override("font_size", 12)
+		l.add_theme_font_size_override("font_size", 13)
 		sell_grid.add_child(l)
 	var my_players: Array[Player] = user_team.players.duplicate()
 	my_players.sort_custom(func(a: Player, b: Player) -> bool:
@@ -5319,7 +5319,7 @@ func _on_attempt_buy(player: Player, seller_team: Team, fee: int) -> void:
 		var rel: int = int(ag.relations.get(user_team_id, 0))
 		ag_info.text = "🤝 Agente: %s ★%d (%s) — Relación: %+d  ·  Comisión: %d%%" % [
 			ag.name, ag.reputation, ag.personality, rel, int(ag.commission_percentage() * 100)]
-		ag_info.add_theme_font_size_override("font_size", 11)
+		ag_info.add_theme_font_size_override("font_size", 13)
 		ag_info.add_theme_color_override("font_color", _agent_personality_color(ag.personality))
 		box.add_child(ag_info)
 	# v0.3.2: persuasion modifier visible si está activo
@@ -5328,7 +5328,7 @@ func _on_attempt_buy(player: Player, seller_team: Team, fee: int) -> void:
 		mod_info.text = "💬 Charla previa aplicará: %+.0f%% accept" % (pending_persuasion_modifier * 100)
 		mod_info.add_theme_color_override("font_color",
 			Color(0.5, 0.95, 0.6) if pending_persuasion_modifier > 0 else Color(1.0, 0.5, 0.5))
-		mod_info.add_theme_font_size_override("font_size", 11)
+		mod_info.add_theme_font_size_override("font_size", 13)
 		box.add_child(mod_info)
 	popup.ok_button_text = "Hacer oferta"
 	popup.cancel_button_text = "Cancelar"
@@ -5681,7 +5681,7 @@ func _make_inbox_row(m: InboxMessage) -> Control:
 	var when_l := Label.new()
 	var jornada_text: String = "j%d" % m.jornada_when if m.jornada_when > 0 else "—"
 	when_l.text = "[%d · %s]" % [m.year_when, jornada_text]
-	when_l.add_theme_font_size_override("font_size", 11)
+	when_l.add_theme_font_size_override("font_size", 13)
 	when_l.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
 	hdr.add_child(when_l)
 
@@ -5689,7 +5689,7 @@ func _make_inbox_row(m: InboxMessage) -> Control:
 		var body_l := Label.new()
 		body_l.text = m.body
 		body_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		body_l.add_theme_font_size_override("font_size", 12)
+		body_l.add_theme_font_size_override("font_size", 13)
 		body_l.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
 		box.add_child(body_l)
 
@@ -5764,7 +5764,7 @@ func _show_press_conference_modal() -> bool:
 	var feedback_label := Label.new()
 	feedback_label.text = ""
 	feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	feedback_label.add_theme_font_size_override("font_size", 12)
+	feedback_label.add_theme_font_size_override("font_size", 13)
 	feedback_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
 
 	var btn_group := ButtonGroup.new()
@@ -5979,7 +5979,7 @@ func _render_agents_view() -> void:
 	var hint := Label.new()
 	hint.text = "Ordenados por reputación (★) y número de clientes. Si tienes mala relación con un agente, sus jugadores son más caros/difíciles de fichar para ti."
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.add_theme_font_size_override("font_size", 11)
+	hint.add_theme_font_size_override("font_size", 13)
 	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	content_area.add_child(hint)
 
@@ -6027,7 +6027,7 @@ func _make_agent_row(a: Agent) -> Control:
 
 	var personality_l := Label.new()
 	personality_l.text = "[%s]" % a.personality
-	personality_l.add_theme_font_size_override("font_size", 11)
+	personality_l.add_theme_font_size_override("font_size", 13)
 	personality_l.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	hdr.add_child(personality_l)
 
@@ -6037,7 +6037,7 @@ func _make_agent_row(a: Agent) -> Control:
 
 	var clients_l := Label.new()
 	clients_l.text = "%d clientes" % a.client_ids.size()
-	clients_l.add_theme_font_size_override("font_size", 12)
+	clients_l.add_theme_font_size_override("font_size", 13)
 	clients_l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
 	hdr.add_child(clients_l)
 
@@ -6061,7 +6061,7 @@ func _make_agent_row(a: Agent) -> Control:
 			rel_text = "frío (%d)" % rel
 		rel_l.text = rel_text
 		rel_l.add_theme_color_override("font_color", rel_color)
-		rel_l.add_theme_font_size_override("font_size", 11)
+		rel_l.add_theme_font_size_override("font_size", 13)
 		hdr.add_child(rel_l)
 
 	# Lista compacta de clientes (máx 8 visibles)
@@ -6084,7 +6084,7 @@ func _make_agent_row(a: Agent) -> Control:
 		var clients_label := Label.new()
 		clients_label.text = "Representa a: " + ", ".join(clients_text)
 		clients_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		clients_label.add_theme_font_size_override("font_size", 11)
+		clients_label.add_theme_font_size_override("font_size", 13)
 		clients_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
 		box.add_child(clients_label)
 
@@ -6172,7 +6172,7 @@ func _show_persuasion_modal(player: Player) -> void:
 	var feedback_label := Label.new()
 	feedback_label.text = ""
 	feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	feedback_label.add_theme_font_size_override("font_size", 12)
+	feedback_label.add_theme_font_size_override("font_size", 13)
 
 	var picked: Array = [-1]
 	for i in options.size():
@@ -6298,7 +6298,7 @@ func _show_team_talk_modal(template: Dictionary) -> void:
 	var note := Label.new()
 	note.text = "Estás en un momento difícil. Tienes una oportunidad. Elige tus palabras: una de las opciones es la más sincera y humana — sin gritar ni exigir, hablando de tú a tú."
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	note.add_theme_font_size_override("font_size", 11)
+	note.add_theme_font_size_override("font_size", 13)
 	note.add_theme_color_override("font_color", Color(0.6, 0.95, 0.7))
 	box.add_child(note)
 
@@ -6316,7 +6316,7 @@ func _show_team_talk_modal(template: Dictionary) -> void:
 		var hint_l := Label.new()
 		hint_l.text = "✦ " + hint_text
 		hint_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		hint_l.add_theme_font_size_override("font_size", 12)
+		hint_l.add_theme_font_size_override("font_size", 13)
 		hint_l.add_theme_color_override("font_color", Color(0.95, 0.85, 0.55))
 		box.add_child(hint_l)
 
@@ -6325,7 +6325,7 @@ func _show_team_talk_modal(template: Dictionary) -> void:
 	var feedback_label := Label.new()
 	feedback_label.text = ""
 	feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	feedback_label.add_theme_font_size_override("font_size", 12)
+	feedback_label.add_theme_font_size_override("font_size", 13)
 
 	var options: Array = (template.get("options", []) as Array).duplicate()
 	options.shuffle()
@@ -6526,7 +6526,7 @@ func _render_settings_view() -> void:
 	var theme_hint := Label.new()
 	theme_hint.text = "Elige entre tema oscuro (default, mejor para sesiones largas) o tema claro (estilo dashboard moderno)."
 	theme_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	theme_hint.add_theme_font_size_override("font_size", 11)
+	theme_hint.add_theme_font_size_override("font_size", 13)
 	theme_hint.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 	content_area.add_child(theme_hint)
 
@@ -6555,7 +6555,7 @@ func _render_settings_view() -> void:
 	# Sección: persistencia
 	var note := Label.new()
 	note.text = "Los ajustes se guardan en user://settings.json y persisten al reiniciar el juego."
-	note.add_theme_font_size_override("font_size", 11)
+	note.add_theme_font_size_override("font_size", 13)
 	note.add_theme_color_override("font_color", UIThemeManager.get_current().text_muted)
 	content_area.add_child(note)
 
@@ -6563,7 +6563,7 @@ func _render_settings_view() -> void:
 	content_area.add_child(HSeparator.new())
 	var future := Label.new()
 	future.text = "Más opciones disponibles en próximas versiones (volumen, idioma, animaciones)."
-	future.add_theme_font_size_override("font_size", 11)
+	future.add_theme_font_size_override("font_size", 13)
 	future.add_theme_color_override("font_color", UIThemeManager.get_current().text_muted)
 	content_area.add_child(future)
 
