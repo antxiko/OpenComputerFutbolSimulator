@@ -353,7 +353,7 @@ func _build_ui() -> void:
 	footer.add_child(load_button)
 
 	var settings_button := Button.new()
-	settings_button.text = "⚙"
+	settings_button.text = "Ajustes"
 	settings_button.tooltip_text = "Ajustes (tema claro/oscuro)"
 	settings_button.pressed.connect(_on_select_view.bind(VIEW_SETTINGS))
 	footer.add_child(settings_button)
