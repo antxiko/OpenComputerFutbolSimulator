@@ -1088,8 +1088,9 @@ func _show_season_objective_modal() -> void:
 		return
 	var popup := AcceptDialog.new()
 	popup.title = "🎯 Objetivo de la temporada"
-	popup.size = Vector2(520, 280)
 	popup.ok_button_text = "Entendido"
+	popup.min_size = Vector2(520, 260)
+	popup.max_size = Vector2(640, 360)
 	add_child(popup)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 10)
@@ -1125,7 +1126,7 @@ func _show_season_objective_modal() -> void:
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
-	popup.popup_centered()
+	popup.popup_centered(Vector2(520, 280))
 
 
 # Evalúa el cumplimiento del objetivo al final de temporada y aplica
