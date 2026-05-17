@@ -3834,25 +3834,19 @@ func _render_dashboard_view() -> void:
 	kpi_rival.set_accent_color(theme.accent_info)
 	kpi_rival.setup("Próximo rival", rival_name, rival_short, "", "flat", "⚽")
 
-	# ============ FILA 2+3: MAIN CONTENT ============
-	# Pitch (izq, full height de las 2 filas restantes, ~30% ancho) |
-	# VBox derecha (~70%):
-	#   - top:    clasificación | chart de puntos
-	#   - bottom: noticias / actividad de mercado
-	var main_content := HBoxContainer.new()
-	main_content.add_theme_constant_override("separation", 12)
-	main_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	main_content.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	root.add_child(main_content)
+	# ============ FILA 2: Starting XI | Clasificación | Chart ============
+	var mid_row := HBoxContainer.new()
+	mid_row.add_theme_constant_override("separation", 12)
+	mid_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.add_child(mid_row)
 
-	# Mini pitch VERTICAL — glass panel, 30% del ancho
+	# Mini pitch VERTICAL — glass panel, ~20% del ancho
 	var pitch_panel := PanelContainer.new()
 	pitch_panel.add_theme_stylebox_override("panel", UIThemeManager.glass_panel_style())
-	pitch_panel.custom_minimum_size = Vector2(280, 0)
+	pitch_panel.custom_minimum_size = Vector2(240, 320)
 	pitch_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	pitch_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	pitch_panel.size_flags_stretch_ratio = 1.0
-	main_content.add_child(pitch_panel)
+	pitch_panel.size_flags_stretch_ratio = 0.8
+	mid_row.add_child(pitch_panel)
 	var pitch_box := VBoxContainer.new()
 	pitch_box.add_theme_constant_override("separation", 6)
 	pitch_panel.add_child(pitch_box)
@@ -3899,27 +3893,12 @@ func _render_dashboard_view() -> void:
 		formation_str = team.tactics_default.formation
 	mini_pitch.setup(pitch_players, true, formation_str)
 
-	# ===== ZONA DERECHA: VBox con (clasif + chart) arriba, noticias abajo =====
-	var right_area := VBoxContainer.new()
-	right_area.add_theme_constant_override("separation", 12)
-	right_area.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	right_area.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	right_area.size_flags_stretch_ratio = 2.33   # ~70% del ancho vs pitch ~30%
-	main_content.add_child(right_area)
-
-	# --- TOP: clasificación | chart ---
-	var top_right := HBoxContainer.new()
-	top_right.add_theme_constant_override("separation", 12)
-	top_right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	top_right.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	right_area.add_child(top_right)
-
 	# Line chart: puntos por jornada del user vs líder vs umbral Europa.
 	var chart := LineChart.new()
 	chart.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	chart.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	chart.size_flags_stretch_ratio = 1.0
-	chart.custom_minimum_size = Vector2(300, 240)
+	chart.size_flags_stretch_ratio = 1.2
+	chart.custom_minimum_size = Vector2(300, 320)
 	var series: Array = [
 		{
 			"name": "Tú",
@@ -3949,10 +3928,10 @@ func _render_dashboard_view() -> void:
 	var table_widget := DataTable.new()
 	table_widget.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	table_widget.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	table_widget.size_flags_stretch_ratio = 1.2
-	top_right.add_child(table_widget)
+	table_widget.size_flags_stretch_ratio = 1.4
+	mid_row.add_child(table_widget)
 	# Chart al lado de la tabla
-	top_right.add_child(chart)
+	mid_row.add_child(chart)
 	var columns: Array = [
 		{"key": "pos", "label": "#", "width": 30, "align": "right"},
 		{"key": "team", "label": "Equipo"},
@@ -3982,13 +3961,13 @@ func _render_dashboard_view() -> void:
 		liga_label = "Clasificación %s" % ("Primera" if team.division == "primera" else "Segunda")
 	table_widget.setup(columns, rows, liga_label, 7)
 
-	# --- BOTTOM: Noticias / Actividad ---
+	# ============ FILA 3: Noticias / Actividad (full width) ============
 	var news_panel := PanelContainer.new()
 	news_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	news_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	news_panel.size_flags_stretch_ratio = 1.0
+	news_panel.custom_minimum_size = Vector2(0, 220)
 	news_panel.add_theme_stylebox_override("panel", UIThemeManager.glass_panel_style())
-	right_area.add_child(news_panel)
+	root.add_child(news_panel)
 	var news_vbox := VBoxContainer.new()
 	news_vbox.add_theme_constant_override("separation", 6)
 	news_panel.add_child(news_vbox)
