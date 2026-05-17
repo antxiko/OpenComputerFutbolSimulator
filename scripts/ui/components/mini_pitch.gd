@@ -32,6 +32,20 @@ const SLOT_Y_PREF := {
 # Orden de profundidad del campo (gk = portería propia, fw = portería rival).
 const LINE_ORDER := ["gk", "def", "dm", "mid", "am", "fw"]
 
+# X de cada tipo de línea en coordenadas 0..1 del campo (0=portería propia,
+# 1=portería rival). Las líneas NO se reparten uniformemente — en formaciones
+# reales la defensa va cerca de la portería propia y el ataque cerca de la
+# rival, mientras que mediocampo y líneas intermedias quedan en posiciones
+# específicas. Estos valores reproducen visualmente esquemas tipo FM/FIFA.
+const LINE_X := {
+	"gk": 0.05,
+	"def": 0.22,
+	"dm": 0.38,
+	"mid": 0.52,
+	"am": 0.66,
+	"fw": 0.80,
+}
+
 # Array de Dictionary: [{slot, number, short_name, is_gk}, ...]
 var _players: Array = []
 var _show_names: bool = true
@@ -186,28 +200,22 @@ func _parse_formation(formation: String, n_players: int) -> Array:
 # - line_counts[1] = N jugadores en defensa
 # - line_counts[2] = N jugadores en mediocampo
 # ... etc
-# X de cada línea: reparto uniforme 7%..86%. Y dentro de cada línea: si los
-# players tienen slots con SLOT_Y_PREF útil, ordenar por eso; si no, orden
-# secuencial. Todos distribuidos 18%..82%.
+# X de cada línea: derivada del TIPO de línea (def cerca de portería propia,
+# fw cerca de la rival, intermedias en posiciones específicas) — NO uniforme.
+# Y dentro de cada línea: ordenar por SLOT_Y_PREF si los slots son útiles,
+# luego distribuir uniformemente 18%..82%.
 func _positions_from_formation(players: Array, line_counts: Array) -> Array:
 	var n_lines: int = line_counts.size()
 	if n_lines <= 0:
 		return []
-	# X de cada línea
-	var line_x: Array = []
-	for i in n_lines:
-		var x: float
-		if n_lines == 1:
-			x = 0.5
-		else:
-			var t: float = float(i) / float(n_lines - 1)
-			x = 0.07 + t * 0.79
-		line_x.append(x)
+	# Inferir el tipo de cada línea (gk, def, dm, mid, am, fw)
+	var line_types: Array = _infer_line_types(n_lines)
 	# Asignar players secuencialmente a líneas
 	var result: Array = []
 	var idx: int = 0
 	for line_idx in n_lines:
 		var n_in_line: int = int(line_counts[line_idx])
+		var line_x: float = float(LINE_X.get(String(line_types[line_idx]), 0.5))
 		# Recoger los players de esta línea con su y_pref por slot
 		var line_players: Array = []
 		for _i in n_in_line:
@@ -220,20 +228,68 @@ func _positions_from_formation(players: Array, line_counts: Array) -> Array:
 		# Ordenar por y_pref (LB arriba, RB abajo, centrales al medio)
 		line_players.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 			return float(a["y_pref"]) < float(b["y_pref"]))
-		# Distribuir Y uniformemente
+		# Distribuir Y uniformemente — más juntos si son pocos, más anchos si son muchos
 		var n: int = line_players.size()
+		var y_top: float = 0.18
+		var y_bot: float = 0.82
+		# Para 2 jugadores (ej. STs en 4-4-2): menos spread (~30% a ~70%) para que
+		# no toquen las bandas
+		if n == 2:
+			y_top = 0.30
+			y_bot = 0.70
 		for j in n:
 			var y: float
 			if n == 1:
 				y = 0.5
 			else:
-				y = 0.18 + float(j) / float(n - 1) * 0.64
+				y = y_top + float(j) / float(n - 1) * (y_bot - y_top)
 			result.append({
 				"idx": int(line_players[j]["idx"]),
-				"x": line_x[line_idx],
+				"x": line_x,
 				"y": y,
 			})
 	return result
+
+
+# Infiere el TIPO de cada línea según cuántas líneas hay (incluyendo GK).
+# Reglas:
+#   - Primera línea siempre "gk", segunda siempre "def", última siempre "fw"
+#   - Las intermedias se etiquetan según la cantidad:
+#       1 intermedia → ["mid"]                    (ej. 4-3-3, 4-4-2, 3-4-3)
+#       2 intermedias → ["dm", "am"]              (ej. 4-2-3-1, 4-3-1-2)
+#       3 intermedias → ["dm", "mid", "am"]       (ej. 4-1-2-1-2 diamante)
+#       4+ intermedias → ["dm", "mid"*N, "am"]
+func _infer_line_types(n_lines: int) -> Array:
+	if n_lines <= 0:
+		return []
+	if n_lines == 1:
+		return ["gk"]
+	if n_lines == 2:
+		return ["gk", "def"]
+	# n_lines >= 3 → GK + DEF + ...intermedias... + FW
+	var types: Array = ["gk", "def"]
+	var n_middle: int = n_lines - 3  # entre def y fw
+	match n_middle:
+		0:
+			# Solo gk, def, fw (raro)
+			pass
+		1:
+			types.append("mid")
+		2:
+			types.append("dm")
+			types.append("am")
+		3:
+			types.append("dm")
+			types.append("mid")
+			types.append("am")
+		_:
+			# Más de 3 intermedias: dm + mids + am
+			types.append("dm")
+			for _i in range(n_middle - 2):
+				types.append("mid")
+			types.append("am")
+	types.append("fw")
+	return types
 
 
 # Clasifica los jugadores en líneas por SLOT (fallback si no hay formación).
@@ -258,19 +314,8 @@ func _positions_from_slots(players: Array) -> Array:
 	if active_lines.is_empty():
 		return []
 
-	# X de cada línea: repartir uniformemente entre 7% y 86% del campo.
-	# Si solo hay 1 línea (raro), centramos.
-	var line_x: Dictionary = {}
-	var n_lines: int = active_lines.size()
-	for i in n_lines:
-		var x: float
-		if n_lines == 1:
-			x = 0.5
-		else:
-			var t: float = float(i) / float(n_lines - 1)
-			x = 0.07 + t * 0.79
-		line_x[active_lines[i]] = x
-
+	# X de cada línea: usar LINE_X (def cerca de portería propia, fw cerca de la
+	# rival) en lugar de reparto uniforme — esto produce esquemas realistas.
 	# Para cada línea, ordenar por y_pref y distribuir Y entre 18% y 82%.
 	# Jugadores centrales (y_pref ~0.5) van al medio, laterales (LB/RB) a las bandas.
 	var result: Array = []
@@ -279,15 +324,20 @@ func _positions_from_slots(players: Array) -> Array:
 		line_players.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 			return float(a["y_pref"]) < float(b["y_pref"]))
 		var n: int = line_players.size()
+		var y_top: float = 0.18
+		var y_bot: float = 0.82
+		if n == 2:
+			y_top = 0.30
+			y_bot = 0.70
 		for i in n:
 			var y: float
 			if n == 1:
 				y = 0.5
 			else:
-				y = 0.18 + float(i) / float(n - 1) * 0.64
+				y = y_top + float(i) / float(n - 1) * (y_bot - y_top)
 			result.append({
 				"idx": int(line_players[i]["idx"]),
-				"x": line_x[line_key],
+				"x": float(LINE_X.get(line_key, 0.5)),
 				"y": y,
 			})
 	return result
