@@ -130,8 +130,8 @@ func _draw() -> void:
 		var x: float = rx + pos_data["x"] * rw
 		var y: float = ry + pos_data["y"] * rh
 		var center_p := Vector2(x, y)
-		var is_gk: bool = bool(p.get("is_gk", false))
-		var color: Color = theme.player_gk if is_gk else theme.player_team_a
+		var line_type: String = String(pos_data.get("line_type", ""))
+		var color: Color = _color_for_line(line_type, p, theme)
 		# Sombra suave bajo el círculo
 		draw_circle(center_p + Vector2(0, 2), radius + 1, Color(0, 0, 0, 0.35))
 		draw_circle(center_p, radius, color)
@@ -215,7 +215,8 @@ func _positions_from_formation(players: Array, line_counts: Array) -> Array:
 	var idx: int = 0
 	for line_idx in n_lines:
 		var n_in_line: int = int(line_counts[line_idx])
-		var line_x: float = float(LINE_X.get(String(line_types[line_idx]), 0.5))
+		var line_type_str: String = String(line_types[line_idx])
+		var line_x: float = float(LINE_X.get(line_type_str, 0.5))
 		# Recoger los players de esta línea con su y_pref por slot
 		var line_players: Array = []
 		for _i in n_in_line:
@@ -250,8 +251,28 @@ func _positions_from_formation(players: Array, line_counts: Array) -> Array:
 				"idx": int(line_players[j]["idx"]),
 				"x": clampf(line_x + x_off, 0.05, 0.92),
 				"y": y,
+				"line_type": line_type_str,
 			})
 	return result
+
+
+# Color del círculo según el tipo de línea (defensa/medio/ataque/portero).
+# Permite distinguir visualmente las líneas sin necesidad de leyenda.
+func _color_for_line(line_type: String, p: Dictionary, theme: UITheme) -> Color:
+	if bool(p.get("is_gk", false)) or line_type == "gk":
+		return theme.player_gk  # amarillo
+	match line_type:
+		"def":
+			return theme.accent_info        # azul
+		"dm":
+			return Color(0.30, 0.66, 0.90)  # azul más claro
+		"mid":
+			return theme.accent_success     # verde
+		"am":
+			return Color(0.95, 0.55, 0.20)  # naranja
+		"fw":
+			return theme.accent_primary     # rojo
+	return theme.player_team_a  # fallback rojo
 
 
 # Offset en X según la posición del jugador en su línea. Para líneas con muchos
@@ -263,8 +284,14 @@ func _positions_from_formation(players: Array, line_counts: Array) -> Array:
 #   j: índice del jugador (0 = más arriba en pantalla / banda izq, n-1 = banda der)
 # Devuelve offset relativo a la X de la línea (positivo = adelantado, negativo = atrás)
 func _depth_offset(n: int, j: int) -> float:
-	if n < 4:
+	if n < 3:
 		return 0.0
+	if n == 3:
+		# 3 jugadores: lateral izq atrás, central adelantado, lateral der atrás.
+		# Útil para defensas de 3 (sweeper detrás) y ataques de 3 (ST adelantado).
+		if j == 0 or j == n - 1:
+			return -0.06
+		return 0.06
 	if n == 4:
 		# Defensa o medio de 4: laterales ~10% atrás, centrales planos
 		if j == 0 or j == n - 1:
@@ -366,5 +393,6 @@ func _positions_from_slots(players: Array) -> Array:
 				"idx": int(line_players[i]["idx"]),
 				"x": clampf(float(LINE_X.get(line_key, 0.5)) + x_off, 0.05, 0.92),
 				"y": y,
+				"line_type": line_key,
 			})
 	return result
