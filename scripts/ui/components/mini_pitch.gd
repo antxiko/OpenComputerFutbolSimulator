@@ -243,12 +243,41 @@ func _positions_from_formation(players: Array, line_counts: Array) -> Array:
 				y = 0.5
 			else:
 				y = y_top + float(j) / float(n - 1) * (y_bot - y_top)
+			# Cuña: si hay muchos jugadores en la línea, los laterales se desplazan
+			# hacia atrás y el central se adelanta (rompe la "línea horizontal recta")
+			var x_off: float = _depth_offset(n, j)
 			result.append({
 				"idx": int(line_players[j]["idx"]),
-				"x": line_x,
+				"x": line_x + x_off,
 				"y": y,
 			})
 	return result
+
+
+# Offset en X según la posición del jugador en su línea. Para líneas con muchos
+# jugadores (5+), aplica un patrón en CUÑA — central adelantado, laterales
+# atrás — para que no parezca que 5 jugadores están a la misma altura.
+# Defensas y mediocampos de 3-4 jugadores se mantienen relativamente planos
+# (como en formaciones reales).
+#   n: número total de jugadores en la línea
+#   j: índice del jugador (0 = más arriba en pantalla / banda izq, n-1 = banda der)
+# Devuelve offset relativo a la X de la línea (positivo = adelantado, negativo = atrás)
+func _depth_offset(n: int, j: int) -> float:
+	if n < 4:
+		return 0.0
+	if n == 4:
+		# Defensa o medio de 4: laterales 1% atrás, centrales planos (sutil curvatura)
+		if j == 0 or j == n - 1:
+			return -0.012
+		return 0.0
+	# 5+ jugadores: cuña pronunciada
+	# - banda (j=0, j=n-1): ~4% atrás
+	# - inmediato siguiente (j=1, j=n-2): ~1% atrás
+	# - centro (j ≈ (n-1)/2): ~2.5% adelantado
+	var center: float = float(n - 1) * 0.5
+	var dist: float = abs(float(j) - center) / center  # 0 centro .. 1 banda
+	# Función suave: forward al centro, retraso creciente hacia las bandas
+	return 0.028 - pow(dist, 1.5) * 0.072
 
 
 # Infiere el TIPO de cada línea según cuántas líneas hay (incluyendo GK).
@@ -335,9 +364,10 @@ func _positions_from_slots(players: Array) -> Array:
 				y = 0.5
 			else:
 				y = y_top + float(i) / float(n - 1) * (y_bot - y_top)
+			var x_off: float = _depth_offset(n, i)
 			result.append({
 				"idx": int(line_players[i]["idx"]),
-				"x": float(LINE_X.get(line_key, 0.5)),
+				"x": float(LINE_X.get(line_key, 0.5)) + x_off,
 				"y": y,
 			})
 	return result
