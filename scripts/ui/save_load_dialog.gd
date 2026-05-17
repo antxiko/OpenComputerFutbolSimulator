@@ -72,7 +72,7 @@ func _build_body() -> void:
 	var header := Label.new()
 	header.text = ("Selecciona un slot para guardar o crea uno nuevo:" if _mode == Mode.SAVE
 			else "Selecciona la partida que quieres cargar:")
-	header.add_theme_font_size_override("font_size", 13)
+	header.add_theme_font_size_override("font_size", 14)
 	header.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
 	vbox.add_child(header)
 
@@ -95,7 +95,7 @@ func _build_body() -> void:
 		_new_slot_section.add_child(sep)
 		var new_label := Label.new()
 		new_label.text = "Crear nuevo slot:"
-		new_label.add_theme_font_size_override("font_size", 12)
+		new_label.add_theme_font_size_override("font_size", 14)
 		_new_slot_section.add_child(new_label)
 		var hbox := HBoxContainer.new()
 		hbox.add_theme_constant_override("separation", 6)
@@ -113,7 +113,7 @@ func _build_body() -> void:
 
 	# Status
 	_status_label = Label.new()
-	_status_label.add_theme_font_size_override("font_size", 11)
+	_status_label.add_theme_font_size_override("font_size", 14)
 	_status_label.add_theme_color_override("font_color", Color(0.7, 0.85, 0.7))
 	vbox.add_child(_status_label)
 
@@ -172,13 +172,13 @@ func _make_slot_row(meta: Dictionary) -> Control:
 	var line2 := Label.new()
 	line2.text = "Año %d-%d · J%d · %s%s" % [year, year + 1, p_jor, team_label,
 			" · %d temp. completas" % career if career > 0 else ""]
-	line2.add_theme_font_size_override("font_size", 11)
+	line2.add_theme_font_size_override("font_size", 14)
 	line2.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
 	info.add_child(line2)
 
 	var line3 := Label.new()
 	line3.text = "🕒 %s" % saved_at
-	line3.add_theme_font_size_override("font_size", 10)
+	line3.add_theme_font_size_override("font_size", 14)
 	line3.add_theme_color_override("font_color", Color(0.6, 0.65, 0.7))
 	info.add_child(line3)
 

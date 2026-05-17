@@ -132,7 +132,7 @@ func _on_new_game() -> void:
 	vbox.add_child(option)
 	var hint := Label.new()
 	hint.text = "(Pulsa OK para confirmar)"
-	hint.add_theme_font_size_override("font_size", 11)
+	hint.add_theme_font_size_override("font_size", 14)
 	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	vbox.add_child(hint)
 

@@ -17,6 +17,9 @@ var _trend: String = ""
 var _trend_dir: String = ""  # "up" | "down" | "flat"
 var _icon: String = ""
 var _accent: Color = Color(0.86, 0.15, 0.15)
+# Widget custom que sustituye al Label del value (ej. fila de medallas).
+# Si != null, el _value text se ignora y se renderiza este nodo en su lugar.
+var _value_widget: Control = null
 
 
 func _ready() -> void:
@@ -40,6 +43,14 @@ func setup(title: String, value: String, subtitle: String = "", trend: String = 
 	_trend = trend
 	_trend_dir = trend_dir
 	_icon = icon
+	if is_inside_tree():
+		_rebuild()
+
+
+# Sustituye el Label del value por un widget custom (ej. fila de medallas).
+# Llamar tras setup() — el value text se ignora si hay widget.
+func set_value_widget(widget: Control) -> void:
+	_value_widget = widget
 	if is_inside_tree():
 		_rebuild()
 
@@ -121,31 +132,36 @@ func _rebuild() -> void:
 
 	var title_lbl := Label.new()
 	title_lbl.text = _title.to_upper()
-	title_lbl.add_theme_font_size_override("font_size", 11)
+	title_lbl.add_theme_font_size_override("font_size", 14)
 	title_lbl.add_theme_color_override("font_color", theme.text_secondary)
 	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_lbl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	top.add_child(title_lbl)
 
-	# === Valor grande ===
-	# Auto-shrink: si el value es muy largo, bajamos font_size para no romper el card.
-	var value_lbl := Label.new()
-	value_lbl.text = _value
-	var value_font_size: int = 32
-	if _value.length() > 14:
-		value_font_size = 18
-	elif _value.length() > 10:
-		value_font_size = 22
-	elif _value.length() > 7:
-		value_font_size = 26
-	value_lbl.add_theme_font_size_override("font_size", value_font_size)
-	value_lbl.add_theme_color_override("font_color", theme.text_primary)
-	# Negrita visual: outline 1px del mismo color (Godot no tiene font_weight directo)
-	value_lbl.add_theme_color_override("font_outline_color", theme.text_primary)
-	value_lbl.add_theme_constant_override("outline_size", 1)
-	value_lbl.clip_text = true
-	value_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	vbox.add_child(value_lbl)
+	# === Valor grande (Label O widget custom si fue seteado con set_value_widget) ===
+	if _value_widget != null:
+		# Si el widget ya tenía un padre (re-rebuild), removerlo antes de re-añadir
+		if _value_widget.get_parent() != null:
+			_value_widget.get_parent().remove_child(_value_widget)
+		vbox.add_child(_value_widget)
+	else:
+		# Auto-shrink: si el value es muy largo, bajamos font_size para no romper el card.
+		var value_lbl := Label.new()
+		value_lbl.text = _value
+		var value_font_size: int = 32
+		if _value.length() > 14:
+			value_font_size = 18
+		elif _value.length() > 10:
+			value_font_size = 22
+		elif _value.length() > 7:
+			value_font_size = 26
+		value_lbl.add_theme_font_size_override("font_size", value_font_size)
+		value_lbl.add_theme_color_override("font_color", theme.text_primary)
+		value_lbl.add_theme_color_override("font_outline_color", theme.text_primary)
+		value_lbl.add_theme_constant_override("outline_size", 1)
+		value_lbl.clip_text = true
+		value_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		vbox.add_child(value_lbl)
 
 	# === Línea inferior: subtitle (izq, expand) + trend (der) ===
 	var bottom := HBoxContainer.new()
@@ -155,7 +171,7 @@ func _rebuild() -> void:
 	if _subtitle != "":
 		var sub_lbl := Label.new()
 		sub_lbl.text = _subtitle
-		sub_lbl.add_theme_font_size_override("font_size", 12)
+		sub_lbl.add_theme_font_size_override("font_size", 14)
 		sub_lbl.add_theme_color_override("font_color", theme.text_secondary)
 		sub_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		sub_lbl.clip_text = true
@@ -233,12 +249,12 @@ func _build_trend_pill() -> Control:
 	pill.add_child(hbox)
 	var arrow_lbl := Label.new()
 	arrow_lbl.text = arrow
-	arrow_lbl.add_theme_font_size_override("font_size", 11)
+	arrow_lbl.add_theme_font_size_override("font_size", 14)
 	arrow_lbl.add_theme_color_override("font_color", trend_color)
 	hbox.add_child(arrow_lbl)
 	var delta_lbl := Label.new()
 	delta_lbl.text = _trend
-	delta_lbl.add_theme_font_size_override("font_size", 12)
+	delta_lbl.add_theme_font_size_override("font_size", 14)
 	delta_lbl.add_theme_color_override("font_color", trend_color)
 	hbox.add_child(delta_lbl)
 	return pill

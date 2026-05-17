@@ -113,12 +113,12 @@ func setup(club_name: String, club_short: String, items: Array, user_name: Strin
 	footer.add_child(user_box)
 	var user_label := Label.new()
 	user_label.text = user_name if user_name != "" else "Mánager"
-	user_label.add_theme_font_size_override("font_size", 12)
+	user_label.add_theme_font_size_override("font_size", 14)
 	user_label.add_theme_color_override("font_color", theme.text_primary)
 	user_box.add_child(user_label)
 	var club_sub := Label.new()
 	club_sub.text = club_name if club_name != "" else "Sin club"
-	club_sub.add_theme_font_size_override("font_size", 10)
+	club_sub.add_theme_font_size_override("font_size", 14)
 	club_sub.add_theme_color_override("font_color", theme.text_secondary)
 	user_box.add_child(club_sub)
 

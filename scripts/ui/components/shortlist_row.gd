@@ -54,7 +54,7 @@ func setup(data: Dictionary) -> void:
 	tier_pc.add_theme_stylebox_override("panel", tier_sb)
 	var tier_lbl := Label.new()
 	tier_lbl.text = tier
-	tier_lbl.add_theme_font_size_override("font_size", 11)
+	tier_lbl.add_theme_font_size_override("font_size", 14)
 	tier_lbl.add_theme_color_override("font_color", Color.BLACK)
 	tier_pc.add_child(tier_lbl)
 	hbox.add_child(tier_pc)
@@ -62,7 +62,7 @@ func setup(data: Dictionary) -> void:
 	# Nombre
 	var name_lbl := Label.new()
 	name_lbl.text = String(data.get("name", "—"))
-	name_lbl.add_theme_font_size_override("font_size", 13)
+	name_lbl.add_theme_font_size_override("font_size", 14)
 	name_lbl.add_theme_color_override("font_color", theme.text_primary)
 	name_lbl.custom_minimum_size = Vector2(140, 0)
 	hbox.add_child(name_lbl)
@@ -70,7 +70,7 @@ func setup(data: Dictionary) -> void:
 	# Pos / edad
 	var meta_lbl := Label.new()
 	meta_lbl.text = "%s · %d a" % [String(data.get("pos", "?")), int(data.get("age", 0))]
-	meta_lbl.add_theme_font_size_override("font_size", 12)
+	meta_lbl.add_theme_font_size_override("font_size", 14)
 	meta_lbl.add_theme_color_override("font_color", theme.text_secondary)
 	meta_lbl.custom_minimum_size = Vector2(80, 0)
 	hbox.add_child(meta_lbl)
@@ -78,7 +78,7 @@ func setup(data: Dictionary) -> void:
 	# Club
 	var club_lbl := Label.new()
 	club_lbl.text = String(data.get("club", ""))
-	club_lbl.add_theme_font_size_override("font_size", 12)
+	club_lbl.add_theme_font_size_override("font_size", 14)
 	club_lbl.add_theme_color_override("font_color", theme.text_secondary)
 	club_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hbox.add_child(club_lbl)
@@ -86,7 +86,7 @@ func setup(data: Dictionary) -> void:
 	# Valor
 	var val_lbl := Label.new()
 	val_lbl.text = _format_eur(int(data.get("value_eur", 0)))
-	val_lbl.add_theme_font_size_override("font_size", 13)
+	val_lbl.add_theme_font_size_override("font_size", 14)
 	val_lbl.add_theme_color_override("font_color", theme.accent_success)
 	val_lbl.custom_minimum_size = Vector2(70, 0)
 	val_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT

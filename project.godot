@@ -24,7 +24,7 @@ window/stretch/mode="canvas_items"
 
 [gui]
 
-theme/default_theme_scale=1.15
+theme/default_theme_scale=1.25
 
 [rendering]
 

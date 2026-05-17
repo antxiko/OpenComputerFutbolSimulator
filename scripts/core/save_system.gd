@@ -41,6 +41,8 @@ class SaveData:
 	# v0.4.0 — datos para el Dashboard
 	var user_points_per_jornada: Array = []   # Array[int] longitud == jornadas jugadas
 	var user_shortlist: Array = []             # Array[String] player_ids marcados desde Mercado
+	var liga_leader_points_per_jornada: Array = []   # Array[int] puntos del líder por jornada (división del user)
+	var liga_europa_points_per_jornada: Array = []   # Array[int] puntos del 6º (umbral Europa)
 
 
 # ============================================================================
@@ -54,7 +56,8 @@ static func save_game(slot_name: String, year: int, all_teams: Array,
 		inbox_messages: Array = [], manager_reputation: int = 0,
 		board_expectations: BoardExpectations = null,
 		agents_pool: Array = [], user_recent_results: Array = [],
-		user_points_per_jornada: Array = [], user_shortlist: Array = []) -> Dictionary:
+		user_points_per_jornada: Array = [], user_shortlist: Array = [],
+		liga_leader_points_per_jornada: Array = [], liga_europa_points_per_jornada: Array = []) -> Dictionary:
 	# Crear directorio
 	if not DirAccess.dir_exists_absolute(SAVE_DIR):
 		var err: int = DirAccess.make_dir_recursive_absolute(SAVE_DIR)
@@ -80,6 +83,8 @@ static func save_game(slot_name: String, year: int, all_teams: Array,
 		"user_recent_results": user_recent_results.duplicate(true),
 		"user_points_per_jornada": user_points_per_jornada.duplicate(),
 		"user_shortlist": user_shortlist.duplicate(),
+		"liga_leader_points_per_jornada": liga_leader_points_per_jornada.duplicate(),
+		"liga_europa_points_per_jornada": liga_europa_points_per_jornada.duplicate(),
 		"teams": all_teams.map(func(t: Team) -> Dictionary: return _team_to_dict(t)),
 	}
 
@@ -136,6 +141,8 @@ static func load_game(slot_name: String) -> SaveData:
 	# v0.4.0 — Dashboard data (defaults tolerantes para saves anteriores)
 	save_data.user_points_per_jornada = parsed.get("user_points_per_jornada", []).duplicate()
 	save_data.user_shortlist = parsed.get("user_shortlist", []).duplicate()
+	save_data.liga_leader_points_per_jornada = parsed.get("liga_leader_points_per_jornada", []).duplicate()
+	save_data.liga_europa_points_per_jornada = parsed.get("liga_europa_points_per_jornada", []).duplicate()
 	# Reconstruir equipos desde el dict
 	save_data.teams = []
 	for team_dict in parsed.get("teams", []):

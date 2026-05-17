@@ -54,7 +54,7 @@ func _rebuild() -> void:
 	if _title != "":
 		var title_lbl := Label.new()
 		title_lbl.text = _title.to_upper()
-		title_lbl.add_theme_font_size_override("font_size", 11)
+		title_lbl.add_theme_font_size_override("font_size", 14)
 		title_lbl.add_theme_color_override("font_color", theme.text_secondary)
 		_vbox.add_child(title_lbl)
 		var spacer := Control.new()
@@ -107,7 +107,7 @@ func _build_row(row_data, is_header: bool) -> Control:
 		elif row_data != null:
 			txt = String(row_data.get(key, ""))
 		lbl.text = txt
-		lbl.add_theme_font_size_override("font_size", 13 if not is_header else 11)
+		lbl.add_theme_font_size_override("font_size", 14 if not is_header else 12)
 		var color: Color
 		if is_header:
 			color = theme.text_secondary
