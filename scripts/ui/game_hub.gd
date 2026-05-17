@@ -3834,19 +3834,25 @@ func _render_dashboard_view() -> void:
 	kpi_rival.set_accent_color(theme.accent_info)
 	kpi_rival.setup("Próximo rival", rival_name, rival_short, "", "flat", "⚽")
 
-	# ============ FILA 2: MiniPitch | LineChart ============
-	var mid_row := HBoxContainer.new()
-	mid_row.add_theme_constant_override("separation", 12)
-	mid_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	root.add_child(mid_row)
+	# ============ FILA 2+3: MAIN CONTENT ============
+	# Pitch (izq, full height de las 2 filas restantes, ~30% ancho) |
+	# VBox derecha (~70%):
+	#   - top:    clasificación | chart de puntos
+	#   - bottom: noticias / actividad de mercado
+	var main_content := HBoxContainer.new()
+	main_content.add_theme_constant_override("separation", 12)
+	main_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	main_content.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	root.add_child(main_content)
 
-	# Mini pitch con titulares — glass panel (más espacio horizontal que el chart)
+	# Mini pitch VERTICAL — glass panel, 30% del ancho
 	var pitch_panel := PanelContainer.new()
 	pitch_panel.add_theme_stylebox_override("panel", UIThemeManager.glass_panel_style())
-	pitch_panel.custom_minimum_size = Vector2(420, 280)
+	pitch_panel.custom_minimum_size = Vector2(280, 0)
 	pitch_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	pitch_panel.size_flags_stretch_ratio = 1.8
-	mid_row.add_child(pitch_panel)
+	pitch_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	pitch_panel.size_flags_stretch_ratio = 1.0
+	main_content.add_child(pitch_panel)
 	var pitch_box := VBoxContainer.new()
 	pitch_box.add_theme_constant_override("separation", 6)
 	pitch_panel.add_child(pitch_box)
@@ -3858,6 +3864,7 @@ func _render_dashboard_view() -> void:
 	var mini_pitch := MiniPitch.new()
 	mini_pitch.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mini_pitch.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	mini_pitch.set_vertical(true)
 	pitch_box.add_child(mini_pitch)
 	var pitch_players: Array = []
 	if team != null and not user_lineup_template.is_empty():
@@ -3892,14 +3899,27 @@ func _render_dashboard_view() -> void:
 		formation_str = team.tactics_default.formation
 	mini_pitch.setup(pitch_players, true, formation_str)
 
+	# ===== ZONA DERECHA: VBox con (clasif + chart) arriba, noticias abajo =====
+	var right_area := VBoxContainer.new()
+	right_area.add_theme_constant_override("separation", 12)
+	right_area.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right_area.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	right_area.size_flags_stretch_ratio = 2.33   # ~70% del ancho vs pitch ~30%
+	main_content.add_child(right_area)
+
+	# --- TOP: clasificación | chart ---
+	var top_right := HBoxContainer.new()
+	top_right.add_theme_constant_override("separation", 12)
+	top_right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top_right.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	right_area.add_child(top_right)
+
 	# Line chart: puntos por jornada del user vs líder vs umbral Europa.
-	# Compacto (stretch_ratio bajo) y proporcional a 38 jornadas.
 	var chart := LineChart.new()
 	chart.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	chart.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	chart.size_flags_stretch_ratio = 1.0
-	chart.custom_minimum_size = Vector2(300, 280)
-	mid_row.add_child(chart)
+	chart.custom_minimum_size = Vector2(300, 240)
 	var series: Array = [
 		{
 			"name": "Tú",
@@ -3925,17 +3945,14 @@ func _render_dashboard_view() -> void:
 	]
 	chart.setup_multi(series, [], "Puntos acumulados", 38)
 
-	# ============ FILA 3: Tabla Liga (top 5) | Shortlist ============
-	var bot_row := HBoxContainer.new()
-	bot_row.add_theme_constant_override("separation", 12)
-	bot_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	root.add_child(bot_row)
-
-	# Tabla Liga top 5 — menos peso horizontal que el shortlist
+	# Tabla Clasificación (top 7)
 	var table_widget := DataTable.new()
 	table_widget.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	table_widget.size_flags_stretch_ratio = 1.0
-	bot_row.add_child(table_widget)
+	table_widget.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	table_widget.size_flags_stretch_ratio = 1.2
+	top_right.add_child(table_widget)
+	# Chart al lado de la tabla
+	top_right.add_child(chart)
 	var columns: Array = [
 		{"key": "pos", "label": "#", "width": 30, "align": "right"},
 		{"key": "team", "label": "Equipo"},
@@ -3965,39 +3982,22 @@ func _render_dashboard_view() -> void:
 		liga_label = "Clasificación %s" % ("Primera" if team.division == "primera" else "Segunda")
 	table_widget.setup(columns, rows, liga_label, 7)
 
-	# Shortlist — glass panel, más espacio horizontal que la tabla
-	var shortlist_panel := PanelContainer.new()
-	shortlist_panel.size_flags_stretch_ratio = 1.4
-	shortlist_panel.add_theme_stylebox_override("panel", UIThemeManager.glass_panel_style())
-	shortlist_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bot_row.add_child(shortlist_panel)
-	var sl_vbox := VBoxContainer.new()
-	sl_vbox.add_theme_constant_override("separation", 6)
-	shortlist_panel.add_child(sl_vbox)
-	var sl_title := Label.new()
-	sl_title.text = "SCOUT SHORTLIST"
-	sl_title.add_theme_font_size_override("font_size", 14)
-	sl_title.add_theme_color_override("font_color", theme.text_secondary)
-	sl_vbox.add_child(sl_title)
-	if user_shortlist.is_empty():
-		var empty_lbl := Label.new()
-		empty_lbl.text = "Sin jugadores marcados.\nVe al Mercado y pulsa el ✚ para añadir."
-		empty_lbl.add_theme_font_size_override("font_size", 14)
-		empty_lbl.add_theme_color_override("font_color", theme.text_muted)
-		sl_vbox.add_child(empty_lbl)
-	else:
-		var count_shown: int = 0
-		for pid: String in user_shortlist:
-			if count_shown >= 8:
-				break
-			var info: Dictionary = _find_player_dashboard_info(pid)
-			if info.is_empty():
-				continue
-			var row := ShortlistRow.new()
-			row.setup(info)
-			row.remove_requested.connect(_on_shortlist_remove)
-			sl_vbox.add_child(row)
-			count_shown += 1
+	# --- BOTTOM: Noticias / Actividad ---
+	var news_panel := PanelContainer.new()
+	news_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	news_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	news_panel.size_flags_stretch_ratio = 1.0
+	news_panel.add_theme_stylebox_override("panel", UIThemeManager.glass_panel_style())
+	right_area.add_child(news_panel)
+	var news_vbox := VBoxContainer.new()
+	news_vbox.add_theme_constant_override("separation", 6)
+	news_panel.add_child(news_vbox)
+	var news_title := Label.new()
+	news_title.text = "NOTICIAS · ACTIVIDAD"
+	news_title.add_theme_font_size_override("font_size", 14)
+	news_title.add_theme_color_override("font_color", theme.text_secondary)
+	news_vbox.add_child(news_title)
+	_populate_news_panel(news_vbox)
 
 
 # Devuelve {id, name, pos, age, club, value_eur, tier} para shortlist row
@@ -4014,6 +4014,99 @@ func _find_player_dashboard_info(player_id: String) -> Dictionary:
 				"club": t.short_name, "value_eur": val, "tier": p.tier,
 			}
 	return {}
+
+
+# Rellena la sección "Noticias · Actividad" del Dashboard. Mezcla los últimos
+# mensajes del inbox del user con eventos relevantes (placeholder de "actividad
+# de mercado" para añadir en el futuro).
+func _populate_news_panel(parent: VBoxContainer) -> void:
+	var theme: UITheme = UIThemeManager.get_current()
+	# Recolectar items: últimos N inbox messages ordenados por jornada descendente
+	var items: Array = []
+	for m: InboxMessage in user_inbox:
+		items.append({
+			"icon": _icon_for_inbox_type(m.type),
+			"title": m.title,
+			"body": m.body,
+			"jornada": m.jornada_when,
+			"read": m.read,
+		})
+	# Ordenar por jornada descendente (más reciente primero)
+	items.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return int(a["jornada"]) > int(b["jornada"]))
+
+	if items.is_empty():
+		var empty_lbl := Label.new()
+		empty_lbl.text = "Sin novedades todavía. Avanza una jornada para ver actividad."
+		empty_lbl.add_theme_font_size_override("font_size", 14)
+		empty_lbl.add_theme_color_override("font_color", theme.text_muted)
+		parent.add_child(empty_lbl)
+		return
+
+	# Mostrar hasta 6 items
+	var max_items: int = min(6, items.size())
+	for i in range(max_items):
+		parent.add_child(_build_news_row(items[i]))
+
+
+func _icon_for_inbox_type(t: String) -> String:
+	match t:
+		"injury": return "🏥"
+		"press": return "🎙"
+		"board_message": return "📋"
+		"agent_offer": return "💼"
+		"transfer_rumor": return "🔄"
+		"manager_offer": return "📨"
+		"coach_award": return "🏆"
+		_: return "📰"
+
+
+func _build_news_row(item: Dictionary) -> Control:
+	var theme: UITheme = UIThemeManager.get_current()
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+	var icon_lbl := Label.new()
+	icon_lbl.text = String(item.get("icon", "📰"))
+	icon_lbl.add_theme_font_size_override("font_size", 18)
+	icon_lbl.custom_minimum_size = Vector2(28, 0)
+	row.add_child(icon_lbl)
+
+	var text_box := VBoxContainer.new()
+	text_box.add_theme_constant_override("separation", 0)
+	text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(text_box)
+
+	var title_lbl := Label.new()
+	title_lbl.text = String(item.get("title", ""))
+	title_lbl.add_theme_font_size_override("font_size", 14)
+	var unread: bool = not bool(item.get("read", false))
+	title_lbl.add_theme_color_override("font_color", theme.text_primary if unread else theme.text_secondary)
+	title_lbl.clip_text = true
+	text_box.add_child(title_lbl)
+
+	var body: String = String(item.get("body", ""))
+	if body != "":
+		var body_lbl := Label.new()
+		# Mostrar solo la primera línea / primeros 100 chars
+		var first_line: String = body.split("\n")[0]
+		if first_line.length() > 100:
+			first_line = first_line.substr(0, 97) + "..."
+		body_lbl.text = first_line
+		body_lbl.add_theme_font_size_override("font_size", 12)
+		body_lbl.add_theme_color_override("font_color", theme.text_muted)
+		body_lbl.clip_text = true
+		text_box.add_child(body_lbl)
+
+	var jornada_lbl := Label.new()
+	jornada_lbl.text = "J%d" % int(item.get("jornada", 0))
+	jornada_lbl.add_theme_font_size_override("font_size", 11)
+	jornada_lbl.add_theme_color_override("font_color", theme.text_muted)
+	jornada_lbl.custom_minimum_size = Vector2(36, 0)
+	jornada_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	row.add_child(jornada_lbl)
+	return row
 
 
 func _on_shortlist_remove(player_id: String) -> void:

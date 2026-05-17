@@ -55,6 +55,10 @@ var _show_names: bool = true
 # cuando el user cambia de formación y el slot_assignments queda con strings
 # de la formación anterior.
 var _formation: String = ""
+# Orientación: false=horizontal (campo a lo ancho), true=vertical (campo a lo
+# alto, portería propia abajo, ataque arriba). En vertical el control rota
+# las coordenadas internas: lo que era profundidad X pasa a Y inverso.
+var _vertical: bool = false
 
 
 func _ready() -> void:
@@ -70,18 +74,26 @@ func setup(players: Array, show_names: bool = true, formation: String = "") -> v
 	queue_redraw()
 
 
+# Cambia la orientación. true = campo vertical (portería propia abajo).
+func set_vertical(vertical: bool) -> void:
+	_vertical = vertical
+	queue_redraw()
+
+
 func _draw() -> void:
 	var theme: UITheme = UIThemeManager.get_current()
-	# Mantener aspect ratio del campo (105m x 68m ≈ 1.54:1)
-	const PITCH_RATIO: float = 1.54
+	# Aspect ratio del campo (105m x 68m ≈ 1.54:1). En vertical se invierte
+	# (ancho/alto < 1), en horizontal es > 1.
+	const PITCH_RATIO_H: float = 1.54
+	var target_ratio: float = (1.0 / PITCH_RATIO_H) if _vertical else PITCH_RATIO_H
 	var rect: Rect2
 	var available_ratio: float = size.x / max(1.0, size.y)
-	if available_ratio > PITCH_RATIO:
-		var w: float = size.y * PITCH_RATIO
+	if available_ratio > target_ratio:
+		var w: float = size.y * target_ratio
 		var x: float = (size.x - w) * 0.5
 		rect = Rect2(x, 0, w, size.y)
 	else:
-		var h: float = size.x / PITCH_RATIO
+		var h: float = size.x / target_ratio
 		var y: float = (size.y - h) * 0.5
 		rect = Rect2(0, y, size.x, h)
 
@@ -90,28 +102,19 @@ func _draw() -> void:
 	var line_w: float = 2.0
 	draw_rect(rect, theme.pitch_lines, false, line_w)
 
-	var rx: float = rect.position.x
-	var ry: float = rect.position.y
-	var rw: float = rect.size.x
-	var rh: float = rect.size.y
-
-	# Línea medio campo
-	var mid_x: float = rx + rw * 0.5
-	draw_line(Vector2(mid_x, ry), Vector2(mid_x, ry + rh), theme.pitch_lines, line_w)
+	# Línea medio campo: profundidad interna 0.5 va de banda a banda
+	draw_line(_to_screen(rect, 0.5, 0.0), _to_screen(rect, 0.5, 1.0), theme.pitch_lines, line_w)
 	# Círculo central
-	var center := Vector2(mid_x, ry + rh * 0.5)
-	var r_center: float = min(rw, rh) * 0.12
+	var center: Vector2 = _to_screen(rect, 0.5, 0.5)
+	var r_center: float = min(rect.size.x, rect.size.y) * 0.12
 	draw_arc(center, r_center, 0.0, TAU, 32, theme.pitch_lines, line_w)
 	draw_circle(center, 3.0, theme.pitch_lines)
-	# Porterías (área pequeña)
-	var goal_w: float = rw * 0.10
-	var goal_h: float = rh * 0.50
-	var goal_y: float = ry + (rh - goal_h) * 0.5
-	draw_rect(Rect2(rx, goal_y, goal_w, goal_h), theme.pitch_lines, false, line_w)
-	draw_rect(Rect2(rx + rw - goal_w, goal_y, goal_w, goal_h), theme.pitch_lines, false, line_w)
+	# Áreas pequeñas (porterías): de profundidad 0..0.10 y 0.90..1.0, banda 0.25..0.75
+	_draw_area_rect(rect, 0.0, 0.10, 0.25, 0.75, theme.pitch_lines, line_w)
+	_draw_area_rect(rect, 0.90, 1.0, 0.25, 0.75, theme.pitch_lines, line_w)
 	# Puntos de penalti
-	draw_circle(Vector2(rx + goal_w * 0.7, ry + rh * 0.5), 2.0, theme.pitch_lines)
-	draw_circle(Vector2(rx + rw - goal_w * 0.7, ry + rh * 0.5), 2.0, theme.pitch_lines)
+	draw_circle(_to_screen(rect, 0.07, 0.5), 2.0, theme.pitch_lines)
+	draw_circle(_to_screen(rect, 0.93, 0.5), 2.0, theme.pitch_lines)
 
 	# === Calcular posiciones por LÍNEAS ===
 	var positions: Array = _compute_line_positions(_players)
@@ -119,17 +122,17 @@ func _draw() -> void:
 		return
 
 	# === Pintar jugadores ===
-	# Radius en función del tamaño del rect (campos pequeños = círculos más pequeños)
-	var radius: float = clampf(min(rw, rh) * 0.06, 9.0, 16.0)
+	# Radius en función del lado MENOR del rect (en vertical el lado menor es x)
+	var radius: float = clampf(min(rect.size.x, rect.size.y) * 0.06, 9.0, 16.0)
 	var font := ThemeDB.fallback_font
 	var font_size_num: int = max(9, int(radius * 0.9))
 	var font_size_name: int = max(8, int(radius * 0.75))
 	for pos_data: Dictionary in positions:
 		var i: int = pos_data["idx"]
 		var p: Dictionary = _players[i]
-		var x: float = rx + pos_data["x"] * rw
-		var y: float = ry + pos_data["y"] * rh
-		var center_p := Vector2(x, y)
+		var center_p: Vector2 = _to_screen(rect, float(pos_data["x"]), float(pos_data["y"]))
+		var x: float = center_p.x
+		var y: float = center_p.y
 		var line_type: String = String(pos_data.get("line_type", ""))
 		var color: Color = _color_for_line(line_type, p, theme)
 		# Sombra suave bajo el círculo
@@ -254,6 +257,32 @@ func _positions_from_formation(players: Array, line_counts: Array) -> Array:
 				"line_type": line_type_str,
 			})
 	return result
+
+
+# Mapea coordenadas internas del campo (profundidad X 0..1, banda Y 0..1) a
+# coordenadas de pantalla dentro del rect dado. En horizontal: X=profundidad,
+# Y=banda. En vertical: el campo gira 90° antihorario (portería propia abajo).
+func _to_screen(rect: Rect2, internal_x: float, internal_y: float) -> Vector2:
+	if _vertical:
+		return Vector2(
+			rect.position.x + internal_y * rect.size.x,
+			rect.position.y + (1.0 - internal_x) * rect.size.y,
+		)
+	return Vector2(
+		rect.position.x + internal_x * rect.size.x,
+		rect.position.y + internal_y * rect.size.y,
+	)
+
+
+# Dibuja un rectángulo definido por coordenadas internas (no estiradas).
+#   x0, x1: profundidad (0..1, x0 < x1)
+#   y0, y1: banda (0..1, y0 < y1)
+func _draw_area_rect(rect: Rect2, x0: float, x1: float, y0: float, y1: float, color: Color, line_w: float) -> void:
+	var a: Vector2 = _to_screen(rect, x0, y0)
+	var b: Vector2 = _to_screen(rect, x1, y1)
+	var origin := Vector2(min(a.x, b.x), min(a.y, b.y))
+	var dim := Vector2(abs(b.x - a.x), abs(b.y - a.y))
+	draw_rect(Rect2(origin, dim), color, false, line_w)
 
 
 # Color del círculo según el tipo de línea (defensa/medio/ataque/portero).
