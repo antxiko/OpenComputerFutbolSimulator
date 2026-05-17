@@ -3887,7 +3887,10 @@ func _render_dashboard_view() -> void:
 					"short_name": _short_name(p.name),
 					"is_gk": slot == "GK",
 				})
-	mini_pitch.setup(pitch_players, true)
+	var formation_str: String = String(user_lineup_template.get("formation", "")) if not user_lineup_template.is_empty() else ""
+	if formation_str == "" and team != null:
+		formation_str = team.tactics_default.formation
+	mini_pitch.setup(pitch_players, true, formation_str)
 
 	# Line chart: puntos por jornada del user vs líder vs umbral Europa.
 	# Compacto (stretch_ratio bajo) y proporcional a 38 jornadas.

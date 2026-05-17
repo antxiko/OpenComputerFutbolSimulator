@@ -35,6 +35,12 @@ const LINE_ORDER := ["gk", "def", "dm", "mid", "am", "fw"]
 # Array de Dictionary: [{slot, number, short_name, is_gk}, ...]
 var _players: Array = []
 var _show_names: bool = true
+# Formación como string ("4-3-3", "3-4-3", "4-2-3-1", "3-5-2", ...). Si está
+# presente y es válida, se usa como fuente de verdad para las líneas en lugar
+# de clasificar por slot. Esto evita que la representación se desincronice
+# cuando el user cambia de formación y el slot_assignments queda con strings
+# de la formación anterior.
+var _formation: String = ""
 
 
 func _ready() -> void:
@@ -42,9 +48,11 @@ func _ready() -> void:
 
 
 # players: Array de Dictionary {slot, number, short_name, is_gk}
-func setup(players: Array, show_names: bool = true) -> void:
+# formation: string opcional "3-4-3", "4-3-3", "4-2-3-1", etc.
+func setup(players: Array, show_names: bool = true, formation: String = "") -> void:
 	_players = players
 	_show_names = show_names
+	_formation = formation
 	queue_redraw()
 
 
@@ -134,11 +142,102 @@ func _draw() -> void:
 						font_size_name, theme.text_primary)
 
 
-# Clasifica los jugadores en líneas según su slot, calcula la X de cada línea
-# repartiendo el campo uniformemente, y dentro de cada línea distribuye los
-# jugadores en Y de banda a banda (ordenados por SLOT_Y_PREF).
-# Devuelve: Array de Dictionary {idx, x, y} con coords 0..1.
+# Si tenemos una formación válida ("3-4-3", "4-3-3", etc.) y los jugadores
+# vienen en orden (GK primero, defensas, medios, ataque), usar la formación
+# como fuente de verdad para las líneas. Mucho más robusto que clasificar
+# por slot (los slot_assignments pueden quedar obsoletos si el user cambia de
+# formación sin re-asignar slots).
 func _compute_line_positions(players: Array) -> Array:
+	if players.is_empty():
+		return []
+	# Intentar usar la formación si está disponible
+	if _formation != "":
+		var line_counts: Array = _parse_formation(_formation, players.size())
+		if not line_counts.is_empty():
+			return _positions_from_formation(players, line_counts)
+	# Fallback: clasificar por slots (puede dar resultados raros si los slots
+	# no coinciden con la formación seleccionada)
+	return _positions_from_slots(players)
+
+
+# Parsea "3-4-3" -> [1, 3, 4, 3] (incluyendo GK como primera línea).
+# Devuelve [] si el string es inválido o no suma N jugadores.
+func _parse_formation(formation: String, n_players: int) -> Array:
+	var parts: PackedStringArray = formation.split("-")
+	if parts.size() < 2:
+		return []
+	var lines: Array = [1]  # GK siempre primera línea
+	var total: int = 1
+	for p in parts:
+		var n: int = int(p.strip_edges())
+		if n <= 0:
+			return []
+		lines.append(n)
+		total += n
+	# Tolerar formaciones que no sumen exactamente n_players: si suma 11 OK,
+	# si los players son menos asumimos que faltan algunos pero usamos en orden
+	if total < 2:
+		return []
+	return lines
+
+
+# Distribuye los jugadores en orden secuencial según los counts por línea.
+# - line_counts[0] = N jugadores en GK (siempre 1)
+# - line_counts[1] = N jugadores en defensa
+# - line_counts[2] = N jugadores en mediocampo
+# ... etc
+# X de cada línea: reparto uniforme 7%..86%. Y dentro de cada línea: si los
+# players tienen slots con SLOT_Y_PREF útil, ordenar por eso; si no, orden
+# secuencial. Todos distribuidos 18%..82%.
+func _positions_from_formation(players: Array, line_counts: Array) -> Array:
+	var n_lines: int = line_counts.size()
+	if n_lines <= 0:
+		return []
+	# X de cada línea
+	var line_x: Array = []
+	for i in n_lines:
+		var x: float
+		if n_lines == 1:
+			x = 0.5
+		else:
+			var t: float = float(i) / float(n_lines - 1)
+			x = 0.07 + t * 0.79
+		line_x.append(x)
+	# Asignar players secuencialmente a líneas
+	var result: Array = []
+	var idx: int = 0
+	for line_idx in n_lines:
+		var n_in_line: int = int(line_counts[line_idx])
+		# Recoger los players de esta línea con su y_pref por slot
+		var line_players: Array = []
+		for _i in n_in_line:
+			if idx >= players.size():
+				break
+			var slot: String = String(players[idx].get("slot", "CM"))
+			var y_pref: float = float(SLOT_Y_PREF.get(slot, 0.5))
+			line_players.append({"idx": idx, "y_pref": y_pref})
+			idx += 1
+		# Ordenar por y_pref (LB arriba, RB abajo, centrales al medio)
+		line_players.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+			return float(a["y_pref"]) < float(b["y_pref"]))
+		# Distribuir Y uniformemente
+		var n: int = line_players.size()
+		for j in n:
+			var y: float
+			if n == 1:
+				y = 0.5
+			else:
+				y = 0.18 + float(j) / float(n - 1) * 0.64
+			result.append({
+				"idx": int(line_players[j]["idx"]),
+				"x": line_x[line_idx],
+				"y": y,
+			})
+	return result
+
+
+# Clasifica los jugadores en líneas por SLOT (fallback si no hay formación).
+func _positions_from_slots(players: Array) -> Array:
 	if players.is_empty():
 		return []
 
