@@ -266,18 +266,18 @@ func _depth_offset(n: int, j: int) -> float:
 	if n < 4:
 		return 0.0
 	if n == 4:
-		# Defensa o medio de 4: laterales 1% atrás, centrales planos (sutil curvatura)
+		# Defensa o medio de 4: laterales ~3.5% atrás, centrales planos
 		if j == 0 or j == n - 1:
-			return -0.012
+			return -0.035
 		return 0.0
-	# 5+ jugadores: cuña pronunciada
-	# - banda (j=0, j=n-1): ~4% atrás
-	# - inmediato siguiente (j=1, j=n-2): ~1% atrás
-	# - centro (j ≈ (n-1)/2): ~2.5% adelantado
+	# 5+ jugadores: cuña muy pronunciada (3x el efecto anterior)
+	# - banda (j=0, j=n-1): ~12.5% atrás
+	# - inmediato siguiente: ~3% atrás
+	# - centro: ~7.5% adelantado
+	# Spread total ~20%, casi medio salto entre líneas
 	var center: float = float(n - 1) * 0.5
 	var dist: float = abs(float(j) - center) / center  # 0 centro .. 1 banda
-	# Función suave: forward al centro, retraso creciente hacia las bandas
-	return 0.028 - pow(dist, 1.5) * 0.072
+	return 0.075 - pow(dist, 1.5) * 0.20
 
 
 # Infiere el TIPO de cada línea según cuántas líneas hay (incluyendo GK).
