@@ -248,7 +248,7 @@ func _positions_from_formation(players: Array, line_counts: Array) -> Array:
 			var x_off: float = _depth_offset(n, j)
 			result.append({
 				"idx": int(line_players[j]["idx"]),
-				"x": line_x + x_off,
+				"x": clampf(line_x + x_off, 0.05, 0.92),
 				"y": y,
 			})
 	return result
@@ -266,18 +266,15 @@ func _depth_offset(n: int, j: int) -> float:
 	if n < 4:
 		return 0.0
 	if n == 4:
-		# Defensa o medio de 4: laterales ~3.5% atrás, centrales planos
+		# Defensa o medio de 4: laterales ~10% atrás, centrales planos
 		if j == 0 or j == n - 1:
-			return -0.035
+			return -0.10
 		return 0.0
-	# 5+ jugadores: cuña muy pronunciada (3x el efecto anterior)
-	# - banda (j=0, j=n-1): ~12.5% atrás
-	# - inmediato siguiente: ~3% atrás
-	# - centro: ~7.5% adelantado
-	# Spread total ~20%, casi medio salto entre líneas
+	# 5+ jugadores: cuña ANCHA — central claramente adelantado, bandas casi
+	# en la línea anterior. Spread total ~60% del salto entre líneas.
 	var center: float = float(n - 1) * 0.5
 	var dist: float = abs(float(j) - center) / center  # 0 centro .. 1 banda
-	return 0.075 - pow(dist, 1.5) * 0.20
+	return 0.22 - pow(dist, 1.5) * 0.60
 
 
 # Infiere el TIPO de cada línea según cuántas líneas hay (incluyendo GK).
@@ -367,7 +364,7 @@ func _positions_from_slots(players: Array) -> Array:
 			var x_off: float = _depth_offset(n, i)
 			result.append({
 				"idx": int(line_players[i]["idx"]),
-				"x": float(LINE_X.get(line_key, 0.5)) + x_off,
+				"x": clampf(float(LINE_X.get(line_key, 0.5)) + x_off, 0.05, 0.92),
 				"y": y,
 			})
 	return result
