@@ -3760,6 +3760,10 @@ func _render_dashboard_view() -> void:
 	root.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	root.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_theme_constant_override("separation", 14)
+	# Forzar altura mínima para que las filas con SIZE_EXPAND_FILL llenen
+	# el viewport (el content_area está dentro de un ScrollContainer y por
+	# defecto toma solo la altura natural de los hijos).
+	root.custom_minimum_size = Vector2(0, 940)
 	content_area.add_child(root)
 
 	# ============ FILA 1: 4 KPI cards ============
@@ -3835,17 +3839,20 @@ func _render_dashboard_view() -> void:
 	kpi_rival.setup("Próximo rival", rival_name, rival_short, "", "flat", "⚽")
 
 	# ============ FILA 2: Starting XI | Clasificación | Chart ============
+	# Expande vertical para ocupar el espacio entre los KPIs y la fila de noticias
 	var mid_row := HBoxContainer.new()
 	mid_row.add_theme_constant_override("separation", 12)
 	mid_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mid_row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_child(mid_row)
 
-	# Mini pitch VERTICAL — glass panel, ~20% del ancho
+	# Mini pitch VERTICAL — glass panel, ~25% del ancho
 	var pitch_panel := PanelContainer.new()
 	pitch_panel.add_theme_stylebox_override("panel", UIThemeManager.glass_panel_style())
-	pitch_panel.custom_minimum_size = Vector2(240, 320)
+	pitch_panel.custom_minimum_size = Vector2(280, 0)
 	pitch_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	pitch_panel.size_flags_stretch_ratio = 0.8
+	pitch_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	pitch_panel.size_flags_stretch_ratio = 0.9
 	mid_row.add_child(pitch_panel)
 	var pitch_box := VBoxContainer.new()
 	pitch_box.add_theme_constant_override("separation", 6)
@@ -3961,10 +3968,10 @@ func _render_dashboard_view() -> void:
 		liga_label = "Clasificación %s" % ("Primera" if team.division == "primera" else "Segunda")
 	table_widget.setup(columns, rows, liga_label, 7)
 
-	# ============ FILA 3: Noticias / Actividad (full width) ============
+	# ============ FILA 3: Noticias / Actividad (full width, altura fija abajo) ============
 	var news_panel := PanelContainer.new()
 	news_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	news_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	# NO expandir vertical — queda a altura fija pegada abajo del viewport
 	news_panel.custom_minimum_size = Vector2(0, 220)
 	news_panel.add_theme_stylebox_override("panel", UIThemeManager.glass_panel_style())
 	root.add_child(news_panel)
