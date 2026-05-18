@@ -77,6 +77,11 @@ func _rebuild() -> void:
 		count = min(count, _max_rows_visible)
 	for i in range(count):
 		_vbox.add_child(_build_row(_rows[i], false))
+	# Spacer expand al final para que el panel quede balanceado verticalmente
+	# (sin esto las rows quedan agrupadas arriba y el resto del panel vacío)
+	var bottom_spacer := Control.new()
+	bottom_spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_vbox.add_child(bottom_spacer)
 
 
 func _build_row(row_data, is_header: bool) -> Control:

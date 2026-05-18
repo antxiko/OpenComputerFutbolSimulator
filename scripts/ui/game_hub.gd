@@ -3965,7 +3965,7 @@ func _render_dashboard_view() -> void:
 		var st_t: DivisionState = primera_state if team.division == "primera" else segunda_state
 		if st_t.league_table != null:
 			var sorted_rows: Array = st_t.league_table.sorted_rows()
-			var max_n: int = min(7, sorted_rows.size())
+			var max_n: int = min(10, sorted_rows.size())
 			for i in range(max_n):
 				var r: LeagueTable.TeamRow = sorted_rows[i]
 				var t_obj: Team = _find_team_by_id(r.team_id)
@@ -3980,13 +3980,13 @@ func _render_dashboard_view() -> void:
 	var liga_label: String = "Clasificación Liga"
 	if team != null:
 		liga_label = "Clasificación %s" % ("Primera" if team.division == "primera" else "Segunda")
-	table_widget.setup(columns, rows, liga_label, 7)
+	table_widget.setup(columns, rows, liga_label, 10)
 
 	# --- Bottom derecho: Noticias / Actividad (mismo ancho que clasif+chart) ---
 	var news_panel := PanelContainer.new()
 	news_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	# Altura fija ~220px pegada abajo de right_area
-	news_panel.custom_minimum_size = Vector2(0, 220)
+	# Altura fija ~320px pegada abajo de right_area
+	news_panel.custom_minimum_size = Vector2(0, 320)
 	news_panel.add_theme_stylebox_override("panel", UIThemeManager.glass_panel_style())
 	right_area.add_child(news_panel)
 	var news_vbox := VBoxContainer.new()
