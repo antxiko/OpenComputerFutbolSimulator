@@ -82,20 +82,32 @@ func set_vertical(vertical: bool) -> void:
 
 func _draw() -> void:
 	var theme: UITheme = UIThemeManager.get_current()
-	# Aspect ratio del campo (105m x 68m ≈ 1.54:1). En vertical se invierte
-	# (ancho/alto < 1), en horizontal es > 1.
+	# Aspect ratio "ideal" del campo (105m x 68m ≈ 1.54:1). En vertical se
+	# invierte. Si el control es muy distinto al ratio ideal, EN VERTICAL
+	# permitimos estirar la longitud (eje Y) hasta llenar el alto disponible
+	# para que no quede hueco visible arriba/abajo. El ancho sigue respetando
+	# que el campo no se aplaste lateralmente.
 	const PITCH_RATIO_H: float = 1.54
-	var target_ratio: float = (1.0 / PITCH_RATIO_H) if _vertical else PITCH_RATIO_H
 	var rect: Rect2
-	var available_ratio: float = size.x / max(1.0, size.y)
-	if available_ratio > target_ratio:
-		var w: float = size.y * target_ratio
+	if _vertical:
+		# El campo VERTICAL siempre llena toda la altura del control. El ancho
+		# máximo es alto/1.20 (un poco más cuadrado que el real 1.54 para
+		# aprovechar mejor el espacio cuando el panel es muy estrecho).
+		var max_w: float = size.y / 1.20
+		var w: float = min(size.x, max_w)
 		var x: float = (size.x - w) * 0.5
 		rect = Rect2(x, 0, w, size.y)
 	else:
-		var h: float = size.x / target_ratio
-		var y: float = (size.y - h) * 0.5
-		rect = Rect2(0, y, size.x, h)
+		# Horizontal: mantener ratio estricto, centrar verticalmente si sobra alto
+		var available_ratio: float = size.x / max(1.0, size.y)
+		if available_ratio > PITCH_RATIO_H:
+			var w: float = size.y * PITCH_RATIO_H
+			var x: float = (size.x - w) * 0.5
+			rect = Rect2(x, 0, w, size.y)
+		else:
+			var h: float = size.x / PITCH_RATIO_H
+			var y: float = (size.y - h) * 0.5
+			rect = Rect2(0, y, size.x, h)
 
 	# Fondo + bordes
 	draw_rect(rect, theme.pitch_bg, true)

@@ -10,7 +10,7 @@ class_name DataTable extends PanelContainer
 # Si una row tiene `highlight: true`, se pinta con fondo accent (útil para
 # resaltar la fila del user en la clasificación).
 
-const ROW_HEIGHT: int = 28
+const ROW_HEIGHT_MIN: int = 32   # altura mínima de cada row — las rows expanden vertical para llenar el panel
 
 var _columns: Array = []     # Array de Dictionary
 var _rows: Array = []        # Array de Dictionary
@@ -49,6 +49,7 @@ func _rebuild() -> void:
 
 	_vbox = VBoxContainer.new()
 	_vbox.add_theme_constant_override("separation", 2)
+	_vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	add_child(_vbox)
 
 	if _title != "":
@@ -71,23 +72,22 @@ func _rebuild() -> void:
 	sep.custom_minimum_size = Vector2(0, 1)
 	_vbox.add_child(sep)
 
-	# Rows
+	# Rows — todas con SIZE_EXPAND_FILL vertical para distribuirse uniformemente
+	# en toda la altura disponible del panel (sin huecos ni rows aplastadas).
 	var count: int = _rows.size()
 	if _max_rows_visible > 0:
 		count = min(count, _max_rows_visible)
 	for i in range(count):
 		_vbox.add_child(_build_row(_rows[i], false))
-	# Spacer expand al final para que el panel quede balanceado verticalmente
-	# (sin esto las rows quedan agrupadas arriba y el resto del panel vacío)
-	var bottom_spacer := Control.new()
-	bottom_spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_vbox.add_child(bottom_spacer)
 
 
 func _build_row(row_data, is_header: bool) -> Control:
 	var theme: UITheme = UIThemeManager.get_current()
 	var pc := PanelContainer.new()
-	pc.custom_minimum_size = Vector2(0, ROW_HEIGHT)
+	pc.custom_minimum_size = Vector2(0, ROW_HEIGHT_MIN)
+	# Header NO expande, rows SÍ — para que las rows llenen toda la altura
+	if not is_header:
+		pc.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	if not is_header and row_data != null and bool(row_data.get("highlight", false)):
 		var sb := StyleBoxFlat.new()
 		sb.bg_color = theme.sidebar_active_bg
@@ -112,7 +112,7 @@ func _build_row(row_data, is_header: bool) -> Control:
 		elif row_data != null:
 			txt = String(row_data.get(key, ""))
 		lbl.text = txt
-		lbl.add_theme_font_size_override("font_size", 14 if not is_header else 12)
+		lbl.add_theme_font_size_override("font_size", 18 if not is_header else 14)
 		var color: Color
 		if is_header:
 			color = theme.text_secondary

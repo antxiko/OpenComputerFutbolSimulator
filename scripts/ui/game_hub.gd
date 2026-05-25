@@ -3846,12 +3846,13 @@ func _render_dashboard_view() -> void:
 	root.add_child(main_content)
 
 	# Mini pitch VERTICAL — ocupa toda la altura de las 2 filas restantes
+	# stretch_ratio relativo al right_area (que tiene 2.6). Pitch ~25% del ancho.
 	var pitch_panel := PanelContainer.new()
 	pitch_panel.add_theme_stylebox_override("panel", UIThemeManager.glass_panel_style())
-	pitch_panel.custom_minimum_size = Vector2(280, 0)
+	pitch_panel.custom_minimum_size = Vector2(240, 0)
 	pitch_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pitch_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	pitch_panel.size_flags_stretch_ratio = 0.9
+	pitch_panel.size_flags_stretch_ratio = 0.85
 	main_content.add_child(pitch_panel)
 	var pitch_box := VBoxContainer.new()
 	pitch_box.add_theme_constant_override("separation", 6)
@@ -3915,11 +3916,12 @@ func _render_dashboard_view() -> void:
 	right_area.add_child(top_right)
 
 	# Line chart: puntos por jornada del user vs líder vs umbral Europa.
+	# Stretch_ratio 0.7 (vs clasif 1.4) → el chart toma ~33% del ancho del top_right,
+	# la clasif ~67%. Sin custom_minimum_size para que escale con el panel.
 	var chart := LineChart.new()
 	chart.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	chart.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	chart.size_flags_stretch_ratio = 1.0
-	chart.custom_minimum_size = Vector2(300, 240)
+	chart.size_flags_stretch_ratio = 0.7
 	var series: Array = [
 		{
 			"name": "Tú",
