@@ -10,6 +10,9 @@ class_name SidebarNav extends PanelContainer
 # Emite signal `view_selected(view_name: String)` cuando el user pulsa un item.
 
 signal view_selected(view_name: String)
+# Emitido cuando el user envía una búsqueda desde el campo del sidebar.
+# El game_hub se encarga de buscar y mostrar resultados.
+signal search_requested(query: String)
 
 const SIDEBAR_WIDTH: int = 230
 
@@ -71,6 +74,41 @@ func setup(club_name: String, club_short: String, items: Array, user_name: Strin
 	sep.color = theme.border_subtle
 	sep.custom_minimum_size = Vector2(0, 1)
 	root.add_child(sep)
+
+	# Campo de búsqueda global (jugadores + equipos)
+	var search_pad := MarginContainer.new()
+	search_pad.add_theme_constant_override("margin_left", 10)
+	search_pad.add_theme_constant_override("margin_right", 10)
+	search_pad.add_theme_constant_override("margin_top", 10)
+	search_pad.add_theme_constant_override("margin_bottom", 4)
+	root.add_child(search_pad)
+	var search_edit := LineEdit.new()
+	search_edit.placeholder_text = "Buscar jugador o equipo..."
+	search_edit.add_theme_font_size_override("font_size", 13)
+	search_edit.text_submitted.connect(func(text: String) -> void:
+		var q: String = text.strip_edges()
+		if q.length() >= 2:
+			search_requested.emit(q)
+			search_edit.text = "")
+	var sb_search := StyleBoxFlat.new()
+	sb_search.bg_color = theme.bg_secondary
+	sb_search.corner_radius_top_left = 4
+	sb_search.corner_radius_top_right = 4
+	sb_search.corner_radius_bottom_left = 4
+	sb_search.corner_radius_bottom_right = 4
+	sb_search.content_margin_left = 8
+	sb_search.content_margin_right = 8
+	sb_search.content_margin_top = 4
+	sb_search.content_margin_bottom = 4
+	search_edit.add_theme_stylebox_override("normal", sb_search)
+	search_edit.add_theme_stylebox_override("focus", sb_search)
+	search_pad.add_child(search_edit)
+
+	# Separador sutil tras búsqueda
+	var sep_search := ColorRect.new()
+	sep_search.color = theme.border_subtle
+	sep_search.custom_minimum_size = Vector2(0, 1)
+	root.add_child(sep_search)
 
 	# Items box
 	var items_pad := MarginContainer.new()

@@ -109,6 +109,10 @@ var user_recent_results: Array = []
 var user_points_per_jornada: Array = []  # Array[int]
 # Lista de player_ids marcados por el user desde Mercado (Scout Shortlist).
 var user_shortlist: Array = []  # Array[String]
+# Noticias de mercado para mostrar en el panel "Noticias · Actividad" del
+# Dashboard. Cada item es {title, body, jornada}. Solo en memoria — no se
+# persiste en SaveData (se reconstruye desde inbox + último mercado al cargar).
+var recent_market_news: Array = []
 # Para el chart de contexto: puntos del líder de la división del user
 # y puntos del 6º clasificado (umbral zona Europa) en cada jornada.
 var liga_leader_points_per_jornada: Array = []   # Array[int]
@@ -236,6 +240,7 @@ func _build_ui() -> void:
 	# === SIDEBAR ===
 	sidebar_nav = SidebarNav.new()
 	sidebar_nav.view_selected.connect(_on_sidebar_view_selected)
+	sidebar_nav.search_requested.connect(_on_global_search)
 	root_hbox.add_child(sidebar_nav)
 
 	# === MAIN AREA ===
@@ -553,14 +558,14 @@ func _show_preseason_modal(user_team: Team, results: Array) -> void:
 	title.text = "Amistosos de %s" % user_team.name
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 16)
-	title.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+	title.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	box.add_child(title)
 
 	var subtitle := Label.new()
 	subtitle.text = "Sin efecto en la clasificación, pero te dan ritmo de cara al primer partido."
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	subtitle.add_theme_font_size_override("font_size", 14)
-	subtitle.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	subtitle.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(subtitle)
 
 	box.add_child(HSeparator.new())
@@ -591,7 +596,7 @@ func _show_preseason_modal(user_team: Team, results: Array) -> void:
 	summary.text = "Balance: %d V · %d E · %d D" % [won, drawn, lost]
 	summary.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	summary.add_theme_font_size_override("font_size", 14)
-	summary.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	summary.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(summary)
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
@@ -605,6 +610,8 @@ func _show_preseason_modal(user_team: Team, results: Array) -> void:
 func _run_winter_market() -> void:
 	var window: TransferMarket.WindowConfig = TransferMarket.winter_window()
 	var market_result := TransferMarket.run(all_teams, year, SEED_BASE * 31 + year, window)
+	# Capturar top fichajes para el panel de Noticias del Dashboard
+	_capture_market_news(market_result, "Mercado de invierno")
 	# Mostrar modal solo si hubo movimiento o si el usuario tiene fichaje/venta
 	var user_relevant: bool = false
 	for tr: TransferMarket.Transfer in market_result.transfers:
@@ -635,7 +642,7 @@ func _show_winter_market_modal(market_result: TransferMarket.MarketResult) -> vo
 	header.text = "Cerró la ventana de invierno con %d operaciones." % market_result.transfers.size()
 	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	header.add_theme_font_size_override("font_size", 14)
-	header.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	header.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(header)
 
 	box.add_child(HSeparator.new())
@@ -652,17 +659,17 @@ func _show_winter_market_modal(market_result: TransferMarket.MarketResult) -> vo
 		var your_label := Label.new()
 		your_label.text = "🏟 Tu club:"
 		your_label.add_theme_font_size_override("font_size", 14)
-		your_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+		your_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		box.add_child(your_label)
 		for tr: TransferMarket.Transfer in user_signings:
 			var l := Label.new()
 			l.text = "  ✅ Firma: %s (de %s, %s €)" % [tr.player_name, tr.from_team_name, TransferMarket._fmt_eur(tr.fee_eur)]
-			l.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+			l.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 			box.add_child(l)
 		for tr: TransferMarket.Transfer in user_departures:
 			var l := Label.new()
 			l.text = "  ❌ Vende: %s (a %s, %s €)" % [tr.player_name, tr.to_team_name, TransferMarket._fmt_eur(tr.fee_eur)]
-			l.add_theme_color_override("font_color", Color(1.0, 0.7, 0.7))
+			l.add_theme_color_override("font_color", UIThemeManager.get_current().accent_danger)
 			box.add_child(l)
 		box.add_child(HSeparator.new())
 
@@ -673,7 +680,7 @@ func _show_winter_market_modal(market_result: TransferMarket.MarketResult) -> vo
 	var others_label := Label.new()
 	others_label.text = "Top fichajes de la ventana:"
 	others_label.add_theme_font_size_override("font_size", 14)
-	others_label.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	others_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(others_label)
 	var shown: int = 0
 	for tr: TransferMarket.Transfer in sorted_t:
@@ -720,7 +727,7 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 		market.released.size() - market.free_agent_signings.size(),
 	]
 	stats_label.add_theme_font_size_override("font_size", 14)
-	stats_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	stats_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(stats_label)
 
 	box.add_child(HSeparator.new())
@@ -741,12 +748,12 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 		var your_label := Label.new()
 		your_label.text = "🏟 Tu club:"
 		your_label.add_theme_font_size_override("font_size", 14)
-		your_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+		your_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		box.add_child(your_label)
 		for tr: TransferMarket.Transfer in user_signings:
 			var l := Label.new()
 			l.text = "  ✅ Ficha: %s (%s, %s €)" % [tr.player_name, tr.from_team_name, TransferMarket._fmt_eur(tr.fee_eur)]
-			l.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+			l.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 			box.add_child(l)
 		for fa: Dictionary in user_free_signings:
 			var l := Label.new()
@@ -754,12 +761,12 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 				String(fa["player_name"]), String(fa["prev_team_name"]),
 				int(fa["overall"]), TransferMarket._fmt_eur(int(fa["salary"])),
 			]
-			l.add_theme_color_override("font_color", Color(0.85, 1.0, 0.5))
+			l.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 			box.add_child(l)
 		for tr: TransferMarket.Transfer in user_departures:
 			var l := Label.new()
 			l.text = "  ❌ Vende: %s (a %s, %s €)" % [tr.player_name, tr.to_team_name, TransferMarket._fmt_eur(tr.fee_eur)]
-			l.add_theme_color_override("font_color", Color(1.0, 0.7, 0.7))
+			l.add_theme_color_override("font_color", UIThemeManager.get_current().accent_danger)
 			box.add_child(l)
 		box.add_child(HSeparator.new())
 
@@ -770,7 +777,7 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 	var top_label := Label.new()
 	top_label.text = "💰 Top traspasos:"
 	top_label.add_theme_font_size_override("font_size", 14)
-	top_label.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	top_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(top_label)
 	var shown: int = 0
 	for tr: TransferMarket.Transfer in sorted_t:
@@ -791,7 +798,7 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 		var fa_label := Label.new()
 		fa_label.text = "🆓 Top fichajes libres:"
 		fa_label.add_theme_font_size_override("font_size", 14)
-		fa_label.add_theme_color_override("font_color", Color(0.85, 1.0, 0.5))
+		fa_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 		box.add_child(fa_label)
 		shown = 0
 		for fa: Dictionary in sorted_fa:
@@ -823,7 +830,7 @@ func _show_summer_market_modal(market: TransferMarket.MarketResult) -> void:
 		var rel_label := Label.new()
 		rel_label.text = "⚠ Sin equipo (retirados o fuera de la liga):"
 		rel_label.add_theme_font_size_override("font_size", 14)
-		rel_label.add_theme_color_override("font_color", Color(1.0, 0.7, 0.7))
+		rel_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_danger)
 		box.add_child(rel_label)
 		shown = 0
 		for r: Dictionary in unsigned:
@@ -904,13 +911,13 @@ func _show_renewals_view_modal(team: Team, pending: Array, season_year: int) -> 
 		var detail_l := Label.new()
 		detail_l.text = "Salario actual: %s€/año · Justo estimado: %s€/año" % [_fmt_eur(current_salary), _fmt_eur(fair)]
 		detail_l.add_theme_font_size_override("font_size", 14)
-		detail_l.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+		detail_l.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 		info.add_child(detail_l)
 
 		var status_l := Label.new()
 		status_l.text = "⏳ Pendiente"
 		status_l.add_theme_font_size_override("font_size", 14)
-		status_l.add_theme_color_override("font_color", Color(0.9, 0.8, 0.4))
+		status_l.add_theme_color_override("font_color", UIThemeManager.get_current().tier_s)
 		info.add_child(status_l)
 		status_labels[p.id] = status_l
 
@@ -1020,7 +1027,7 @@ func _on_renew_player_pressed(player: Player, season_year: int, decisions: Dicti
 func _on_release_player_pressed(player_id: String, decisions: Dictionary, status_label: Label) -> void:
 	decisions[player_id] = "released"
 	status_label.text = "❌ Liberado"
-	status_label.add_theme_color_override("font_color", Color(0.9, 0.5, 0.5))
+	status_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_danger)
 
 
 func _on_send_renewal_offer(player: Player, season_year: int, sal_spin: SpinBox, years_spin: SpinBox, feedback: Label, status_label: Label, decisions: Dictionary, popup: AcceptDialog) -> void:
@@ -1035,11 +1042,11 @@ func _on_send_renewal_offer(player: Player, season_year: int, sal_spin: SpinBox,
 		if agent != null:
 			agent.adjust_relation(user_team_id, 5)
 		status_label.text = "✅ Renovado (%d años, %s€/año)" % [years, _fmt_eur(salary)]
-		status_label.add_theme_color_override("font_color", Color(0.4, 0.9, 0.5))
+		status_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_success)
 		popup.queue_free()
 		return
 	feedback.text = String(eval.get("message", "Rechaza la oferta."))
-	feedback.add_theme_color_override("font_color", Color(0.95, 0.6, 0.5))
+	feedback.add_theme_color_override("font_color", UIThemeManager.get_current().accent_danger)
 	var counter_sal: int = int(eval.get("counter_salary", 0))
 	var counter_yrs: int = int(eval.get("counter_years", 0))
 	if counter_sal > 0:
@@ -1119,20 +1126,20 @@ func _show_season_objective_modal() -> void:
 	header.text = "%s · Temporada %d-%d" % [team.name, year, year + 1]
 	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	header.add_theme_font_size_override("font_size", 16)
-	header.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	header.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	box.add_child(header)
 
 	var goal_label := Label.new()
 	goal_label.text = "🎯 %s" % String(season_objective.get("description", ""))
 	goal_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	goal_label.add_theme_font_size_override("font_size", 14)
-	goal_label.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+	goal_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 	box.add_child(goal_label)
 
 	var detail := Label.new()
 	detail.text = "Posición objetivo: %dº o mejor" % int(season_objective.get("target_position", 1))
 	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	detail.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	detail.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(detail)
 
 	var hint := Label.new()
@@ -1140,7 +1147,7 @@ func _show_season_objective_modal() -> void:
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.add_theme_font_size_override("font_size", 14)
-	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	hint.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 	box.add_child(hint)
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
@@ -1174,19 +1181,19 @@ func _evaluate_season_objective() -> Dictionary:
 	var budget_change: float
 	if actual_position <= target - 2:
 		verdict = "EXCELENTE — superaste con creces el objetivo"
-		verdict_color = Color(0.4, 1.0, 0.5)
+		verdict_color = UIThemeManager.get_current().accent_success
 		budget_change = 0.30  # +30% presupuesto
 	elif actual_position <= target:
 		verdict = "OBJETIVO CUMPLIDO"
-		verdict_color = Color(0.7, 1.0, 0.7)
+		verdict_color = UIThemeManager.get_current().tier_a
 		budget_change = 0.15  # +15%
 	elif actual_position <= target + 3:
 		verdict = "PRÓXIMO al objetivo, ligero descontento"
-		verdict_color = Color(1.0, 0.85, 0.4)
+		verdict_color = UIThemeManager.get_current().accent_warning
 		budget_change = 0.0
 	else:
 		verdict = "FRACASO — muy lejos del objetivo"
-		verdict_color = Color(1.0, 0.5, 0.5)
+		verdict_color = UIThemeManager.get_current().accent_danger
 		budget_change = -0.20  # -20%
 	# Aplicar al presupuesto
 	team.finances.budget_transfers_eur = int(float(team.finances.budget_transfers_eur) * (1.0 + budget_change))
@@ -1235,7 +1242,7 @@ func _show_objective_evaluation_modal(eval: Dictionary) -> void:
 		int(eval["actual_position"]),
 	]
 	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	detail.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	detail.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(detail)
 
 	var change: float = float(eval["budget_change"])
@@ -1244,7 +1251,7 @@ func _show_objective_evaluation_modal(eval: Dictionary) -> void:
 		change_label.text = "Presupuesto fichajes: %s%.0f%%" % ["+" if change > 0 else "", change * 100]
 		change_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		change_label.add_theme_font_size_override("font_size", 14)
-		change_label.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7) if change > 0 else Color(1.0, 0.7, 0.7))
+		change_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a if change > 0 else UIThemeManager.get_current().accent_danger)
 		box.add_child(change_label)
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
@@ -1293,12 +1300,12 @@ func _show_coach_award_modal(verdict: String, points: int, prize: int) -> void:
 	v.text = verdict
 	v.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_theme_font_size_override("font_size", 20)
-	v.add_theme_color_override("font_color", Color(0.7, 1.0, 0.6))
+	v.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 	box.add_child(v)
 	var detail := Label.new()
 	detail.text = "%d puntos en las últimas 4 jornadas\n+%s € de premio" % [points, TransferMarket._fmt_eur(prize)]
 	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	detail.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	detail.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(detail)
 	popup.confirmed.connect(func() -> void: popup.queue_free())
 	popup.canceled.connect(func() -> void: popup.queue_free())
@@ -1415,13 +1422,13 @@ func _show_post_match_modal(r: MatchResult) -> void:
 	var user_scored: int = r.score_home if is_user_home else r.score_away
 	var rival_scored: int = r.score_away if is_user_home else r.score_home
 	var verdict: String = "EMPATE"
-	var verdict_color: Color = Color(0.85, 0.85, 0.85)
+	var verdict_color: Color = UIThemeManager.get_current().tier_c
 	if user_scored > rival_scored:
 		verdict = "VICTORIA"
-		verdict_color = Color(0.4, 1.0, 0.5)
+		verdict_color = UIThemeManager.get_current().accent_success
 	elif user_scored < rival_scored:
 		verdict = "DERROTA"
-		verdict_color = Color(1.0, 0.5, 0.5)
+		verdict_color = UIThemeManager.get_current().accent_danger
 
 	var verdict_label := Label.new()
 	verdict_label.text = verdict
@@ -1444,7 +1451,7 @@ func _show_post_match_modal(r: MatchResult) -> void:
 		var goals_title := Label.new()
 		goals_title.text = "⚽ Goleadores:"
 		goals_title.add_theme_font_size_override("font_size", 14)
-		goals_title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		goals_title.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		box.add_child(goals_title)
 		for ev: MatchEvent in goal_evs:
 			var team_short: String = ""
@@ -1458,7 +1465,7 @@ func _show_post_match_modal(r: MatchResult) -> void:
 	else:
 		var no_goals := Label.new()
 		no_goals.text = "(Sin goles)"
-		no_goals.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+		no_goals.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 		box.add_child(no_goals)
 
 	# MVP
@@ -1478,7 +1485,7 @@ func _show_post_match_modal(r: MatchResult) -> void:
 		else:
 			mvp_label.text = "🏆 MVP: -"
 		mvp_label.add_theme_font_size_override("font_size", 14)
-		mvp_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		mvp_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		box.add_child(mvp_label)
 
 	# Stats compactos
@@ -1587,7 +1594,7 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 	var header := Label.new()
 	header.text = "%s   vs   %s" % [user_team.name, opponent.name]
 	header.add_theme_font_size_override("font_size", 18)
-	header.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	header.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	header.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(header)
 
@@ -1597,7 +1604,7 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 		(user_team.stadium.name if is_home else opponent.stadium.name) if user_team.stadium else "?",
 	]
 	loc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	loc.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	loc.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	content.add_child(loc)
 
 	content.add_child(HSeparator.new())
@@ -1616,7 +1623,7 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 		tactics.get("tempo", "normal"),
 		tactics.get("width", "normal"),
 	]
-	l_tact.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+	l_tact.add_theme_color_override("font_color", UIThemeManager.get_current().tier_c)
 	content.add_child(l_tact)
 
 	# Once inicial (compactado)
@@ -1651,10 +1658,10 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 	var news_l := Label.new()
 	if news_text.is_empty():
 		news_l.text = "Sin lesiones ni sancionados — plantilla disponible al 100%."
-		news_l.add_theme_color_override("font_color", Color(0.5, 0.9, 0.5))
+		news_l.add_theme_color_override("font_color", UIThemeManager.get_current().accent_success)
 	else:
 		news_l.text = "Bajas (%d lesionados, %d sancionados):\n  " % [inj_count, susp_count] + "\n  ".join(news_text)
-		news_l.add_theme_color_override("font_color", Color(1.0, 0.7, 0.5))
+		news_l.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	news_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	news_l.add_theme_font_size_override("font_size", 14)
 	content.add_child(news_l)
@@ -1662,7 +1669,7 @@ func _show_pre_match_modal(user_fx_data: Dictionary) -> void:
 	var rep_l := Label.new()
 	rep_l.text = "Tu reputación de mánager: %d  ·  Reputación del club: %d" % [manager_reputation, user_team.reputation]
 	rep_l.add_theme_font_size_override("font_size", 14)
-	rep_l.add_theme_color_override("font_color", Color(0.85, 0.85, 0.4))
+	rep_l.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	content.add_child(rep_l)
 
 	popup.confirmed.connect(func() -> void:
@@ -1783,6 +1790,8 @@ func _on_reset_season() -> void:
 				user_decisions = await _show_renewals_view_modal(user_team_for_renewals, pending, year - 1)
 	# Mercado de fichajes (verano)
 	var summer_result: TransferMarket.MarketResult = TransferMarket.run(all_teams, year, SEED_BASE * 7, null, user_decisions)
+	# Capturar top fichajes para el panel de Noticias del Dashboard
+	_capture_market_news(summer_result, "Mercado de verano")
 	# Modal de resumen (solo si hubo movimientos relevantes)
 	if user_team_id != "" and (summer_result.transfers.size() > 0 or summer_result.free_agent_signings.size() > 0):
 		_show_summer_market_modal(summer_result)
@@ -1928,13 +1937,13 @@ func _show_playoff_modal(movement: PromotionRelegation.Movement) -> void:
 	var color: Color
 	if user_promoted:
 		verdict = "🎉 ASCENSO A PRIMERA"
-		color = Color(0.6, 1.0, 0.6)
+		color = UIThemeManager.get_current().accent_success
 	elif user_finalist:
 		verdict = "FINAL PERDIDA — un año más en Segunda"
-		color = Color(1.0, 0.85, 0.4)
+		color = UIThemeManager.get_current().accent_warning
 	else:
 		verdict = "ELIMINADO EN SEMIFINALES"
-		color = Color(1.0, 0.6, 0.6)
+		color = UIThemeManager.get_current().accent_danger
 	var verdict_lbl := Label.new()
 	verdict_lbl.text = verdict
 	verdict_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1962,7 +1971,7 @@ func _show_playoff_modal(movement: PromotionRelegation.Movement) -> void:
 		var is_user_match: bool = String(r.get("home_name", "")) == user_name \
 				or String(r.get("away_name", "")) == user_name
 		if is_user_match:
-			line.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+			line.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		box.add_child(line)
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
@@ -1985,13 +1994,13 @@ func _show_supercopa_modal(sc: SupercopaSimulator.SupercopaResult) -> void:
 	champ_label.text = "Campeón: %s" % sc.champion_name
 	champ_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	champ_label.add_theme_font_size_override("font_size", 18)
-	champ_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	champ_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	box.add_child(champ_label)
 
 	var sub_label := Label.new()
 	sub_label.text = "Subcampeón: %s" % sc.runner_up_name
 	sub_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	sub_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	sub_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(sub_label)
 
 	box.add_child(HSeparator.new())
@@ -2138,13 +2147,13 @@ func _show_manager_offers_modal(current_team: Team, offers: Array, score: int) -
 	header.text = "Tras la temporada en %s, otros clubes se interesan por ti." % current_team.name
 	header.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	header.add_theme_font_size_override("font_size", 14)
-	header.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+	header.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	box.add_child(header)
 
 	var subheader := Label.new()
 	subheader.text = "Puntuación de tu temporada: %d. Cuanto mayor, mejores ofertas." % score
 	subheader.add_theme_font_size_override("font_size", 14)
-	subheader.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	subheader.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(subheader)
 
 	box.add_child(HSeparator.new())
@@ -2158,7 +2167,7 @@ func _show_manager_offers_modal(current_team: Team, offers: Array, score: int) -
 	hint.text = "Si aceptas una oferta, dirigirás al nuevo club desde la próxima temporada.\nSi pulsas 'Quedarme', sigues en %s." % current_team.name
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.add_theme_font_size_override("font_size", 14)
-	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	hint.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 	box.add_child(hint)
 
 	popup.confirmed.connect(func() -> void: popup.queue_free())
@@ -2189,7 +2198,7 @@ func _make_offer_row(current_team: Team, offer_team: Team, popup: AcceptDialog) 
 	var name_label := Label.new()
 	name_label.text = offer_team.name
 	name_label.add_theme_font_size_override("font_size", 14)
-	name_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4))
+	name_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	info.add_child(name_label)
 
 	var stars: String = "★".repeat(int(offer_team.reputation / 20))
@@ -2197,7 +2206,7 @@ func _make_offer_row(current_team: Team, offer_team: Team, popup: AcceptDialog) 
 	details.text = "%s · %s · Reputación %d %s" % [
 		offer_team.city, offer_team.division.capitalize(), offer_team.reputation, stars]
 	details.add_theme_font_size_override("font_size", 14)
-	details.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	details.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	info.add_child(details)
 
 	var rep_diff: int = offer_team.reputation - current_team.reputation
@@ -2207,12 +2216,12 @@ func _make_offer_row(current_team: Team, offer_team: Team, popup: AcceptDialog) 
 	diff_label.text = "vs tu club actual: %s" % diff_str
 	diff_label.add_theme_font_size_override("font_size", 14)
 	diff_label.add_theme_color_override("font_color",
-			Color(0.7, 1.0, 0.7) if rep_diff > 0 else (Color(1.0, 0.7, 0.7) if rep_diff < 0 else Color(0.85, 0.85, 0.85)))
+			UIThemeManager.get_current().tier_a if rep_diff > 0 else (UIThemeManager.get_current().accent_danger if rep_diff < 0 else UIThemeManager.get_current().tier_c))
 	info.add_child(diff_label)
 
 	var accept_btn := Button.new()
 	accept_btn.text = "✅ Aceptar"
-	accept_btn.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+	accept_btn.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 	var offer_id: String = offer_team.id
 	var offer_name: String = offer_team.name
 	accept_btn.pressed.connect(func() -> void:
@@ -2372,7 +2381,7 @@ func _render_champions_view() -> void:
 		var l := Label.new()
 		l.text = "Aún no hay competiciones europeas activas.\nFinaliza una temporada (botón \"🔁 Nueva temp.\") para que se simule la edición siguiente."
 		l.add_theme_font_size_override("font_size", 14)
-		l.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+		l.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		content_area.add_child(l)
 		return
@@ -2421,13 +2430,13 @@ func _render_european_bracket(vbox: VBoxContainer, bracket: ChampionsBracket, co
 	var title := Label.new()
 	title.text = "%s · %d-%d" % [comp_name, bracket.season_year, bracket.season_year + 1]
 	title.add_theme_font_size_override("font_size", 18)
-	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	title.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	vbox.add_child(title)
 
 	if bracket.champion_name != "":
 		var champ := Label.new()
 		champ.text = "Campeón: %s   ·   Subcampeón: %s" % [bracket.champion_name, bracket.runner_up_name]
-		champ.add_theme_color_override("font_color", Color(0.8, 1.0, 0.6))
+		champ.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 		vbox.add_child(champ)
 
 	# Fase de grupos (solo en Champions)
@@ -2435,7 +2444,7 @@ func _render_european_bracket(vbox: VBoxContainer, bracket: ChampionsBracket, co
 		var groups_label := Label.new()
 		groups_label.text = "── Fase de grupos ──"
 		groups_label.add_theme_font_size_override("font_size", 14)
-		groups_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+		groups_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 		vbox.add_child(groups_label)
 
 		var groups_grid := GridContainer.new()
@@ -2449,7 +2458,7 @@ func _render_european_bracket(vbox: VBoxContainer, bracket: ChampionsBracket, co
 			var gh := Label.new()
 			gh.text = "Grupo %s" % g.letter
 			gh.add_theme_font_size_override("font_size", 14)
-			gh.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+			gh.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 			gbox.add_child(gh)
 			var grid := GridContainer.new()
 			grid.columns = 6
@@ -2458,12 +2467,12 @@ func _render_european_bracket(vbox: VBoxContainer, bracket: ChampionsBracket, co
 				var hl := Label.new()
 				hl.text = h_text
 				hl.add_theme_font_size_override("font_size", 14)
-				hl.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+				hl.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 				grid.add_child(hl)
 			var standings: Array = g.sorted_standings()
 			for i in standings.size():
 				var st: ChampionsBracket.GroupStanding = standings[i]
-				var color: Color = Color(0.7, 1.0, 0.7) if i < 2 else Color(0.85, 0.85, 0.85)
+				var color: Color = UIThemeManager.get_current().tier_a if i < 2 else UIThemeManager.get_current().tier_c
 				grid.add_child(_make_label("%d" % (i + 1), 11, color))
 				grid.add_child(_make_label(st.team_name, 11, color))
 				grid.add_child(_make_label("%d" % st.played, 11, color))
@@ -2477,14 +2486,14 @@ func _render_european_bracket(vbox: VBoxContainer, bracket: ChampionsBracket, co
 	var ko_label := Label.new()
 	ko_label.text = "── Eliminatorias ──"
 	ko_label.add_theme_font_size_override("font_size", 14)
-	ko_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	ko_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	vbox.add_child(ko_label)
 
 	for r: ChampionsBracket.KORound in bracket.ko_rounds:
 		var rh := Label.new()
 		rh.text = r.name
 		rh.add_theme_font_size_override("font_size", 14)
-		rh.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+		rh.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		vbox.add_child(rh)
 		for fx: ChampionsBracket.KOFixture in r.fixtures:
 			var line := Label.new()
@@ -2531,7 +2540,7 @@ func _show_champions_modal(bracket: ChampionsBracket) -> void:
 	var path_label := Label.new()
 	path_label.text = "Tu trayectoria: %s" % user_path
 	path_label.add_theme_font_size_override("font_size", 14)
-	path_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+	path_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	box.add_child(path_label)
 
 	box.add_child(HSeparator.new())
@@ -2541,19 +2550,19 @@ func _show_champions_modal(bracket: ChampionsBracket) -> void:
 		champ.text = "Campeón: %s" % bracket.champion_name
 		champ.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		champ.add_theme_font_size_override("font_size", 16)
-		champ.add_theme_color_override("font_color", Color(0.7, 1.0, 0.6))
+		champ.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 		box.add_child(champ)
 		var sub := Label.new()
 		sub.text = "Subcampeón: %s" % bracket.runner_up_name
 		sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		sub.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+		sub.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 		box.add_child(sub)
 
 	var hint := Label.new()
 	hint.text = "Pulsa la pestaña 🏆 Champions para ver el bracket completo."
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_font_size_override("font_size", 14)
-	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	hint.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 	box.add_child(hint)
 
 	popup.popup_centered(Vector2(560, 380))
@@ -2620,14 +2629,14 @@ func _render_finances_view() -> void:
 	var title := Label.new()
 	title.text = "💰 Finanzas — %s · Temporada %d-%d" % [team.name, year, year + 1]
 	title.add_theme_font_size_override("font_size", 18)
-	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	title.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	box.add_child(title)
 
 	# Caja actual destacada
 	var cash_label := Label.new()
 	cash_label.text = "💵 Caja: %s €" % TransferMarket._fmt_eur(team.finances.cash_balance)
 	cash_label.add_theme_font_size_override("font_size", 22)
-	cash_label.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7) if team.finances.cash_balance >= 0 else Color(1.0, 0.55, 0.55))
+	cash_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a if team.finances.cash_balance >= 0 else Color(1.0, 0.55, 0.55))
 	box.add_child(cash_label)
 
 	# Última temporada (resumen)
@@ -2641,9 +2650,9 @@ func _render_finances_view() -> void:
 		sub_grid.add_theme_constant_override("h_separation", 20)
 		box.add_child(sub_grid)
 		# Ingresos
-		_make_subheader(sub_grid, "Ingresos", Color(0.7, 1.0, 0.7))
+		_make_subheader(sub_grid, "Ingresos", UIThemeManager.get_current().tier_a)
 		_make_subheader(sub_grid, "", Color.WHITE)
-		_make_subheader(sub_grid, "Gastos", Color(1.0, 0.7, 0.7))
+		_make_subheader(sub_grid, "Gastos", UIThemeManager.get_current().accent_danger)
 		_make_subheader(sub_grid, "", Color.WHITE)
 		_finance_pair(sub_grid, "Matchday (entradas)", int(income.get("matchday", 0)),
 			"Salarios", int(expense.get("salaries", 0)))
@@ -2661,7 +2670,7 @@ func _render_finances_view() -> void:
 		var net_v: int = int(summary.get("net", 0))
 		net_label.text = "Balance neto: %s €" % TransferMarket._fmt_eur(net_v)
 		net_label.add_theme_font_size_override("font_size", 14)
-		net_label.add_theme_color_override("font_color", Color(0.6, 1.0, 0.6) if net_v >= 0 else Color(1.0, 0.6, 0.6))
+		net_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_success if net_v >= 0 else UIThemeManager.get_current().accent_danger)
 		box.add_child(net_label)
 		# Premios desglose
 		var pb: Dictionary = income.get("prize_breakdown", {})
@@ -2675,7 +2684,7 @@ func _render_finances_view() -> void:
 			if parts.size() > 0:
 				pb_label.text = "  Premios: " + " · ".join(parts)
 				pb_label.add_theme_font_size_override("font_size", 14)
-				pb_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+				pb_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_c)
 				box.add_child(pb_label)
 
 	# Estadio
@@ -2719,7 +2728,7 @@ func _render_finances_view() -> void:
 		if not team.finances.ongoing_projects.is_empty():
 			var oproj_label := Label.new()
 			oproj_label.text = "Proyectos en curso:"
-			oproj_label.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+			oproj_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 			box.add_child(oproj_label)
 			for proj in team.finances.ongoing_projects:
 				var pl := Label.new()
@@ -2739,7 +2748,7 @@ func _render_finances_view() -> void:
 			var hl := Label.new()
 			hl.text = h
 			hl.add_theme_font_size_override("font_size", 14)
-			hl.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+			hl.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 			staff_grid.add_child(hl)
 		var roles := [
 			["Preparador físico", "fitness_coach", team.staff.fitness_coach],
@@ -2758,7 +2767,7 @@ func _render_finances_view() -> void:
 			var ql := Label.new()
 			ql.text = "★".repeat(q) + "☆".repeat(5 - q) + "  (%d/5)" % q
 			ql.add_theme_font_size_override("font_size", 14)
-			ql.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+			ql.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 			staff_grid.add_child(ql)
 			var sl := Label.new()
 			sl.text = "%s €/año" % TransferMarket._fmt_eur(StaffInfo.salary_for_quality(q))
@@ -2767,7 +2776,7 @@ func _render_finances_view() -> void:
 			if q >= 5:
 				var maxed := Label.new()
 				maxed.text = "MAX"
-				maxed.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+				maxed.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 				staff_grid.add_child(maxed)
 			else:
 				var cost: int = StaffInfo.upgrade_cost(q)
@@ -2783,7 +2792,7 @@ func _render_finances_view() -> void:
 	if team.finances.sponsors.is_empty():
 		var none_label := Label.new()
 		none_label.text = "  (sin patrocinadores activos)"
-		none_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+		none_label.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 		box.add_child(none_label)
 	else:
 		for sp in team.finances.sponsors:
@@ -2829,7 +2838,7 @@ func _finances_section_header(box: VBoxContainer, text: String) -> void:
 	var l := Label.new()
 	l.text = text
 	l.add_theme_font_size_override("font_size", 14)
-	l.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	l.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(l)
 
 
@@ -2849,7 +2858,7 @@ func _simple_row(grid: GridContainer, label: String, value: String) -> void:
 	var l2 := Label.new()
 	l2.text = value
 	l2.add_theme_font_size_override("font_size", 14)
-	l2.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	l2.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	grid.add_child(l2)
 
 
@@ -2862,7 +2871,7 @@ func _finance_pair(grid: GridContainer, label_in: String, amount_in: int, label_
 	var l2 := Label.new()
 	l2.text = "%s €" % TransferMarket._fmt_eur(amount_in) if amount_in > 0 else ""
 	l2.add_theme_font_size_override("font_size", 14)
-	l2.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+	l2.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 	l2.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	grid.add_child(l2)
 	var l3 := Label.new()
@@ -2872,7 +2881,7 @@ func _finance_pair(grid: GridContainer, label_in: String, amount_in: int, label_
 	var l4 := Label.new()
 	l4.text = "%s €" % TransferMarket._fmt_eur(amount_out) if amount_out > 0 else ""
 	l4.add_theme_font_size_override("font_size", 14)
-	l4.add_theme_color_override("font_color", Color(1.0, 0.7, 0.7))
+	l4.add_theme_color_override("font_color", UIThemeManager.get_current().accent_danger)
 	l4.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	grid.add_child(l4)
 
@@ -2999,12 +3008,12 @@ func _show_finance_balance_modal(summary: Dictionary) -> void:
 	net_label.text = "%s %s €" % ["📈" if net_v >= 0 else "📉", TransferMarket._fmt_eur(net_v)]
 	net_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	net_label.add_theme_font_size_override("font_size", 22)
-	net_label.add_theme_color_override("font_color", Color(0.6, 1.0, 0.6) if net_v >= 0 else Color(1.0, 0.6, 0.6))
+	net_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_success if net_v >= 0 else UIThemeManager.get_current().accent_danger)
 	box.add_child(net_label)
 	var cash_after_label := Label.new()
 	cash_after_label.text = "Caja tras la temporada: %s €" % TransferMarket._fmt_eur(int(summary.get("cash_balance_after", 0)))
 	cash_after_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	cash_after_label.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	cash_after_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(cash_after_label)
 
 	box.add_child(HSeparator.new())
@@ -3012,7 +3021,7 @@ func _show_finance_balance_modal(summary: Dictionary) -> void:
 	var income_label := Label.new()
 	income_label.text = "📈 Ingresos: %s €" % TransferMarket._fmt_eur(int(income.get("total", 0)))
 	income_label.add_theme_font_size_override("font_size", 14)
-	income_label.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+	income_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 	box.add_child(income_label)
 	for k in [["Matchday", "matchday"], ["TV", "tv"], ["Patrocinadores", "sponsors"], ["Premios", "prizes"], ["Ventas", "transfers_in"]]:
 		var v: int = int(income.get(String(k[1]), 0))
@@ -3024,7 +3033,7 @@ func _show_finance_balance_modal(summary: Dictionary) -> void:
 	var expense_label := Label.new()
 	expense_label.text = "📉 Gastos: %s €" % TransferMarket._fmt_eur(int(expense.get("total", 0)))
 	expense_label.add_theme_font_size_override("font_size", 14)
-	expense_label.add_theme_color_override("font_color", Color(1.0, 0.7, 0.7))
+	expense_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_danger)
 	box.add_child(expense_label)
 	for k in [["Salarios", "salaries"], ["Mantenimiento estadio", "stadium_maintenance"], ["Personal técnico", "staff"], ["Compras", "transfers_out"]]:
 		var v: int = int(expense.get(String(k[1]), 0))
@@ -3046,7 +3055,7 @@ func _finances_row(grid: GridContainer, label: String, amount: int) -> void:
 	var l2 := Label.new()
 	l2.text = "%s €" % TransferMarket._fmt_eur(amount)
 	l2.add_theme_font_size_override("font_size", 14)
-	l2.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7) if amount >= 0 else Color(1.0, 0.7, 0.7))
+	l2.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a if amount >= 0 else UIThemeManager.get_current().accent_danger)
 	l2.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	grid.add_child(l2)
 
@@ -3077,7 +3086,7 @@ func _render_calendar_view() -> void:
 		title.text = "📅 Calendario %s · Temporada %d-%d" % [
 			selected_division.capitalize(), year, year + 1]
 	title.add_theme_font_size_override("font_size", 18)
-	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	title.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	vbox.add_child(title)
 
 	# Si hay equipo del usuario: solo sus partidos. Si no: calendario completo.
@@ -3125,11 +3134,11 @@ func _render_calendar_user_only(vbox: VBoxContainer, st: DivisionState, user_tea
 			loc, status,
 		]
 		line.add_theme_font_size_override("font_size", 14)
-		var color: Color = Color(0.85, 0.9, 1.0)
+		var color: Color = UIThemeManager.get_current().tier_b
 		if j_idx == st.current_jornada:
-			color = Color(1.0, 0.95, 0.5)
+			color = UIThemeManager.get_current().accent_warning
 		elif played:
-			color = Color(0.7, 0.7, 0.7)
+			color = UIThemeManager.get_current().text_secondary
 		line.add_theme_color_override("font_color", color)
 		vbox.add_child(line)
 
@@ -3153,9 +3162,9 @@ func _render_calendar_full(vbox: VBoxContainer, st: DivisionState) -> void:
 		var header := Label.new()
 		header.text = "── Jornada %d%s %s──" % [j_idx + 1, date_range, "(jugada) " if played else ""]
 		header.add_theme_font_size_override("font_size", 14)
-		var hdr_color: Color = Color(0.85, 0.85, 0.85) if played else Color(0.5, 0.5, 0.5)
+		var hdr_color: Color = UIThemeManager.get_current().tier_c if played else UIThemeManager.get_current().text_muted
 		if j_idx == st.current_jornada:
-			hdr_color = Color(1.0, 0.85, 0.2)
+			hdr_color = UIThemeManager.get_current().accent_warning
 			header.text = "── Jornada %d%s (próxima) ──" % [j_idx + 1, date_range]
 		header.add_theme_color_override("font_color", hdr_color)
 		vbox.add_child(header)
@@ -3173,7 +3182,7 @@ func _render_calendar_full(vbox: VBoxContainer, st: DivisionState) -> void:
 			line.text = "  %s%-28s vs %-28s" % [date_str, home.name.left(28), away.name.left(28)]
 			line.add_theme_font_size_override("font_size", 14)
 			if played:
-				line.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+				line.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 			vbox.add_child(line)
 
 
@@ -3188,7 +3197,7 @@ func _render_career_view() -> void:
 	var header := Label.new()
 	header.text = "📈 Carrera como mánager de %s" % user_team.name
 	header.add_theme_font_size_override("font_size", 18)
-	header.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	header.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	content_area.add_child(header)
 
 	if user_career_history.is_empty():
@@ -3238,7 +3247,7 @@ func _render_career_view() -> void:
 		total_played, total_won, total_drawn, total_lost,
 		total_gf, total_ga, total_gf - total_ga,
 	]
-	stats2.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	stats2.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	content_area.add_child(stats2)
 
 	content_area.add_child(HSeparator.new())
@@ -3252,7 +3261,7 @@ func _render_career_view() -> void:
 	for h in ["Año", "Div", "Pos", "PJ-G-E-P", "GF/GC", "Pts", "Pichichi", "Copa", "🏆 Champ", "⭐ Europa", "🥉 Conf"]:
 		var l := Label.new()
 		l.text = h
-		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		l.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		l.add_theme_font_size_override("font_size", 14)
 		grid.add_child(l)
 	# Ordenar por año descendente
@@ -3261,13 +3270,13 @@ func _render_career_view() -> void:
 		return int(a["year"]) > int(b["year"]))
 	for r: Dictionary in sorted_history:
 		var pos: int = int(r["position"])
-		var color: Color = Color(0.85, 0.85, 0.85)
+		var color: Color = UIThemeManager.get_current().tier_c
 		if pos == 1 and r["division"] == "primera":
-			color = Color(1.0, 0.85, 0.2)
+			color = UIThemeManager.get_current().accent_warning
 		elif pos <= 4 and r["division"] == "primera":
-			color = Color(0.6, 1.0, 0.7)
+			color = UIThemeManager.get_current().tier_a
 		elif pos <= 6 and r["division"] == "primera":
-			color = Color(0.6, 0.8, 1.0)
+			color = UIThemeManager.get_current().tier_b
 		var cells: Array[String] = [
 			"%d-%d" % [int(r["year"]), int(r["year"]) + 1 - 2000],
 			"1ª" if r["division"] == "primera" else "2ª",
@@ -3463,7 +3472,7 @@ func _show_grave_injuries_modal(injuries: Array) -> void:
 		"" if injuries.size() == 1 else "s",
 	]
 	header.add_theme_font_size_override("font_size", 14)
-	header.add_theme_color_override("font_color", Color(1.0, 0.7, 0.6))
+	header.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	box.add_child(header)
 	for inj in injuries:
 		var match_date: Dictionary = inj.get("match_date", {})
@@ -3611,6 +3620,87 @@ func _on_sidebar_view_selected(view: String) -> void:
 	_on_select_view(view)
 
 
+# v0.4.0 Fase E: búsqueda global desde el sidebar. Busca por nombre (case-insensitive)
+# en jugadores y equipos. Muestra modal con resultados clickeables.
+func _on_global_search(query: String) -> void:
+	var q_lower: String = query.to_lower()
+	# Resultados: top 15 jugadores que matchean (por nombre) + top 5 equipos
+	var player_hits: Array = []
+	var team_hits: Array = []
+	for t: Team in all_teams:
+		if q_lower in t.name.to_lower() or q_lower in t.short_name.to_lower():
+			team_hits.append(t)
+		for p: Player in t.players:
+			if q_lower in p.name.to_lower():
+				player_hits.append({"player": p, "team": t})
+	if player_hits.is_empty() and team_hits.is_empty():
+		status_label.text = "Búsqueda \"%s\": sin resultados." % query
+		return
+	_show_search_results_modal(query, player_hits, team_hits)
+
+
+func _show_search_results_modal(query: String, player_hits: Array, team_hits: Array) -> void:
+	var theme: UITheme = UIThemeManager.get_current()
+	var popup := AcceptDialog.new()
+	popup.title = "Resultados para \"%s\"" % query
+	popup.min_size = Vector2(560, 480)
+	popup.max_size = Vector2(840, 720)
+	add_child(popup)
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	popup.add_child(scroll)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 6)
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(box)
+	# Sección equipos
+	if not team_hits.is_empty():
+		var th := Label.new()
+		th.text = "Equipos (%d)" % team_hits.size()
+		th.add_theme_font_size_override("font_size", 15)
+		th.add_theme_color_override("font_color", theme.accent_warning)
+		box.add_child(th)
+		var max_t: int = min(5, team_hits.size())
+		for i in range(max_t):
+			var t: Team = team_hits[i]
+			var btn := Button.new()
+			btn.text = "  ⚽  %s  ·  %s  ·  Rep %d" % [t.name, t.division.capitalize(), t.reputation]
+			btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			btn.flat = true
+			btn.add_theme_font_size_override("font_size", 14)
+			btn.pressed.connect(func() -> void:
+				popup.queue_free()
+				selected_division = t.division
+				_on_select_view(VIEW_TABLE))
+			box.add_child(btn)
+	# Sección jugadores
+	if not player_hits.is_empty():
+		var ph := Label.new()
+		ph.text = "Jugadores (%d)" % player_hits.size()
+		ph.add_theme_font_size_override("font_size", 15)
+		ph.add_theme_color_override("font_color", theme.accent_warning)
+		box.add_child(ph)
+		var max_p: int = min(15, player_hits.size())
+		for i in range(max_p):
+			var hit: Dictionary = player_hits[i]
+			var p: Player = hit["player"]
+			var t: Team = hit["team"]
+			var ovr: int = PlayerFactory.compute_overall(p, "")
+			var btn := Button.new()
+			btn.text = "  [%s]  %s  ·  %s  ·  ovr %d  ·  %s" % [p.tier, p.name, _position_label(p), ovr, t.short_name]
+			btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			btn.flat = true
+			btn.add_theme_font_size_override("font_size", 14)
+			btn.add_theme_color_override("font_color", theme.color_for_tier(p.tier))
+			btn.pressed.connect(func() -> void:
+				popup.queue_free()
+				selected_team = t
+				_on_select_view(VIEW_TEAM))
+			box.add_child(btn)
+	popup.popup_centered(Vector2(560, 480))
+
+
 # v0.4.0 Fase B: rebuild de items de la sidebar según user_team_id
 func _refresh_sidebar() -> void:
 	if sidebar_nav == null:
@@ -3740,6 +3830,20 @@ func _refresh_ui() -> void:
 		VIEW_INBOX: _render_inbox_view()
 		VIEW_AGENTS: _render_agents_view()
 		VIEW_SETTINGS: _render_settings_view()
+
+	# v0.4.0 Fase E: FadeIn sutil al cambiar de vista (modulate.a 0→1 en 0.18s)
+	_play_view_fade_in()
+
+
+# Anima el content_area con un fadeIn de modulate.a desde 0 a 1.
+func _play_view_fade_in() -> void:
+	if content_area == null:
+		return
+	content_area.modulate.a = 0.0
+	var tween: Tween = create_tween()
+	tween.set_trans(Tween.TRANS_SINE)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(content_area, "modulate:a", 1.0, 0.18)
 
 
 # --------------------------------------------------------------------------- #
@@ -4019,12 +4123,11 @@ func _find_player_dashboard_info(player_id: String) -> Dictionary:
 
 
 # Rellena la sección "Noticias · Actividad" del Dashboard. Mezcla los últimos
-# mensajes del inbox del user con eventos relevantes (placeholder de "actividad
-# de mercado" para añadir en el futuro).
+# mensajes del inbox del user con los top fichajes de mercado de la liga.
 func _populate_news_panel(parent: VBoxContainer) -> void:
 	var theme: UITheme = UIThemeManager.get_current()
-	# Recolectar items: últimos N inbox messages ordenados por jornada descendente
 	var items: Array = []
+	# Inbox del user
 	for m: InboxMessage in user_inbox:
 		items.append({
 			"icon": _icon_for_inbox_type(m.type),
@@ -4033,6 +4136,9 @@ func _populate_news_panel(parent: VBoxContainer) -> void:
 			"jornada": m.jornada_when,
 			"read": m.read,
 		})
+	# Top fichajes capturados del último mercado (mismo formato)
+	for n: Dictionary in recent_market_news:
+		items.append(n)
 	# Ordenar por jornada descendente (más reciente primero)
 	items.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return int(a["jornada"]) > int(b["jornada"]))
@@ -4049,6 +4155,28 @@ func _populate_news_panel(parent: VBoxContainer) -> void:
 	var max_items: int = min(6, items.size())
 	for i in range(max_items):
 		parent.add_child(_build_news_row(items[i]))
+
+
+# Tras correr un mercado, capturar los top 5 fichajes (por fee) como noticias.
+# Mantiene solo los últimos 15 items para no acumular ad infinitum.
+func _capture_market_news(market_result: TransferMarket.MarketResult, title_prefix: String) -> void:
+	var sorted_t: Array = market_result.transfers.duplicate()
+	sorted_t.sort_custom(func(a: TransferMarket.Transfer, b: TransferMarket.Transfer) -> bool:
+		return a.fee_eur > b.fee_eur)
+	var top: int = min(5, sorted_t.size())
+	var jornada_now: int = primera_state.current_jornada if primera_state else 0
+	for i in range(top):
+		var tr: TransferMarket.Transfer = sorted_t[i]
+		recent_market_news.append({
+			"icon": "💰",
+			"title": "%s: %s ficha por %s" % [title_prefix, tr.player_name, tr.to_team_name],
+			"body": "%s pagó %s a %s." % [tr.to_team_name, TransferMarket._fmt_eur(tr.fee_eur), tr.from_team_name],
+			"jornada": jornada_now,
+			"read": false,
+		})
+	# Cap a 15 items totales
+	while recent_market_news.size() > 15:
+		recent_market_news.pop_front()
 
 
 func _icon_for_inbox_type(t: String) -> String:
@@ -4277,12 +4405,12 @@ func _render_hub_view_legacy() -> void:
 		var team_label := Label.new()
 		team_label.text = team.name
 		team_label.add_theme_font_size_override("font_size", 18)
-		team_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.6))
+		team_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		team_box.add_child(team_label)
 	else:
 		var team_label := Label.new()
 		team_label.text = "(sin club)"
-		team_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+		team_label.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 		team_box.add_child(team_label)
 	# Spacer
 	var sp1 := Control.new()
@@ -4292,7 +4420,7 @@ func _render_hub_view_legacy() -> void:
 	var title := Label.new()
 	title.text = "MENU PROMANAGER"
 	title.add_theme_font_size_override("font_size", 22)
-	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	title.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	header_h.add_child(title)
 	# Spacer 2
 	var sp2 := Control.new()
@@ -4323,13 +4451,13 @@ func _render_hub_view_legacy() -> void:
 	]
 	jornada_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	jornada_lbl.add_theme_font_size_override("font_size", 14)
-	jornada_lbl.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	jornada_lbl.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	info_v.add_child(jornada_lbl)
 	var year_lbl := Label.new()
 	year_lbl.text = "Temporada %d-%d" % [year, year + 1]
 	year_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	year_lbl.add_theme_font_size_override("font_size", 14)
-	year_lbl.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+	year_lbl.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	info_v.add_child(year_lbl)
 
 	# === CUERPO: 4 cuadrantes + centro ===
@@ -4379,7 +4507,7 @@ func _render_hub_view_legacy() -> void:
 		your_name.text = team.short_name
 		your_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		your_name.add_theme_font_size_override("font_size", 14)
-		your_name.add_theme_color_override("font_color", Color(1.0, 0.95, 0.6))
+		your_name.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		center_col.add_child(your_name)
 		# Próximo rival
 		var rival: Team = _find_next_rival(team)
@@ -4390,7 +4518,7 @@ func _render_hub_view_legacy() -> void:
 			vs_label.text = "── próximo rival%s ──" % (" · " + next_date_str if next_date_str != "" else "")
 			vs_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			vs_label.add_theme_font_size_override("font_size", 14)
-			vs_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+			vs_label.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 			center_col.add_child(vs_label)
 			var rival_logo := _make_team_logo(rival, 64)
 			var rival_logo_box := CenterContainer.new()
@@ -4408,7 +4536,7 @@ func _render_hub_view_legacy() -> void:
 			cash_label.text = "💵 %s €" % TransferMarket._fmt_eur(team.finances.cash_balance)
 			cash_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			cash_label.add_theme_font_size_override("font_size", 14)
-			cash_label.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7) if team.finances.cash_balance >= 0 else Color(1.0, 0.6, 0.6))
+			cash_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a if team.finances.cash_balance >= 0 else UIThemeManager.get_current().accent_danger)
 			center_col.add_child(cash_label)
 
 	# Columna derecha
@@ -4444,7 +4572,7 @@ func _render_hub_view_legacy() -> void:
 	var status_mirror := Label.new()
 	status_mirror.text = status_label.text if status_label != null else ""
 	status_mirror.add_theme_font_size_override("font_size", 14)
-	status_mirror.add_theme_color_override("font_color", Color(0.7, 0.85, 0.7))
+	status_mirror.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 	status_panel.add_child(status_mirror)
 
 	# === FOOTER ===
@@ -4562,7 +4690,7 @@ func _make_team_logo(team: Team, size: int) -> Control:
 	p.custom_minimum_size = Vector2(size, size)
 	var bg := StyleBoxFlat.new()
 	var color_hex: String = String(team.colors.get("primary", "#888888"))
-	bg.bg_color = Color.from_string(color_hex, Color(0.5, 0.5, 0.5))
+	bg.bg_color = Color.from_string(color_hex, UIThemeManager.get_current().text_muted)
 	bg.set_corner_radius_all(int(size / 4))
 	p.add_theme_stylebox_override("panel", bg)
 	var l := Label.new()
@@ -4633,7 +4761,7 @@ func _render_rival_view() -> void:
 	var vs := Label.new()
 	vs.text = "VS"
 	vs.add_theme_font_size_override("font_size", 28)
-	vs.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	vs.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	header.add_child(vs)
 	header.add_child(_make_team_logo(rival, 80))
 
@@ -4642,7 +4770,7 @@ func _render_rival_view() -> void:
 	name_label.text = rival.name
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.add_theme_font_size_override("font_size", 20)
-	name_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+	name_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	box.add_child(name_label)
 
 	# Datos clave
@@ -4671,7 +4799,7 @@ func _render_rival_view() -> void:
 	var top_label := Label.new()
 	top_label.text = "── Jugadores destacados ──"
 	top_label.add_theme_font_size_override("font_size", 14)
-	top_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	top_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(top_label)
 	var rivals_sorted: Array = rival.players.duplicate()
 	rivals_sorted.sort_custom(func(a: Player, b: Player) -> bool:
@@ -4703,7 +4831,7 @@ func _render_decisions_view() -> void:
 			int(season_objective.get("target_position", 0)),
 		]
 		obj_label.add_theme_font_size_override("font_size", 14)
-		obj_label.add_theme_color_override("font_color", Color(0.7, 1.0, 0.7))
+		obj_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 		box.add_child(obj_label)
 
 	# Sponsors actuales
@@ -4711,7 +4839,7 @@ func _render_decisions_view() -> void:
 		var sp_header := Label.new()
 		sp_header.text = "💼 Patrocinadores"
 		sp_header.add_theme_font_size_override("font_size", 14)
-		sp_header.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+		sp_header.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 		box.add_child(sp_header)
 		if team.finances.sponsors.is_empty():
 			var n := Label.new()
@@ -4799,17 +4927,17 @@ func _render_employees_view() -> void:
 		TransferMarket._fmt_eur(team.organigrama.total_salary()),
 	]
 	header.add_theme_font_size_override("font_size", 14)
-	header.add_theme_color_override("font_color", Color(1.0, 0.95, 0.5))
+	header.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	header.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	box.add_child(header)
 
 	# Secciones
 	var sections := [
-		["direccion", "🏛 Dirección", Color(1.0, 0.85, 0.4)],
-		["tecnico", "🎯 Cuerpo técnico", Color(0.5, 0.85, 1.0)],
-		["ojeo", "🔍 Ojeo / Scouting", Color(0.7, 1.0, 0.7)],
-		["medico", "⚕ Servicios médicos", Color(1.0, 0.7, 0.7)],
-		["cantera", "🌱 Cantera", Color(0.85, 1.0, 0.5)],
+		["direccion", "🏛 Dirección", UIThemeManager.get_current().accent_warning],
+		["tecnico", "🎯 Cuerpo técnico", UIThemeManager.get_current().accent_info],
+		["ojeo", "🔍 Ojeo / Scouting", UIThemeManager.get_current().tier_a],
+		["medico", "⚕ Servicios médicos", UIThemeManager.get_current().accent_danger],
+		["cantera", "🌱 Cantera", UIThemeManager.get_current().tier_a],
 	]
 	for sec_data in sections:
 		var sec_id: String = String(sec_data[0])
@@ -4833,7 +4961,7 @@ func _render_employees_view() -> void:
 			var hl := Label.new()
 			hl.text = h
 			hl.add_theme_font_size_override("font_size", 14)
-			hl.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+			hl.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 			grid.add_child(hl)
 		for emp: Employee in sec_employees:
 			var l_name := Label.new()
@@ -4844,12 +4972,12 @@ func _render_employees_view() -> void:
 			# Si es individual, mostrar el rol; si es grupal, mostrar "—"
 			l_role.text = emp.role_label if emp.count == 1 else "—"
 			l_role.add_theme_font_size_override("font_size", 14)
-			l_role.add_theme_color_override("font_color", Color(0.85, 0.9, 1.0))
+			l_role.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 			grid.add_child(l_role)
 			var l_q := Label.new()
 			l_q.text = "★".repeat(emp.quality) + "☆".repeat(5 - emp.quality)
 			l_q.add_theme_font_size_override("font_size", 14)
-			l_q.add_theme_color_override("font_color", Color(1.0, 0.95, 0.4))
+			l_q.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 			grid.add_child(l_q)
 			var l_sal := Label.new()
 			if emp.count == 1:
@@ -4865,7 +4993,7 @@ func _render_employees_view() -> void:
 			if emp.quality >= 5:
 				var maxed := Label.new()
 				maxed.text = "MAX"
-				maxed.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+				maxed.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 				grid.add_child(maxed)
 			else:
 				var btn := Button.new()
@@ -4912,7 +5040,7 @@ func _render_table_view() -> void:
 	for i in headers.size():
 		var l := Label.new()
 		l.text = headers[i]
-		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		l.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		l.add_theme_font_size_override("font_size", 14)
 		# Header de Equipo alineado izquierda; resto centrado/derecha
 		if i == 0 or i >= 2:
@@ -4937,21 +5065,21 @@ func _add_table_row(grid: GridContainer, pos: int, row: LeagueTable.TeamRow, n_t
 	# Solo Primera tiene plazas europeas
 	var is_primera: bool = (selected_division == "primera")
 	if is_primera and pos <= 4:
-		color = Color(0.6, 1.0, 0.7)
+		color = UIThemeManager.get_current().tier_a
 		icon = "🏆 "
 	elif is_primera and pos <= 6:
-		color = Color(0.6, 0.8, 1.0)
+		color = UIThemeManager.get_current().tier_b
 		icon = "⭐ "
 	elif is_primera and pos == 7:
-		color = Color(0.6, 0.8, 1.0)
+		color = UIThemeManager.get_current().tier_b
 		icon = "🥉 "
 	elif pos <= 2 and not is_primera:
 		# Segunda: top 2 ascienden directos
-		color = Color(0.6, 1.0, 0.7)
+		color = UIThemeManager.get_current().tier_a
 		icon = "⬆ "
 	elif pos <= 6 and not is_primera:
 		# Segunda: 3-6 zona playoff de ascenso
-		color = Color(0.7, 0.85, 1.0)
+		color = UIThemeManager.get_current().tier_b
 		icon = "↑ "
 	elif pos > n_teams - 3:
 		color = Color(1.0, 0.65, 0.65)
@@ -5034,10 +5162,10 @@ func _position_label(p: Player) -> String:
 static func _position_color(slot: String) -> Color:
 	var cat: String = _position_category(slot)
 	match cat:
-		"POR": return Color(1.0, 0.85, 0.4)   # amarillo claro
-		"DEF": return Color(0.5, 0.85, 1.0)   # azul
-		"MED": return Color(0.7, 1.0, 0.7)    # verde
-		"DEL": return Color(1.0, 0.7, 0.7)    # rojo claro
+		"POR": return UIThemeManager.get_current().accent_warning   # amarillo claro
+		"DEF": return UIThemeManager.get_current().accent_info   # azul
+		"MED": return UIThemeManager.get_current().tier_a    # verde
+		"DEL": return UIThemeManager.get_current().accent_danger    # rojo claro
 		_:     return Color(0.8, 0.8, 0.8)
 
 
@@ -5089,7 +5217,7 @@ func _render_fixtures_view() -> void:
 
 	var hint := Label.new()
 	hint.text = "(Pulsa cualquier partido para ver eventos y abrir el visor 2D)"
-	hint.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	hint.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	hint.add_theme_font_size_override("font_size", 14)
 	content_area.add_child(hint)
 	content_area.add_child(HSeparator.new())
@@ -5134,7 +5262,7 @@ func _render_match_view() -> void:
 	top_btns.add_child(back_btn_top)
 	var view2d_btn_top := Button.new()
 	view2d_btn_top.text = "▶ Ver partido en 2D"
-	view2d_btn_top.add_theme_color_override("font_color", Color(0.4, 1.0, 0.5))
+	view2d_btn_top.add_theme_color_override("font_color", UIThemeManager.get_current().accent_success)
 	view2d_btn_top.pressed.connect(_on_open_2d_viewer.bind(r))
 	top_btns.add_child(view2d_btn_top)
 
@@ -5154,7 +5282,7 @@ func _render_match_view() -> void:
 	var score_label := Label.new()
 	score_label.text = " %d - %d " % [r.score_home, r.score_away]
 	score_label.add_theme_font_size_override("font_size", 22)
-	score_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	score_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	hbox.add_child(score_label)
 
 	var away_label := Label.new()
@@ -5201,15 +5329,15 @@ func _render_match_view() -> void:
 		if not (ev.type in key_types):
 			continue
 		var l := Label.new()
-		var color: Color = Color(0.85, 0.85, 0.85)
+		var color: Color = UIThemeManager.get_current().tier_c
 		if ev.type == MatchEvent.T_GOAL:
-			color = Color(0.4, 1.0, 0.5)
+			color = UIThemeManager.get_current().accent_success
 		elif ev.type == MatchEvent.T_RED:
 			color = Color(1.0, 0.4, 0.4)
 		elif ev.type == MatchEvent.T_YELLOW:
-			color = Color(1.0, 0.85, 0.2)
+			color = UIThemeManager.get_current().accent_warning
 		elif ev.type == MatchEvent.T_HALFTIME or ev.type == MatchEvent.T_FULLTIME:
-			color = Color(0.6, 0.8, 1.0)
+			color = UIThemeManager.get_current().tier_b
 		l.text = "  %s   %s" % [ev.clock_str(), ev.description]
 		l.add_theme_color_override("font_color", color)
 		content_area.add_child(l)
@@ -5272,7 +5400,7 @@ func _render_team_view() -> void:
 	for h in headers:
 		var l := Label.new()
 		l.text = h
-		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		l.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		l.add_theme_font_size_override("font_size", 14)
 		grid.add_child(l)
 
@@ -5316,17 +5444,17 @@ func _render_team_view() -> void:
 			str(until_year),
 		]
 		# Color por tier
-		var color: Color = Color(0.85, 0.85, 0.85)
+		var color: Color = UIThemeManager.get_current().tier_c
 		match p.tier:
-			"S": color = Color(1.0, 0.85, 0.2)  # oro
-			"A": color = Color(0.6, 1.0, 0.7)
-			"B": color = Color(0.6, 0.8, 1.0)
-			"Y": color = Color(0.9, 0.7, 1.0)
+			"S": color = UIThemeManager.get_current().accent_warning  # oro
+			"A": color = UIThemeManager.get_current().tier_a
+			"B": color = UIThemeManager.get_current().tier_b
+			"Y": color = UIThemeManager.get_current().tier_y
 		# Si está lesionado o sancionado, color rojo (sobreescribe)
 		var is_inj: bool = InjurySystem.is_injured(p)
 		var is_susp: bool = CardSystem.is_suspended(p)
 		if is_inj or is_susp:
-			color = Color(1.0, 0.5, 0.5)
+			color = UIThemeManager.get_current().accent_danger
 		# Cedido: color violeta para diferenciar
 		if p.loan_origin_team_id != "":
 			color = Color(0.85, 0.7, 1.0)
@@ -5353,7 +5481,7 @@ func _render_protagonist_selector() -> void:
 
 	var lbl := Label.new()
 	lbl.text = "⭐ Jugador protagonista (Camera A2):"
-	lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	lbl.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	lbl.add_theme_font_size_override("font_size", 14)
 	hbox.add_child(lbl)
 
@@ -5381,7 +5509,7 @@ func _render_protagonist_selector() -> void:
 
 	var info := Label.new()
 	info.text = "  +30%% probabilidad de ser shooter/asistente · destacado en visor 2D"
-	info.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	info.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 	info.add_theme_font_size_override("font_size", 14)
 	hbox.add_child(info)
 
@@ -5622,7 +5750,7 @@ func _render_tactics_view() -> void:
 	focus_hint.text = "Entrenamiento aplica +1 al atributo focus de cada jugador (titulares y suplentes) al avanzar de temporada."
 	focus_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	focus_hint.add_theme_font_size_override("font_size", 14)
-	focus_hint.add_theme_color_override("font_color", Color(0.65, 0.65, 0.65))
+	focus_hint.add_theme_color_override("font_color", UIThemeManager.get_current().text_muted)
 	content_area.add_child(focus_hint)
 
 	content_area.add_child(HSeparator.new())
@@ -5644,7 +5772,7 @@ func _render_tactics_view() -> void:
 		var slot: String = slots[i]
 		var lbl := Label.new()
 		lbl.text = "%s:" % slot
-		lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		lbl.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		slot_grid.add_child(lbl)
 
 		var current_id: String = String(eleven_ids[i]) if i < eleven_ids.size() else ""
@@ -5695,7 +5823,7 @@ func _render_market_view() -> void:
 	var budget: int = user_team.finances.budget_transfers_eur if user_team.finances else 0
 	budget_label.text = "Presupuesto: %s" % TransferMarket._fmt_eur(budget)
 	budget_label.add_theme_font_size_override("font_size", 16)
-	budget_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+	budget_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	header.add_child(budget_label)
 
 	var filter_label := Label.new()
@@ -5728,7 +5856,7 @@ func _render_market_view() -> void:
 	for h in ["Jugador", "Equipo", "Pos", "Edad", "Ovr", "Valor / acción"]:
 		var l := Label.new()
 		l.text = h
-		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		l.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		l.add_theme_font_size_override("font_size", 14)
 		buy_grid.add_child(l)
 
@@ -5791,7 +5919,7 @@ func _render_market_view() -> void:
 	for h in ["Jugador", "Pos", "Edad", "Tier", "Ovr", "Valor / acción"]:
 		var l := Label.new()
 		l.text = h
-		l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		l.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		l.add_theme_font_size_override("font_size", 14)
 		sell_grid.add_child(l)
 	var my_players: Array[Player] = user_team.players.duplicate()
@@ -5820,14 +5948,10 @@ func _market_add_label(grid: GridContainer, text: String, color: Color) -> void:
 
 
 func _player_color(p: Player) -> Color:
+	var theme: UITheme = UIThemeManager.get_current()
 	if InjurySystem.is_injured(p):
-		return Color(1.0, 0.5, 0.5)
-	match p.tier:
-		"S": return Color(1.0, 0.85, 0.2)
-		"A": return Color(0.6, 1.0, 0.7)
-		"B": return Color(0.6, 0.8, 1.0)
-		"Y": return Color(0.9, 0.7, 1.0)
-	return Color(0.85, 0.85, 0.85)
+		return theme.accent_danger
+	return theme.color_for_tier(p.tier)
 
 
 func _on_attempt_buy(player: Player, seller_team: Team, fee: int) -> void:
@@ -5874,7 +5998,7 @@ func _on_attempt_buy(player: Player, seller_team: Team, fee: int) -> void:
 		var mod_info := Label.new()
 		mod_info.text = "💬 Charla previa aplicará: %+.0f%% accept" % (pending_persuasion_modifier * 100)
 		mod_info.add_theme_color_override("font_color",
-			Color(0.5, 0.95, 0.6) if pending_persuasion_modifier > 0 else Color(1.0, 0.5, 0.5))
+			UIThemeManager.get_current().accent_success if pending_persuasion_modifier > 0 else UIThemeManager.get_current().accent_danger)
 		mod_info.add_theme_font_size_override("font_size", 14)
 		box.add_child(mod_info)
 	popup.ok_button_text = "Hacer oferta"
@@ -5973,7 +6097,7 @@ func _show_counter_offer_modal(player: Player, seller_team: Team, original_fee: 
 	if counter_fee > budget:
 		var warn := Label.new()
 		warn.text = "⚠ Excede tu presupuesto (%s)." % TransferMarket._fmt_eur(budget)
-		warn.add_theme_color_override("font_color", Color(1.0, 0.6, 0.4))
+		warn.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 		box.add_child(warn)
 		popup.get_ok_button().disabled = true
 	popup.ok_button_text = "Pagar %s" % TransferMarket._fmt_eur(counter_fee)
@@ -6183,7 +6307,7 @@ func _render_inbox_view() -> void:
 	if user_inbox.is_empty():
 		var empty := Label.new()
 		empty.text = "(sin mensajes)"
-		empty.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+		empty.add_theme_color_override("font_color", UIThemeManager.get_current().text_muted)
 		content_area.add_child(empty)
 		return
 
@@ -6218,7 +6342,7 @@ func _make_inbox_row(m: InboxMessage) -> Control:
 	title.text = m.title if m.title != "" else "(sin título)"
 	title.add_theme_font_size_override("font_size", 14)
 	if not m.read:
-		title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
+		title.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	hdr.add_child(title)
 
 	var spacer := Control.new()
@@ -6229,7 +6353,7 @@ func _make_inbox_row(m: InboxMessage) -> Control:
 	var jornada_text: String = "j%d" % m.jornada_when if m.jornada_when > 0 else "—"
 	when_l.text = "[%d · %s]" % [m.year_when, jornada_text]
 	when_l.add_theme_font_size_override("font_size", 14)
-	when_l.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+	when_l.add_theme_color_override("font_color", UIThemeManager.get_current().text_muted)
 	hdr.add_child(when_l)
 
 	if not m.body.is_empty():
@@ -6237,7 +6361,7 @@ func _make_inbox_row(m: InboxMessage) -> Control:
 		body_l.text = m.body
 		body_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		body_l.add_theme_font_size_override("font_size", 14)
-		body_l.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+		body_l.add_theme_color_override("font_color", UIThemeManager.get_current().tier_c)
 		box.add_child(body_l)
 
 	if not m.read:
@@ -6312,7 +6436,7 @@ func _show_press_conference_modal() -> bool:
 	feedback_label.text = ""
 	feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	feedback_label.add_theme_font_size_override("font_size", 14)
-	feedback_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	feedback_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 
 	var btn_group := ButtonGroup.new()
 	var picked: Array = [-1]
@@ -6527,7 +6651,7 @@ func _render_agents_view() -> void:
 	hint.text = "Ordenados por reputación (★) y número de clientes. Si tienes mala relación con un agente, sus jugadores son más caros/difíciles de fichar para ti."
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.add_theme_font_size_override("font_size", 14)
-	hint.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	hint.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 	content_area.add_child(hint)
 
 	content_area.add_child(HSeparator.new())
@@ -6575,7 +6699,7 @@ func _make_agent_row(a: Agent) -> Control:
 	var personality_l := Label.new()
 	personality_l.text = "[%s]" % a.personality
 	personality_l.add_theme_font_size_override("font_size", 14)
-	personality_l.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	personality_l.add_theme_color_override("font_color", UIThemeManager.get_current().text_secondary)
 	hdr.add_child(personality_l)
 
 	var spacer := Control.new()
@@ -6585,17 +6709,17 @@ func _make_agent_row(a: Agent) -> Control:
 	var clients_l := Label.new()
 	clients_l.text = "%d clientes" % a.client_ids.size()
 	clients_l.add_theme_font_size_override("font_size", 14)
-	clients_l.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
+	clients_l.add_theme_color_override("font_color", UIThemeManager.get_current().accent_warning)
 	hdr.add_child(clients_l)
 
 	# Relación con el club del usuario
 	if user_team_id != "":
 		var rel: int = int(a.relations.get(user_team_id, 0))
 		var rel_l := Label.new()
-		var rel_color: Color = Color(0.7, 0.7, 0.7)
+		var rel_color: Color = UIThemeManager.get_current().text_secondary
 		var rel_text: String = "neutro"
 		if rel >= 30:
-			rel_color = Color(0.4, 0.9, 0.5)
+			rel_color = UIThemeManager.get_current().accent_success
 			rel_text = "amistoso (%+d)" % rel
 		elif rel >= 5:
 			rel_color = Color(0.6, 0.85, 0.6)
@@ -6632,7 +6756,7 @@ func _make_agent_row(a: Agent) -> Control:
 		clients_label.text = "Representa a: " + ", ".join(clients_text)
 		clients_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		clients_label.add_theme_font_size_override("font_size", 14)
-		clients_label.add_theme_color_override("font_color", Color(0.85, 0.85, 0.85))
+		clients_label.add_theme_color_override("font_color", UIThemeManager.get_current().tier_c)
 		box.add_child(clients_label)
 
 	return panel
@@ -6640,10 +6764,10 @@ func _make_agent_row(a: Agent) -> Control:
 
 func _agent_personality_color(personality: String) -> Color:
 	match personality:
-		"tough": return Color(1.0, 0.5, 0.5)
-		"greedy": return Color(1.0, 0.85, 0.4)
-		"flexible": return Color(0.5, 0.9, 0.6)
-		_: return Color(0.85, 0.85, 0.85)
+		"tough": return UIThemeManager.get_current().accent_danger
+		"greedy": return UIThemeManager.get_current().accent_warning
+		"flexible": return UIThemeManager.get_current().accent_success
+		_: return UIThemeManager.get_current().tier_c
 
 
 # --------------------------------------------------------------------------- #
@@ -6753,9 +6877,9 @@ func _on_persuasion_picked(idx: int, options: Array, feedback_label: Label, pick
 		_: pending_persuasion_modifier = 0.0
 	feedback_label.text = String(opt.get("feedback", ""))
 	if tone == "good":
-		feedback_label.add_theme_color_override("font_color", Color(0.5, 0.9, 0.6))
+		feedback_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_success)
 	elif tone == "bad":
-		feedback_label.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
+		feedback_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_danger)
 
 
 # Team talks (TED): detecta momentos de crisis y dispara modal.
@@ -6846,14 +6970,14 @@ func _show_team_talk_modal(template: Dictionary) -> void:
 	note.text = "Estás en un momento difícil. Tienes una oportunidad. Elige tus palabras: una de las opciones es la más sincera y humana — sin gritar ni exigir, hablando de tú a tú."
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.add_theme_font_size_override("font_size", 14)
-	note.add_theme_color_override("font_color", Color(0.6, 0.95, 0.7))
+	note.add_theme_color_override("font_color", UIThemeManager.get_current().tier_a)
 	box.add_child(note)
 
 	var intro_l := Label.new()
 	intro_l.text = String(template.get("intro", ""))
 	intro_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	intro_l.add_theme_font_size_override("font_size", 14)
-	intro_l.add_theme_color_override("font_color", Color(0.85, 0.85, 1.0))
+	intro_l.add_theme_color_override("font_color", UIThemeManager.get_current().tier_b)
 	box.add_child(intro_l)
 
 	# Hint sutil: describe el lenguaje corporal de un líder de la plantilla.
@@ -6864,7 +6988,7 @@ func _show_team_talk_modal(template: Dictionary) -> void:
 		hint_l.text = "✦ " + hint_text
 		hint_l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		hint_l.add_theme_font_size_override("font_size", 14)
-		hint_l.add_theme_color_override("font_color", Color(0.95, 0.85, 0.55))
+		hint_l.add_theme_color_override("font_color", UIThemeManager.get_current().tier_s)
 		box.add_child(hint_l)
 
 	box.add_child(HSeparator.new())
@@ -6971,9 +7095,9 @@ func _on_team_talk_picked(idx: int, options: Array, feedback_label: Label, picke
 			String(opt.get("feedback", "")), morale_delta, form_bonus])
 	feedback_label.text = String(opt.get("feedback", ""))
 	if tone == "good":
-		feedback_label.add_theme_color_override("font_color", Color(0.5, 0.95, 0.6))
+		feedback_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_success)
 	elif tone == "bad":
-		feedback_label.add_theme_color_override("font_color", Color(1.0, 0.5, 0.5))
+		feedback_label.add_theme_color_override("font_color", UIThemeManager.get_current().accent_danger)
 
 
 # Asigna personality a los jugadores que la tienen vacía (carga inicial).
